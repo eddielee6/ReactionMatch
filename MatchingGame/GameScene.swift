@@ -153,6 +153,7 @@ class GameScene: SKScene {
             newY = screenCentre.y - maxMove
         }
         
+        player.removeActionForKey("Return")
         player.position = CGPointMake(newX, newY)
     }
     
@@ -191,26 +192,59 @@ class GameScene: SKScene {
         for target in targets {
             if player.intersectsNode(target) {
                 if player.fillColor == target.fillColor {
+                    
+                    let resetTime = 0.25
+                    
                     print("win")
                     score += 1
+                    updateScore()
+                    
+                    self.returnPlayer(resetTime)
+
+                    
+                    for loosingTarget in self.getLoosingTargets() {
+                        loosingTarget.runAction(SKAction.scaleBy(0, duration: resetTime))
+                    }
+             
+                    target.runAction(SKAction.sequence([
+                        SKAction.scaleBy(2, duration: resetTime),
+                        SKAction.runBlock({
+                            self.newPuzzle()
+                        })
+                    ]))
+
                 } else {
                     print("loose")
                     score = 0
+                    self.newPuzzle()
+                    self.updateScore()
+                    self.returnPlayer(0)
                 }
                 
-                updateScore()
-                newPuzzle()
-                returnPlayer(0.1)
+                
+                return
             }
         }
         
-        returnPlayer(0.5)
+        returnPlayer(0.15)
     }
     
     func returnPlayer(withDuration: Double) {
         player.runAction(
-            SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(withDuration))
+            SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(withDuration)),
+            withKey: "Return"
         )
+    }
+    
+    func getLoosingTargets() -> Array<SKShapeNode> {
+        var loosingTargets = Array<SKShapeNode>()
+        let targets = getNodes(SpriteType.Target) as! Array<SKShapeNode>
+        for target in targets {
+            if target.fillColor == SKColor.greenColor() {
+                loosingTargets.append(target)
+            }
+        }
+        return loosingTargets
     }
     
     func updateScore() {
