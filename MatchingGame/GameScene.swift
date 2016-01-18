@@ -54,6 +54,7 @@ class GameScene: SKScene {
         player.physicsBody?.categoryBitMask = SpriteType.Player
         player.physicsBody?.contactTestBitMask = SpriteType.Target
         player.physicsBody?.collisionBitMask = SpriteType.None
+        player.physicsBody?.usesPreciseCollisionDetection = true
         player.zPosition = 10
         addChild(player)
         
@@ -126,29 +127,32 @@ class GameScene: SKScene {
         addChild(leftTarget)
     }
     
-//    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        guard let touch = touches.first else {
-//            return
-//        }
-//
-//        let touchLocation = touch.locationInNode(self)
-//        if let touchTarget = physicsWorld.bodyAtPoint(touchLocation) {
-//            if touchTarget.node!.physicsBody?.categoryBitMask == SpriteType.Player {
-//                isFingerOnPlayer = true
-//            }
-//        }
-//    }
-    
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         guard let touch = touches.first else {
             return
         }
         
+        let maxMove: CGFloat = 120
+        
         let touchLocation = touch.locationInNode(self)
         let previousLocation = touch.previousLocationInNode(self)
         
-        let newX = player.position.x + (touchLocation.x - previousLocation.x)
-        let newY = player.position.y + (touchLocation.y - previousLocation.y)
+        let screenCentre = CGPoint(x: size.width/2, y: (size.height/2))
+        
+        var newX = player.position.x + (touchLocation.x - previousLocation.x)
+        if newX > screenCentre.x + maxMove {
+            newX = screenCentre.x + maxMove
+        } else if newX < screenCentre.x - maxMove {
+            newX = screenCentre.x - maxMove
+        }
+        
+        var newY = player.position.y + (touchLocation.y - previousLocation.y)
+        if newY > screenCentre.y + maxMove {
+            newY = screenCentre.y + maxMove
+        } else if newY < screenCentre.y - maxMove {
+            newY = screenCentre.y - maxMove
+        }
+        
         player.position = CGPointMake(newX, newY)
     }
     
@@ -183,29 +187,24 @@ class GameScene: SKScene {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        guard let touch = touches.first else {
-            return
-        }
-        
-        let touchLocation = touch.locationInNode(self)
-        
-        let touchedNodes = nodesAtPoint(touchLocation)
-        
-        if let targetNode = getNode(SpriteType.Target, fromNodes: touchedNodes) as? SKShapeNode {
-            if player.fillColor == targetNode.fillColor {
-                print("win")
-                score += 1
-            } else {
-                print("loose")
-                score = 0
+        let targets = getNodes(SpriteType.Target) as! Array<SKShapeNode>
+        for target in targets {
+            if player.intersectsNode(target) {
+                if player.fillColor == target.fillColor {
+                    print("win")
+                    score += 1
+                } else {
+                    print("loose")
+                    score = 0
+                }
+                
+                updateScore()
+                newPuzzle()
+                returnPlayer(0.1)
             }
-            
-            updateScore()
-            newPuzzle()
-            returnPlayer(0.1)
-        } else {
-            returnPlayer(0.5)
         }
+        
+        returnPlayer(0.5)
     }
     
     func returnPlayer(withDuration: Double) {
