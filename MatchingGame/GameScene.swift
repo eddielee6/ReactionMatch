@@ -8,12 +8,6 @@
 
 import SpriteKit
 
-struct SpriteType {
-    static let None: UInt32 = 0
-    static let Player: UInt32 = 1
-    static let Target: UInt32 = 2
-}
-
 enum TargetType: UInt32 {
     case Top
     case Right
@@ -34,29 +28,21 @@ enum TargetType: UInt32 {
 
 class GameScene: SKScene {
     
-    let shapeSize = CGSize(width: 30, height: 30)
-    
     let scoreLabel = SKLabelNode()
     let timeLabel = SKLabelNode()
     var player = SKShapeNode()
     var score: Int = 0
     var timeRemaining: Double = 0
     
+    let possibleColours = [SKColor.redColor(), SKColor.greenColor(), SKColor.blueColor(), SKColor.cyanColor(), SKColor.yellowColor(), SKColor.magentaColor(), SKColor.orangeColor(), SKColor.purpleColor()]
+    
     override func didMoveToView(view: SKView) {
-        // No gravity
-        physicsWorld.gravity = CGVectorMake(0, 0)
-        
         backgroundColor = SKColor.whiteColor()
         
-        player = SKShapeNode(rectOfSize: shapeSize)
+        player = SKShapeNode(rectOfSize: CGSize(width: 30, height: 30))
         player.fillColor = SKColor.redColor()
         player.position = CGPoint(x: size.width/2, y: size.height/2)
-        player.physicsBody = SKPhysicsBody(rectangleOfSize: shapeSize)
-        player.physicsBody?.dynamic = true
-        player.physicsBody?.categoryBitMask = SpriteType.Player
-        player.physicsBody?.contactTestBitMask = SpriteType.Target
-        player.physicsBody?.collisionBitMask = SpriteType.None
-        player.physicsBody?.usesPreciseCollisionDetection = true
+        player.name = "player"
         player.zPosition = 10
         addChild(player)
         
@@ -82,21 +68,36 @@ class GameScene: SKScene {
         newPuzzle()
     }
     
-    func createTarget() -> SKShapeNode {
-        let target = SKShapeNode(rectOfSize: shapeSize)
-        target.physicsBody = SKPhysicsBody(rectangleOfSize: shapeSize)
-        target.fillColor = SKColor.greenColor()
-        target.physicsBody?.dynamic = true
-        target.physicsBody?.categoryBitMask = SpriteType.Target
-        target.physicsBody?.contactTestBitMask = SpriteType.Player
-        target.physicsBody?.collisionBitMask = SpriteType.None
+    func createTarget(withColour: SKColor) -> SKShapeNode {
+        let target = SKShapeNode(rectOfSize: CGSize(width: 35, height: 35))
+        target.fillColor = withColour
+        target.name = "target"
         target.zPosition = 9
         return target
     }
     
+    func recolorPlayer(withColour: SKColor) {
+        player.fillColor = withColour
+    }
+    
+    func getRandomColour(notColour: SKColor? = nil) -> SKColor {
+        let colourIndex = Int(arc4random_uniform(UInt32(possibleColours.count)))
+        let selectedColour = possibleColours[colourIndex]
+        
+        if selectedColour == notColour {
+            return getRandomColour(notColour)
+        }
+        
+        return selectedColour
+    }
+    
     func newPuzzle() {
         removeTargets()
-        addTargets()
+        
+        let winningColour = getRandomColour()
+        let otherColour = getRandomColour(winningColour)
+        recolorPlayer(winningColour)
+        addTargets(winningColour, otherColour: otherColour)
         startTimer()
     }
     
@@ -134,40 +135,40 @@ class GameScene: SKScene {
     }
     
     func removeTargets() {
-        let targets = getNodes(SpriteType.Target)
+        let targets = getNodes("target")
         removeChildrenInArray(targets)
     }
     
-    func addTargets() {
+    func addTargets(winningColour: SKColor, otherColour: SKColor) {
         let targetDistance: CGFloat = 100
         
         let winningTarget = TargetType.randomType()
         
-        let topTarget = createTarget()
+        let topTarget = createTarget(otherColour)
         topTarget.position = CGPoint(x: size.width/2, y: (size.height/2) + targetDistance)
         if (winningTarget == TargetType.Top) {
-            topTarget.fillColor = SKColor.redColor()
+            topTarget.fillColor = winningColour
         }
         addChild(topTarget)
         
-        let rightTarget = createTarget()
+        let rightTarget = createTarget(otherColour)
         rightTarget.position = CGPoint(x: (size.width/2) + targetDistance, y: size.height/2)
         if (winningTarget == TargetType.Right) {
-            rightTarget.fillColor = SKColor.redColor()
+            rightTarget.fillColor = winningColour
         }
         addChild(rightTarget)
         
-        let bottomTarget = createTarget()
+        let bottomTarget = createTarget(otherColour)
         bottomTarget.position = CGPoint(x: size.width/2, y: (size.height/2) - targetDistance)
         if (winningTarget == TargetType.Bottom) {
-            bottomTarget.fillColor = SKColor.redColor()
+            bottomTarget.fillColor = winningColour
         }
         addChild(bottomTarget)
         
-        let leftTarget = createTarget()
+        let leftTarget = createTarget(otherColour)
         leftTarget.position = CGPoint(x: (size.width/2) - targetDistance, y: size.height/2)
         if (winningTarget == TargetType.Left) {
-            leftTarget.fillColor = SKColor.redColor()
+            leftTarget.fillColor = winningColour
         }
         addChild(leftTarget)
     }
@@ -202,18 +203,17 @@ class GameScene: SKScene {
         player.position = CGPointMake(newX, newY)
     }
     
-    func getNodes(ofType: UInt32) -> Array<SKNode> {
+    func getNodes(ofType: String) -> Array<SKNode> {
         return children.filter({
-            return $0.physicsBody?.categoryBitMask == ofType
+            return $0.name == ofType
         })
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let targets = getNodes(SpriteType.Target) as! Array<SKShapeNode>
+        let targets = getNodes("target") as! Array<SKShapeNode>
         for target in targets {
             if player.intersectsNode(target) {
                 if player.fillColor == target.fillColor {
-                    
 
                     let pointsGained = Int(ceil(timeRemaining / 0.1))
                     
@@ -260,7 +260,7 @@ class GameScene: SKScene {
     }
     
     func gameOver() {
-        let transition = SKTransition.fadeWithColor(UIColor.blackColor(), duration: 0.5)
+        let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
         let gameOverScene = GameOverScene(size: self.size)
         gameOverScene.gameScore = score
         self.view?.presentScene(gameOverScene, transition: transition)
@@ -274,7 +274,7 @@ class GameScene: SKScene {
     }
     
     func getLoosingTargets() -> Array<SKShapeNode> {
-        let targets = getNodes(SpriteType.Target) as! Array<SKShapeNode>
+        let targets = getNodes("target") as! Array<SKShapeNode>
         return targets.filter({
             return $0.fillColor == SKColor.greenColor()
         })
@@ -283,5 +283,4 @@ class GameScene: SKScene {
     func updateScore() {
         scoreLabel.text = "Score: \(score)"
     }
-    
 }

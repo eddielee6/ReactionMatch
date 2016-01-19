@@ -33,18 +33,24 @@ class GameOverScene: SKScene {
         scoreLabel.position = CGPoint(x: size.width / 2, y: size.height - 80)
         addChild(scoreLabel)
         
-        let playAgainLabel = SKLabelNode(fontNamed: "SanFrancisco")
-        playAgainLabel.text = "Tap to Play Again"
-        playAgainLabel.fontSize = 35
-        playAgainLabel.verticalAlignmentMode = .Center
-        playAgainLabel.fontColor = SKColor.whiteColor()
-        playAgainLabel.position = CGPoint(x: size.width/2, y: size.height/2)
-        addChild(playAgainLabel)
-        
-        let growAction = SKAction.scaleBy(1.2, duration: 0.4)
-        let shrinkAction = SKAction.scaleBy(0.8333, duration: 0.4)
-        let growAndShrink = SKAction.sequence([growAction, shrinkAction])
-        playAgainLabel.runAction(SKAction.repeatActionForever(growAndShrink))
+        runAction(SKAction.sequence([
+            SKAction.waitForDuration(NSTimeInterval(0.3)),
+            SKAction.runBlock({
+                let playAgainLabel = SKLabelNode(fontNamed: "SanFrancisco")
+                playAgainLabel.text = "Tap to Play Again"
+                playAgainLabel.fontSize = 35
+                playAgainLabel.verticalAlignmentMode = .Center
+                playAgainLabel.fontColor = SKColor.whiteColor()
+                playAgainLabel.position = CGPoint(x: self.size.width/2, y: self.size.height/2)
+                self.addChild(playAgainLabel)
+                
+                let growAction = SKAction.scaleBy(1.2, duration: 0.4)
+                let shrinkAction = SKAction.scaleBy(0.8333, duration: 0.4)
+                let growAndShrink = SKAction.sequence([growAction, shrinkAction])
+                playAgainLabel.runAction(SKAction.repeatActionForever(growAndShrink))
+
+            })
+        ]))
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
