@@ -37,8 +37,10 @@ class GameScene: SKScene {
     let shapeSize = CGSize(width: 30, height: 30)
     
     let scoreLabel = SKLabelNode(fontNamed: "SanFrancisco")
+    let timeLabel = SKLabelNode(fontNamed: "SanFrancisco")
     var player = SKShapeNode()
     var score: Int = 0
+    var timeRemaining: Double = 0
     
     override func didMoveToView(view: SKView) {
         // No gravity
@@ -59,13 +61,22 @@ class GameScene: SKScene {
         addChild(player)
         
         // Score
-        scoreLabel.text = "Score: 0"
+        scoreLabel.text = "Score: \(score)"
         scoreLabel.horizontalAlignmentMode = .Left
         scoreLabel.fontSize = 25
         scoreLabel.fontColor = SKColor.blackColor()
         scoreLabel.position = CGPoint(x: 10, y: size.height - 35)
         scoreLabel.zPosition = 10
         addChild(scoreLabel)
+        
+        // Timer
+        timeLabel.text = "Time Remaining: \(String(format: "%.1f", timeRemaining))"
+        timeLabel.horizontalAlignmentMode = .Left
+        timeLabel.fontSize = 25
+        timeLabel.fontColor = SKColor.blackColor()
+        timeLabel.position = CGPoint(x: 10, y: size.height - 65)
+        timeLabel.zPosition = 10
+        addChild(timeLabel)
 
         
         newPuzzle()
@@ -86,6 +97,26 @@ class GameScene: SKScene {
     func newPuzzle() {
         removeTargets()
         addTargets()
+        resetTimer()
+    }
+    
+    func resetTimer() {
+        timeRemaining = 3
+        
+        let timerInterval = 0.1
+        runAction(SKAction.repeatActionForever(SKAction.sequence([
+            SKAction.waitForDuration(timerInterval),
+            SKAction.runBlock({
+                if (self.timeRemaining <= 0) {
+                    print("you loose")
+                    self.removeActionForKey("GameTimer")
+                } else {
+                    self.timeRemaining -= timerInterval
+                }
+                
+                self.updateTimer()
+            })
+        ])), withKey: "GameTimer")
     }
     
     func removeTargets() {
@@ -249,6 +280,10 @@ class GameScene: SKScene {
     
     func updateScore() {
         scoreLabel.text = "Score: \(score)"
+    }
+    
+    func updateTimer() {
+        timeLabel.text = "Time Remaining: \(String(format: "%.1f", timeRemaining))"
     }
     
 }
