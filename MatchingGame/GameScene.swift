@@ -97,26 +97,35 @@ class GameScene: SKScene {
     func newPuzzle() {
         removeTargets()
         addTargets()
-        resetTimer()
+        startTimer()
     }
     
-    func resetTimer() {
-        timeRemaining = 3
+    func stopTimer() {
+        removeActionForKey("GameTimer")
+        self.updateTimer(0)
+    }
+    
+    func startTimer() {
+        self.updateTimer(3)
         
         let timerInterval = 0.1
         runAction(SKAction.repeatActionForever(SKAction.sequence([
             SKAction.waitForDuration(timerInterval),
             SKAction.runBlock({
                 if (self.timeRemaining <= 0) {
-                    print("you loose")
+                    print("time expired")
+                    self.updateTimer(0)
                     self.removeActionForKey("GameTimer")
                 } else {
-                    self.timeRemaining -= timerInterval
+                    self.updateTimer(self.timeRemaining - timerInterval)
                 }
-                
-                self.updateTimer()
             })
         ])), withKey: "GameTimer")
+    }
+    
+    func updateTimer(timeRemaining: Double) {
+        self.timeRemaining = timeRemaining
+        self.timeLabel.text = "Time Remaining: \(String(format: "%.1f", timeRemaining))"
     }
     
     func removeTargets() {
@@ -189,33 +198,9 @@ class GameScene: SKScene {
     }
     
     func getNodes(ofType: UInt32) -> Array<SKNode> {
-        return getNodes(ofType, fromNodes: children)
-    }
-    
-    func getNodes(ofType: UInt32, fromNodes: Array<SKNode>) -> Array<SKNode> {
-        var matchedNodes = Array<SKNode>()
-        
-        for node in fromNodes {
-            if (node.physicsBody?.categoryBitMask == ofType) {
-                matchedNodes.append(node)
-            }
-        }
-        
-        return matchedNodes
-    }
-    
-    func getNode(ofType: UInt32) -> SKNode? {
-        return getNode(ofType, fromNodes: children)
-    }
-    
-    func getNode(ofType: UInt32, fromNodes: Array<SKNode>) -> SKNode? {
-        for node in fromNodes {
-            if (node.physicsBody?.categoryBitMask == ofType) {
-                return node
-            }
-        }
-        
-        return nil
+        return children.filter({
+            return $0.physicsBody?.categoryBitMask == ofType
+        })
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -246,10 +231,32 @@ class GameScene: SKScene {
 
                 } else {
                     print("loose")
-                    score = 0
-                    self.newPuzzle()
-                    self.updateScore()
-                    self.returnPlayer(0)
+                    
+                    stopTimer()
+                    
+                    
+                    
+                    let exitAnimationTime = 1.0
+                    for loosingTarget in self.getLoosingTargets() {
+                        loosingTarget.runAction(SKAction.rotateByAngle(5, duration: exitAnimationTime))
+                        loosingTarget.runAction(SKAction.scaleBy(10, duration: exitAnimationTime))
+                    }
+                    
+                    runAction(SKAction.repeatActionForever(SKAction.sequence([
+                        SKAction.waitForDuration(exitAnimationTime),
+                        SKAction.runBlock({
+                            
+                        })
+                    ])))
+                    
+                    
+                    //score = 0
+                    
+                    
+                    
+                    //self.newPuzzle()
+                    //self.updateScore()
+                    //self.returnPlayer(0)
                 }
                 
                 
@@ -268,22 +275,14 @@ class GameScene: SKScene {
     }
     
     func getLoosingTargets() -> Array<SKShapeNode> {
-        var loosingTargets = Array<SKShapeNode>()
         let targets = getNodes(SpriteType.Target) as! Array<SKShapeNode>
-        for target in targets {
-            if target.fillColor == SKColor.greenColor() {
-                loosingTargets.append(target)
-            }
-        }
-        return loosingTargets
+        return targets.filter({
+            return $0.fillColor == SKColor.greenColor()
+        })
     }
     
     func updateScore() {
         scoreLabel.text = "Score: \(score)"
-    }
-    
-    func updateTimer() {
-        timeLabel.text = "Time Remaining: \(String(format: "%.1f", timeRemaining))"
     }
     
 }
