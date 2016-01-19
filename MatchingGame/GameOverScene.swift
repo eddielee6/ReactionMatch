@@ -35,7 +35,7 @@ class GameOverScene: SKScene {
         
         let playAgainLabel = SKLabelNode(fontNamed: "SanFrancisco")
         playAgainLabel.text = "Tap to Play Again"
-        playAgainLabel.fontSize = 50
+        playAgainLabel.fontSize = 35
         playAgainLabel.verticalAlignmentMode = .Center
         playAgainLabel.fontColor = SKColor.whiteColor()
         playAgainLabel.position = CGPoint(x: size.width/2, y: size.height/2)

@@ -36,8 +36,8 @@ class GameScene: SKScene {
     
     let shapeSize = CGSize(width: 30, height: 30)
     
-    let scoreLabel = SKLabelNode(fontNamed: "SanFrancisco")
-    let timeLabel = SKLabelNode(fontNamed: "SanFrancisco")
+    let scoreLabel = SKLabelNode()
+    let timeLabel = SKLabelNode()
     var player = SKShapeNode()
     var score: Int = 0
     var timeRemaining: Double = 0
@@ -61,7 +61,7 @@ class GameScene: SKScene {
         addChild(player)
         
         // Score
-        scoreLabel.text = "Score: \(score)"
+        scoreLabel.text = "Score: 0"
         scoreLabel.horizontalAlignmentMode = .Left
         scoreLabel.fontSize = 25
         scoreLabel.fontColor = SKColor.blackColor()
@@ -70,7 +70,7 @@ class GameScene: SKScene {
         addChild(scoreLabel)
         
         // Timer
-        timeLabel.text = "Time Remaining: \(String(format: "%.1f", timeRemaining))"
+        timeLabel.text = "Remaining: 10"
         timeLabel.horizontalAlignmentMode = .Left
         timeLabel.fontSize = 25
         timeLabel.fontColor = SKColor.blackColor()
@@ -102,11 +102,11 @@ class GameScene: SKScene {
     
     func stopTimer() {
         removeActionForKey("GameTimer")
-        self.updateTimer(0)
+        self.updateTimer(1)
     }
     
     func startTimer() {
-        self.updateTimer(3)
+        self.updateTimer(1)
         
         let timerInterval = 0.1
         runAction(SKAction.repeatActionForever(SKAction.sequence([
@@ -125,7 +125,12 @@ class GameScene: SKScene {
     
     func updateTimer(timeRemaining: Double) {
         self.timeRemaining = timeRemaining
-        self.timeLabel.text = "Time Remaining: \(String(format: "%.1f", timeRemaining))"
+        
+        if (timeRemaining <= 0) {
+            self.timeLabel.text = "Remaining: 0"
+        } else {
+            self.timeLabel.text = "Remaining: \(Int(ceil(timeRemaining / 0.1)))"
+        }
     }
     
     func removeTargets() {
@@ -209,11 +214,15 @@ class GameScene: SKScene {
             if player.intersectsNode(target) {
                 if player.fillColor == target.fillColor {
                     
-                    let resetTime = 0.25
+
+                    let pointsGained = Int(ceil(timeRemaining / 0.1))
                     
-                    print("win")
-                    score += 1
+                    stopTimer()
+                    
+                    score += pointsGained
                     updateScore()
+                    
+                    let resetTime = 0.25
                     
                     self.returnPlayer(resetTime)
 
@@ -223,44 +232,25 @@ class GameScene: SKScene {
                     }
              
                     target.runAction(SKAction.sequence([
-                        SKAction.scaleBy(2, duration: resetTime),
+                        SKAction.group([
+                            SKAction.scaleBy(2, duration: resetTime),
+                            SKAction.runBlock({
+                                let pointsLabel = SKLabelNode(fontNamed: "SanFrancisco")
+                                pointsLabel.verticalAlignmentMode = .Center
+                                pointsLabel.horizontalAlignmentMode = .Center
+                                pointsLabel.fontSize = 20
+                                pointsLabel.text = "\(pointsGained)"
+                                target.addChild(pointsLabel)
+                            })
+                        ]),
                         SKAction.runBlock({
                             self.newPuzzle()
                         })
                     ]))
 
                 } else {
-                    print("loose")
-                    
                     gameOver()
-                    
-//                    stopTimer()
-//                    
-//                    
-//                    
-//                    let exitAnimationTime = 1.0
-//                    for loosingTarget in self.getLoosingTargets() {
-//                        loosingTarget.runAction(SKAction.rotateByAngle(5, duration: exitAnimationTime))
-//                        loosingTarget.runAction(SKAction.scaleBy(10, duration: exitAnimationTime))
-//                    }
-//                    
-//                    runAction(SKAction.repeatActionForever(SKAction.sequence([
-//                        SKAction.waitForDuration(exitAnimationTime),
-//                        SKAction.runBlock({
-//                            
-//                        })
-//                    ])))
-                    
-                    
-                    //score = 0
-                    
-                    
-                    
-                    //self.newPuzzle()
-                    //self.updateScore()
-                    //self.returnPlayer(0)
                 }
-                
                 
                 return
             }
