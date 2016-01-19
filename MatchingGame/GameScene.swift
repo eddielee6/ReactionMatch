@@ -114,8 +114,8 @@ class GameScene: SKScene {
             SKAction.runBlock({
                 if (self.timeRemaining <= 0) {
                     print("time expired")
-                    self.updateTimer(0)
                     self.removeActionForKey("GameTimer")
+                    self.gameOver()
                 } else {
                     self.updateTimer(self.timeRemaining - timerInterval)
                 }
@@ -232,22 +232,24 @@ class GameScene: SKScene {
                 } else {
                     print("loose")
                     
-                    stopTimer()
+                    gameOver()
                     
-                    
-                    
-                    let exitAnimationTime = 1.0
-                    for loosingTarget in self.getLoosingTargets() {
-                        loosingTarget.runAction(SKAction.rotateByAngle(5, duration: exitAnimationTime))
-                        loosingTarget.runAction(SKAction.scaleBy(10, duration: exitAnimationTime))
-                    }
-                    
-                    runAction(SKAction.repeatActionForever(SKAction.sequence([
-                        SKAction.waitForDuration(exitAnimationTime),
-                        SKAction.runBlock({
-                            
-                        })
-                    ])))
+//                    stopTimer()
+//                    
+//                    
+//                    
+//                    let exitAnimationTime = 1.0
+//                    for loosingTarget in self.getLoosingTargets() {
+//                        loosingTarget.runAction(SKAction.rotateByAngle(5, duration: exitAnimationTime))
+//                        loosingTarget.runAction(SKAction.scaleBy(10, duration: exitAnimationTime))
+//                    }
+//                    
+//                    runAction(SKAction.repeatActionForever(SKAction.sequence([
+//                        SKAction.waitForDuration(exitAnimationTime),
+//                        SKAction.runBlock({
+//                            
+//                        })
+//                    ])))
                     
                     
                     //score = 0
@@ -265,6 +267,13 @@ class GameScene: SKScene {
         }
         
         returnPlayer(0.15)
+    }
+    
+    func gameOver() {
+        let transition = SKTransition.fadeWithColor(UIColor.blackColor(), duration: 0.5)
+        let gameOverScene = GameOverScene(size: self.size)
+        gameOverScene.gameScore = score
+        self.view?.presentScene(gameOverScene, transition: transition)
     }
     
     func returnPlayer(withDuration: Double) {
