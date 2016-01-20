@@ -225,11 +225,10 @@ class GameScene: SKScene {
                     let resetTime = 0.25
                     
                     self.returnPlayer(resetTime)
-
                     
-                    for loosingTarget in self.getLoosingTargets() {
-                        loosingTarget.runAction(SKAction.scaleBy(0, duration: resetTime))
-                    }
+                    self.getLoosingTargets().forEach({
+                        $0.runAction(SKAction.scaleBy(0, duration: resetTime))
+                    })
              
                     target.runAction(SKAction.sequence([
                         SKAction.group([
@@ -276,7 +275,7 @@ class GameScene: SKScene {
     func getLoosingTargets() -> Array<SKShapeNode> {
         let targets = getNodes("target") as! Array<SKShapeNode>
         return targets.filter({
-            return $0.fillColor == SKColor.greenColor()
+            return $0.fillColor != player.fillColor
         })
     }
     
