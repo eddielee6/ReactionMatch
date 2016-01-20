@@ -17,7 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2C104D211C4D6BA00097E0AD /* MatchingGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MatchingGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2C104D211C4D6BA00097E0AD /* Reaction Match.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Reaction Match.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C104D241C4D6BA10097E0AD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2C104D281C4D6BA10097E0AD /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		2C104D2A1C4D6BA10097E0AD /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
@@ -50,7 +50,7 @@
 		2C104D221C4D6BA00097E0AD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2C104D211C4D6BA00097E0AD /* MatchingGame.app */,
+				2C104D211C4D6BA00097E0AD /* Reaction Match.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -73,9 +73,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2C104D201C4D6BA00097E0AD /* MatchingGame */ = {
+		2C104D201C4D6BA00097E0AD /* Reaction Match */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2C104D371C4D6BA10097E0AD /* Build configuration list for PBXNativeTarget "MatchingGame" */;
+			buildConfigurationList = 2C104D371C4D6BA10097E0AD /* Build configuration list for PBXNativeTarget "Reaction Match" */;
 			buildPhases = (
 				2C104D1D1C4D6BA00097E0AD /* Sources */,
 				2C104D1E1C4D6BA00097E0AD /* Frameworks */,
@@ -85,9 +85,9 @@
 			);
 			dependencies = (
 			);
-			name = MatchingGame;
+			name = "Reaction Match";
 			productName = MatchingGame;
-			productReference = 2C104D211C4D6BA00097E0AD /* MatchingGame.app */;
+			productReference = 2C104D211C4D6BA00097E0AD /* Reaction Match.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -118,7 +118,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2C104D201C4D6BA00097E0AD /* MatchingGame */,
+				2C104D201C4D6BA00097E0AD /* Reaction Match */,
 			);
 		};
 /* End PBXProject section */
@@ -287,7 +287,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2C104D371C4D6BA10097E0AD /* Build configuration list for PBXNativeTarget "MatchingGame" */ = {
+		2C104D371C4D6BA10097E0AD /* Build configuration list for PBXNativeTarget "Reaction Match" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2C104D381C4D6BA10097E0AD /* Debug */,

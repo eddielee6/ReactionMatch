@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2C104D201C4D6BA00097E0AD"
-               BuildableName = "MatchingGame.app"
-               BlueprintName = "MatchingGame"
+               BuildableName = "Reaction Match.app"
+               BlueprintName = "Reaction Match"
                ReferencedContainer = "container:MatchingGame.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,8 +33,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2C104D201C4D6BA00097E0AD"
-            BuildableName = "MatchingGame.app"
-            BlueprintName = "MatchingGame"
+            BuildableName = "Reaction Match.app"
+            BlueprintName = "Reaction Match"
             ReferencedContainer = "container:MatchingGame.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -56,8 +56,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2C104D201C4D6BA00097E0AD"
-            BuildableName = "MatchingGame.app"
-            BlueprintName = "MatchingGame"
+            BuildableName = "Reaction Match.app"
+            BlueprintName = "Reaction Match"
             ReferencedContainer = "container:MatchingGame.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -75,8 +75,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2C104D201C4D6BA00097E0AD"
-            BuildableName = "MatchingGame.app"
-            BlueprintName = "MatchingGame"
+            BuildableName = "Reaction Match.app"
+            BlueprintName = "Reaction Match"
             ReferencedContainer = "container:MatchingGame.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
