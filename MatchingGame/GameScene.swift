@@ -39,7 +39,7 @@ class GameScene: SKScene {
     override func didMoveToView(view: SKView) {
         backgroundColor = SKColor.whiteColor()
         
-        player = SKShapeNode(rectOfSize: CGSize(width: 30, height: 30))
+        player = SKShapeNode(rectOfSize: CGSize(width: 30, height: 30), cornerRadius: 5.0)
         player.fillColor = SKColor.redColor()
         player.position = CGPoint(x: size.width/2, y: size.height/2)
         player.name = "player"
@@ -132,7 +132,7 @@ class GameScene: SKScene {
     }
     
     func createTarget(withColour: SKColor) -> SKShapeNode {
-        let target = SKShapeNode(rectOfSize: CGSize(width: 35, height: 35))
+        let target = SKShapeNode(rectOfSize: CGSize(width: 35, height: 35), cornerRadius: 5.0)
         target.fillColor = withColour
         target.name = "target"
         target.alpha = 0
