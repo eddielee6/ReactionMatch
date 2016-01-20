@@ -68,18 +68,6 @@ class GameScene: SKScene {
         newPuzzle()
     }
     
-    func createTarget(withColour: SKColor) -> SKShapeNode {
-        let target = SKShapeNode(rectOfSize: CGSize(width: 35, height: 35))
-        target.fillColor = withColour
-        target.name = "target"
-        target.zPosition = 9
-        return target
-    }
-    
-    func recolorPlayer(withColour: SKColor) {
-        player.fillColor = withColour
-    }
-    
     func getRandomColour(notColour: SKColor? = nil) -> SKColor {
         let colourIndex = Int(arc4random_uniform(UInt32(possibleColours.count)))
         let selectedColour = possibleColours[colourIndex]
@@ -89,6 +77,10 @@ class GameScene: SKScene {
         }
         
         return selectedColour
+    }
+    
+    func recolorPlayer(withColour: SKColor) {
+        player.fillColor = withColour
     }
     
     func newPuzzle() {
@@ -139,8 +131,19 @@ class GameScene: SKScene {
         removeChildrenInArray(targets)
     }
     
+    func createTarget(withColour: SKColor) -> SKShapeNode {
+        let target = SKShapeNode(rectOfSize: CGSize(width: 35, height: 35))
+        target.fillColor = withColour
+        target.name = "target"
+        target.alpha = 0
+        target.zPosition = 9
+        return target
+    }
+    
     func addTargets(winningColour: SKColor, otherColour: SKColor) {
         let targetDistance: CGFloat = 100
+        
+        let showAction = SKAction.fadeInWithDuration(0.25)
         
         let winningTarget = TargetType.randomType()
         
@@ -150,6 +153,7 @@ class GameScene: SKScene {
             topTarget.fillColor = winningColour
         }
         addChild(topTarget)
+        topTarget.runAction(showAction)
         
         let rightTarget = createTarget(otherColour)
         rightTarget.position = CGPoint(x: (size.width/2) + targetDistance, y: size.height/2)
@@ -157,6 +161,7 @@ class GameScene: SKScene {
             rightTarget.fillColor = winningColour
         }
         addChild(rightTarget)
+        rightTarget.runAction(showAction)
         
         let bottomTarget = createTarget(otherColour)
         bottomTarget.position = CGPoint(x: size.width/2, y: (size.height/2) - targetDistance)
@@ -164,6 +169,7 @@ class GameScene: SKScene {
             bottomTarget.fillColor = winningColour
         }
         addChild(bottomTarget)
+        bottomTarget.runAction(showAction)
         
         let leftTarget = createTarget(otherColour)
         leftTarget.position = CGPoint(x: (size.width/2) - targetDistance, y: size.height/2)
@@ -171,6 +177,8 @@ class GameScene: SKScene {
             leftTarget.fillColor = winningColour
         }
         addChild(leftTarget)
+        leftTarget.runAction(showAction)
+        
     }
     
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -211,51 +219,59 @@ class GameScene: SKScene {
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         let targets = getNodes("target") as! Array<SKShapeNode>
-        for target in targets {
-            if player.intersectsNode(target) {
-                if player.fillColor == target.fillColor {
-
-                    let pointsGained = Int(ceil(timeRemaining / 0.1))
-                    
-                    stopTimer()
-                    
-                    score += pointsGained
-                    updateScore()
-                    
-                    let resetTime = 0.25
-                    
-                    self.returnPlayer(resetTime)
-                    
-                    self.getLoosingTargets().forEach({
-                        $0.runAction(SKAction.scaleBy(0, duration: resetTime))
+        
+        let winningTarget = targets.filter({
+            return $0.fillColor == player.fillColor
+        }).first!
+        
+        let loosingTargets = targets.filter({
+            return $0.fillColor != player.fillColor
+        })
+        
+        if player.intersectsNode(winningTarget) {
+            let pointsGained = Int(ceil(timeRemaining / 0.1))
+            
+            stopTimer()
+            
+            score += pointsGained
+            updateScore()
+            
+            let resetTime = 0.25
+            
+            self.returnPlayer(resetTime)
+            
+            loosingTargets.forEach({
+                $0.runAction(SKAction.scaleBy(0, duration: resetTime))
+            })
+            
+            winningTarget.runAction(SKAction.sequence([
+                SKAction.group([
+                    SKAction.scaleBy(2, duration: resetTime),
+                    SKAction.runBlock({
+                        let pointsLabel = SKLabelNode(fontNamed: "SanFrancisco")
+                        pointsLabel.verticalAlignmentMode = .Center
+                        pointsLabel.horizontalAlignmentMode = .Center
+                        pointsLabel.fontSize = 20
+                        pointsLabel.text = "\(pointsGained)"
+                        winningTarget.addChild(pointsLabel)
                     })
-             
-                    target.runAction(SKAction.sequence([
-                        SKAction.group([
-                            SKAction.scaleBy(2, duration: resetTime),
-                            SKAction.runBlock({
-                                let pointsLabel = SKLabelNode(fontNamed: "SanFrancisco")
-                                pointsLabel.verticalAlignmentMode = .Center
-                                pointsLabel.horizontalAlignmentMode = .Center
-                                pointsLabel.fontSize = 20
-                                pointsLabel.text = "\(pointsGained)"
-                                target.addChild(pointsLabel)
-                            })
-                        ]),
-                        SKAction.runBlock({
-                            self.newPuzzle()
-                        })
-                    ]))
-
-                } else {
-                    gameOver()
-                }
-                
+                ]),
+                SKAction.runBlock({
+                    self.newPuzzle()
+                })
+            ]))
+        } else {
+            let hitLoosingTarget = loosingTargets.contains({
+                return player.intersectsNode($0);
+            })
+            
+            if hitLoosingTarget {
+                gameOver()
                 return
             }
+            
+            returnPlayer(0.15)
         }
-        
-        returnPlayer(0.15)
     }
     
     func gameOver() {
@@ -270,13 +286,6 @@ class GameScene: SKScene {
             SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(withDuration)),
             withKey: "Return"
         )
-    }
-    
-    func getLoosingTargets() -> Array<SKShapeNode> {
-        let targets = getNodes("target") as! Array<SKShapeNode>
-        return targets.filter({
-            return $0.fillColor != player.fillColor
-        })
     }
     
     func updateScore() {
