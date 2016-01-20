@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:MatchingGame.xcodeproj">
+      location = "self:/Users/Eddie/Git/MatchingGame/ReactionMatch.xcodeproj">
    </FileRef>
 </Workspace>
