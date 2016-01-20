@@ -14,6 +14,8 @@
 		2C104D301C4D6BA10097E0AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C104D2F1C4D6BA10097E0AD /* Assets.xcassets */; };
 		2C104D331C4D6BA10097E0AD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C104D311C4D6BA10097E0AD /* LaunchScreen.storyboard */; };
 		2C677D1B1C4EC57C00E519C9 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */; };
+		2CF9F5121C502E18004B01E5 /* GameStartScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF9F5111C502E18004B01E5 /* GameStartScene.swift */; };
+		2CF9F5141C503596004B01E5 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CF9F5131C503596004B01E5 /* GameKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		2C104D321C4D6BA10097E0AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2C104D341C4D6BA10097E0AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
+		2CF9F5111C502E18004B01E5 /* GameStartScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameStartScene.swift; sourceTree = "<group>"; };
+		2CF9F5131C503596004B01E5 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CF9F5141C503596004B01E5 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +47,7 @@
 		2C104D181C4D6BA00097E0AD = {
 			isa = PBXGroup;
 			children = (
+				2CF9F5131C503596004B01E5 /* GameKit.framework */,
 				2C104D231C4D6BA10097E0AD /* ReactionMatch */,
 				2C104D221C4D6BA00097E0AD /* Products */,
 			);
@@ -60,6 +66,7 @@
 			children = (
 				2C104D241C4D6BA10097E0AD /* AppDelegate.swift */,
 				2C104D2A1C4D6BA10097E0AD /* GameViewController.swift */,
+				2CF9F5111C502E18004B01E5 /* GameStartScene.swift */,
 				2C104D281C4D6BA10097E0AD /* GameScene.swift */,
 				2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */,
 				2C104D2C1C4D6BA10097E0AD /* Main.storyboard */,
@@ -103,6 +110,11 @@
 					2C104D201C4D6BA00097E0AD = {
 						CreatedOnToolsVersion = 7.2;
 						DevelopmentTeam = AKQ68EUQCY;
+						SystemCapabilities = {
+							com.apple.GameCenter = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -142,6 +154,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CF9F5121C502E18004B01E5 /* GameStartScene.swift in Sources */,
 				2C104D291C4D6BA10097E0AD /* GameScene.swift in Sources */,
 				2C104D2B1C4D6BA10097E0AD /* GameViewController.swift in Sources */,
 				2C677D1B1C4EC57C00E519C9 /* GameOverScene.swift in Sources */,
@@ -259,10 +272,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = ReactionMatch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.eddielee.ReactionMatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -271,10 +286,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = ReactionMatch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.eddielee.ReactionMatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};

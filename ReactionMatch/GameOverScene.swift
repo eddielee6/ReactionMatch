@@ -7,6 +7,7 @@
 //
 
 import SpriteKit
+import GameKit
 
 class GameOverScene: SKScene {
     
@@ -24,6 +25,10 @@ class GameOverScene: SKScene {
         
         if (currentHighScore > previousHighScore) {
             scoreLabel.text = "New High Score: \(gameScore)!!"
+            
+            if gameCentreEnabled() {
+                submitScore(gameScore)
+            }
         } else {
             scoreLabel.text = "Score: \(gameScore) High Score: \(currentHighScore)"
         }
@@ -61,6 +66,16 @@ class GameOverScene: SKScene {
         })
     }
     
+    func gameCentreEnabled() -> Bool {
+        let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
+        
+        if let highScore = defaults.objectForKey("gameCentreEnabled") as? Bool {
+            return highScore
+        }
+        
+        return false
+    }
+    
     func storeHighScore(score: Int) {
         let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
         
@@ -68,6 +83,18 @@ class GameOverScene: SKScene {
             defaults.setObject(score, forKey: "highScore")
             defaults.synchronize()
         }
+    }
+    
+    func submitScore(score: Int) {
+        let leaderboardID = "me.eddielee.ReactionMatch.TopScore"
+        let scoreToSubmit = GKScore(leaderboardIdentifier: leaderboardID)
+        scoreToSubmit.value = Int64(score)
+        
+        GKScore.reportScores([scoreToSubmit], withCompletionHandler: { (error: NSError?) -> Void in
+            if error != nil {
+                print(error!.localizedDescription)
+            }
+        })
     }
     
     func getHighScore() -> Int {
