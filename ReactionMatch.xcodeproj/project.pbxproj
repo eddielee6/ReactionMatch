@@ -67,6 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				2C104D241C4D6BA10097E0AD /* AppDelegate.swift */,
+				2CA8E6241C5176200001F2DA /* ScoreManager.swift */,
 				2C104D2A1C4D6BA10097E0AD /* GameViewController.swift */,
 				2CF9F5111C502E18004B01E5 /* GameStartScene.swift */,
 				2C104D281C4D6BA10097E0AD /* GameScene.swift */,
@@ -75,7 +76,6 @@
 				2C104D2F1C4D6BA10097E0AD /* Assets.xcassets */,
 				2C104D311C4D6BA10097E0AD /* LaunchScreen.storyboard */,
 				2C104D341C4D6BA10097E0AD /* Info.plist */,
-				2CA8E6241C5176200001F2DA /* ScoreManager.swift */,
 			);
 			path = ReactionMatch;
 			sourceTree = "<group>";

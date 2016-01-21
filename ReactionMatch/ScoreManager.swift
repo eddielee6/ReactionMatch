@@ -9,13 +9,13 @@
 import UIKit
 import GameKit
 
-class ScoreManager {
-    static let sharedInstance = ScoreManager()
+public class ScoreManager {
+    public static let sharedInstance = ScoreManager()
     
-    let leaderboardIdentifier: String = "me.eddielee.ReactionMatch.TopScore"
-    var gameCentreEnabled: Bool = false
+    private let leaderboardIdentifier: String = "me.eddielee.ReactionMatch.TopScore"
+    public var gameCentreEnabled: Bool = false
     
-    func authenticateLocalPlayer(viewController: UIViewController) {
+    public func authenticateLocalPlayer(viewController: UIViewController) {
         let localPlayer: GKLocalPlayer = GKLocalPlayer.localPlayer()
         
         localPlayer.authenticateHandler = {(GameCentreLoginViewController, error) -> Void in
@@ -31,7 +31,7 @@ class ScoreManager {
         }
     }
     
-    func syncLocalScoreWithGameCentre() {
+    private func syncLocalScoreWithGameCentre() {
         let leaderBoardRequest = GKLeaderboard()
         leaderBoardRequest.identifier = leaderboardIdentifier
         
@@ -48,7 +48,7 @@ class ScoreManager {
         }
     }
     
-    func submitScoreToGameCentre(score: Int) {
+    private func submitScoreToGameCentre(score: Int) {
         let scoreToSubmit = GKScore(leaderboardIdentifier: leaderboardIdentifier)
         scoreToSubmit.value = Int64(score)
         
@@ -59,13 +59,13 @@ class ScoreManager {
         })
     }
     
-    func storeLocalHighScore(score: Int) {
+    private func storeLocalHighScore(score: Int) {
         let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
         defaults.setObject(score, forKey: "highScore")
         defaults.synchronize()
     }
     
-    func getLocalHighScore() -> Int {
+    public func getLocalHighScore() -> Int {
         let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
         
         if let highScore = defaults.objectForKey("highScore") as? Int {
@@ -75,7 +75,7 @@ class ScoreManager {
         return 0
     }
     
-    func recordNewScore(score: Int) {
+    public func recordNewScore(score: Int) {
         if score > getLocalHighScore() {
             storeLocalHighScore(score)
             if gameCentreEnabled {
