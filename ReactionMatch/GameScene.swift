@@ -1,6 +1,6 @@
 //
 //  GameScene.swift
-//  MatchingGame
+//  ReactionMatch
 //
 //  Created by Eddie Lee on 18/01/2016.
 //  Copyright (c) 2016 Eddie Lee. All rights reserved.
@@ -278,7 +278,7 @@ class GameScene: SKScene {
     func gameOver() {
         let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
         let gameOverScene = GameOverScene(size: self.size)
-        gameOverScene.gameScore = score
+        gameOverScene.newScore = score
         self.view?.presentScene(gameOverScene, transition: transition)
     }
     

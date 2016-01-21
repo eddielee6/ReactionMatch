@@ -1,6 +1,6 @@
 //
 //  GameOverScene.swift
-//  MatchingGame
+//  ReactionMatch
 //
 //  Created by Eddie Lee on 19/01/2016.
 //  Copyright © 2016 Eddie Lee. All rights reserved.
@@ -11,26 +11,22 @@ import GameKit
 
 class GameOverScene: SKScene {
     
-    var gameScore: Int!
+    let scoreManager = ScoreManager.sharedInstance
+    var newScore: Int!
     
     override func didMoveToView(view: SKView) {
-        let previousHighScore = getHighScore()
-        
-        storeHighScore(gameScore)
-        let currentHighScore = getHighScore()
-        
         backgroundColor = SKColor.blackColor()
         
+        let currentHighScore = scoreManager.getLocalHighScore()
+        
+        scoreManager.recordNewScore(newScore)
+
         let scoreLabel = SKLabelNode(fontNamed: "SanFrancisco")
         
-        if (currentHighScore > previousHighScore) {
-            scoreLabel.text = "New High Score: \(gameScore)!!"
-            
-            if gameCentreEnabled() {
-                submitScore(gameScore)
-            }
+        if (newScore > currentHighScore) {
+            scoreLabel.text = "New High Score: \(newScore)!!"
         } else {
-            scoreLabel.text = "Score: \(gameScore) High Score: \(currentHighScore)"
+            scoreLabel.text = "Score: \(newScore) High Score: \(currentHighScore)"
         }
         
         scoreLabel.fontSize = 30
@@ -66,44 +62,5 @@ class GameOverScene: SKScene {
         })
     }
     
-    func gameCentreEnabled() -> Bool {
-        let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
-        
-        if let highScore = defaults.objectForKey("gameCentreEnabled") as? Bool {
-            return highScore
-        }
-        
-        return false
-    }
     
-    func storeHighScore(score: Int) {
-        let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
-        
-        if (score > getHighScore()) {
-            defaults.setObject(score, forKey: "highScore")
-            defaults.synchronize()
-        }
-    }
-    
-    func submitScore(score: Int) {
-        let leaderboardID = "me.eddielee.ReactionMatch.TopScore"
-        let scoreToSubmit = GKScore(leaderboardIdentifier: leaderboardID)
-        scoreToSubmit.value = Int64(score)
-        
-        GKScore.reportScores([scoreToSubmit], withCompletionHandler: { (error: NSError?) -> Void in
-            if error != nil {
-                print(error!.localizedDescription)
-            }
-        })
-    }
-    
-    func getHighScore() -> Int {
-        let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
-        
-        if let highScore = defaults.objectForKey("highScore") as? Int {
-            return highScore
-        }
-        
-        return 0
-    }
 }

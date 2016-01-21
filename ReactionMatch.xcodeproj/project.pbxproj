@@ -14,6 +14,7 @@
 		2C104D301C4D6BA10097E0AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C104D2F1C4D6BA10097E0AD /* Assets.xcassets */; };
 		2C104D331C4D6BA10097E0AD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C104D311C4D6BA10097E0AD /* LaunchScreen.storyboard */; };
 		2C677D1B1C4EC57C00E519C9 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */; };
+		2CA8E6251C5176200001F2DA /* ScoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA8E6241C5176200001F2DA /* ScoreManager.swift */; };
 		2CF9F5121C502E18004B01E5 /* GameStartScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF9F5111C502E18004B01E5 /* GameStartScene.swift */; };
 		2CF9F5141C503596004B01E5 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CF9F5131C503596004B01E5 /* GameKit.framework */; };
 /* End PBXBuildFile section */
@@ -28,6 +29,7 @@
 		2C104D321C4D6BA10097E0AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2C104D341C4D6BA10097E0AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
+		2CA8E6241C5176200001F2DA /* ScoreManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScoreManager.swift; sourceTree = "<group>"; };
 		2CF9F5111C502E18004B01E5 /* GameStartScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameStartScene.swift; sourceTree = "<group>"; };
 		2CF9F5131C503596004B01E5 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -73,6 +75,7 @@
 				2C104D2F1C4D6BA10097E0AD /* Assets.xcassets */,
 				2C104D311C4D6BA10097E0AD /* LaunchScreen.storyboard */,
 				2C104D341C4D6BA10097E0AD /* Info.plist */,
+				2CA8E6241C5176200001F2DA /* ScoreManager.swift */,
 			);
 			path = ReactionMatch;
 			sourceTree = "<group>";
@@ -154,6 +157,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CA8E6251C5176200001F2DA /* ScoreManager.swift in Sources */,
 				2CF9F5121C502E18004B01E5 /* GameStartScene.swift in Sources */,
 				2C104D291C4D6BA10097E0AD /* GameScene.swift in Sources */,
 				2C104D2B1C4D6BA10097E0AD /* GameViewController.swift in Sources */,

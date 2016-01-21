@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  MatchingGame
+//  ReactionMatch
 //
 //  Created by Eddie Lee on 18/01/2016.
 //  Copyright © 2016 Eddie Lee. All rights reserved.
