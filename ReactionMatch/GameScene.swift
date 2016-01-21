@@ -248,12 +248,13 @@ class GameScene: SKScene {
                 SKAction.group([
                     SKAction.scaleBy(2, duration: resetTime),
                     SKAction.runBlock({
-                        let pointsLabel = SKLabelNode(fontNamed: "SanFrancisco")
-                        pointsLabel.verticalAlignmentMode = .Center
-                        pointsLabel.horizontalAlignmentMode = .Center
-                        pointsLabel.fontSize = 20
-                        pointsLabel.text = "\(pointsGained)"
-                        winningTarget.addChild(pointsLabel)
+                        let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
+                        pointsGainedLabel.verticalAlignmentMode = .Center
+                        pointsGainedLabel.horizontalAlignmentMode = .Center
+                        pointsGainedLabel.fontSize = 20
+                        pointsGainedLabel.fontColor = self.invertColour(winningTarget.fillColor)
+                        pointsGainedLabel.text = "\(pointsGained)"
+                        winningTarget.addChild(pointsGainedLabel)
                     })
                 ]),
                 SKAction.runBlock({
@@ -290,5 +291,15 @@ class GameScene: SKScene {
     
     func updateScore() {
         scoreLabel.text = "Score: \(score)"
+    }
+    
+    func invertColour(colour: SKColor) -> SKColor {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        
+        colour.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return SKColor(red: 1-r, green: 1-g, blue: 1-b, alpha: a)
     }
 }
