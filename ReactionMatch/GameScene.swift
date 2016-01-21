@@ -34,7 +34,16 @@ class GameScene: SKScene {
     var score: Int = 0
     var timeRemaining: Double = 0
     
-    let possibleColours = [SKColor.redColor(), SKColor.greenColor(), SKColor.blueColor(), SKColor.cyanColor(), SKColor.yellowColor(), SKColor.magentaColor(), SKColor.orangeColor(), SKColor.purpleColor()]
+    let possibleColours = [
+        SKColor(red: 234/255, green: 72/255, blue: 89/255, alpha: 1), // red
+        SKColor(red: 240/255, green: 221/255, blue: 41/255, alpha: 1), // yellow
+        SKColor(red: 148/255, green: 20/255, blue: 141/255, alpha: 1), // purple
+        SKColor(red: 88/255, green: 222/255, blue: 99/255, alpha: 1), // green
+        SKColor(red: 235/255, green: 94/255, blue: 0/255, alpha: 1), // orange
+        SKColor(red: 67/255, green: 213/255, blue: 222/255, alpha: 1), // cyan
+        SKColor(red: 29/255, green: 45/255, blue: 222/255, alpha: 1), // blue
+        SKColor(red: 234/255, green: 85/255, blue: 202/255, alpha: 1), // pink
+    ]
     
     override func didMoveToView(view: SKView) {
         backgroundColor = SKColor.whiteColor()
