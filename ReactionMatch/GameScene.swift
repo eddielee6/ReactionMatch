@@ -224,6 +224,8 @@ class GameScene: SKScene {
             score += pointsGained
             updateScore()
             
+            runAction(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
+            
             let resetTime = 0.25
             
             self.returnPlayer(resetTime)
@@ -264,6 +266,7 @@ class GameScene: SKScene {
     }
     
     func gameOver() {
+        runAction(SKAction.playSoundFileNamed("fail.mp3", waitForCompletion: false))
         let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
         let gameOverScene = GameOverScene(size: self.size)
         gameOverScene.newScore = score
