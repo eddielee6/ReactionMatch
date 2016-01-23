@@ -29,7 +29,6 @@ enum TargetType: UInt32 {
 class GameScene: SKScene {
     
     let scoreLabel = SKLabelNode()
-    let timeLabel = SKLabelNode()
     var player = SKShapeNode()
     var score: Int = 0
     var timeRemaining: Double = 0
@@ -56,23 +55,13 @@ class GameScene: SKScene {
         addChild(player)
         
         // Score
-        scoreLabel.text = "Score: 0"
-        scoreLabel.horizontalAlignmentMode = .Left
-        scoreLabel.fontSize = 25
+        scoreLabel.text = "Score \(score)"
+        scoreLabel.horizontalAlignmentMode = .Center
+        scoreLabel.fontSize = 45
         scoreLabel.fontColor = SKColor.blackColor()
-        scoreLabel.position = CGPoint(x: 10, y: size.height - 35)
+        scoreLabel.position = CGPoint(x: size.width/2, y: size.height - 65)
         scoreLabel.zPosition = 10
         addChild(scoreLabel)
-        
-        // Timer
-        timeLabel.text = "Remaining: 10"
-        timeLabel.horizontalAlignmentMode = .Left
-        timeLabel.fontSize = 25
-        timeLabel.fontColor = SKColor.blackColor()
-        timeLabel.position = CGPoint(x: 10, y: size.height - 65)
-        timeLabel.zPosition = 10
-        addChild(timeLabel)
-
         
         newPuzzle()
     }
@@ -104,11 +93,11 @@ class GameScene: SKScene {
     
     func stopTimer() {
         removeActionForKey("GameTimer")
-        self.updateTimer(1)
+        self.timeRemaining = 1
     }
     
     func startTimer() {
-        self.updateTimer(1)
+        self.timeRemaining = 1
         
         let timerInterval = 0.1
         runAction(SKAction.repeatActionForever(SKAction.sequence([
@@ -119,20 +108,10 @@ class GameScene: SKScene {
                     self.removeActionForKey("GameTimer")
                     self.gameOver()
                 } else {
-                    self.updateTimer(self.timeRemaining - timerInterval)
+                    self.timeRemaining = self.timeRemaining - timerInterval
                 }
             })
         ])), withKey: "GameTimer")
-    }
-    
-    func updateTimer(timeRemaining: Double) {
-        self.timeRemaining = timeRemaining
-        
-        if (timeRemaining <= 0) {
-            self.timeLabel.text = "Remaining: 0"
-        } else {
-            self.timeLabel.text = "Remaining: \(Int(ceil(timeRemaining / 0.1)))"
-        }
     }
     
     func removeTargets() {
@@ -299,7 +278,7 @@ class GameScene: SKScene {
     }
     
     func updateScore() {
-        scoreLabel.text = "Score: \(score)"
+        scoreLabel.text = "Score \(score)"
     }
     
     func invertColour(colour: SKColor) -> SKColor {
