@@ -200,17 +200,19 @@ class GameScene: SKScene {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        targets.forEach({
-            if player.intersectsNode($0) {
-                if player.fillColor == $0.fillColor {
-                    correctSelection($0)
+        for target in targets {
+            if player.intersectsNode(target) {
+                if player.fillColor == target.fillColor {
+                    correctSelection(target)
+                    break
                 } else {
                     incorrectSelection()
+                    break
                 }
-            } else {
-                failedSelection()
             }
-        })
+        }
+        
+        failedSelection()
     }
     
     func correctSelection(winningTarget: SKShapeNode) {
