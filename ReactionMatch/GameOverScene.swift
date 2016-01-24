@@ -85,14 +85,14 @@ class GameOverScene: SKScene {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        guard let touch = touches.first else {
-            return
-        }
-        
-        let touchLocation = touch.locationInNode(self)
-
-        if nodeAtPoint(touchLocation) == playAgainLabel {
+//        guard let touch = touches.first else {
+//            return
+//        }
+//        
+//        let touchLocation = touch.locationInNode(self)
+//
+//        if nodeAtPoint(touchLocation) == playAgainLabel {
             startNewGame()
-        }
+//        }
     }
 }
