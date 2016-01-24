@@ -17,7 +17,6 @@
 		2C4811DF1C53F458007BD90B /* success.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C4811DD1C53F458007BD90B /* success.wav */; };
 		2C677D1B1C4EC57C00E519C9 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */; };
 		2CA8E6251C5176200001F2DA /* ScoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA8E6241C5176200001F2DA /* ScoreManager.swift */; };
-		2CF9F5121C502E18004B01E5 /* GameStartScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF9F5111C502E18004B01E5 /* GameStartScene.swift */; };
 		2CF9F5141C503596004B01E5 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CF9F5131C503596004B01E5 /* GameKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -34,7 +33,6 @@
 		2C4811DD1C53F458007BD90B /* success.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = success.wav; path = Resources/Sounds/success.wav; sourceTree = "<group>"; };
 		2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
 		2CA8E6241C5176200001F2DA /* ScoreManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScoreManager.swift; sourceTree = "<group>"; };
-		2CF9F5111C502E18004B01E5 /* GameStartScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameStartScene.swift; sourceTree = "<group>"; };
 		2CF9F5131C503596004B01E5 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -74,7 +72,6 @@
 				2C104D241C4D6BA10097E0AD /* AppDelegate.swift */,
 				2CA8E6241C5176200001F2DA /* ScoreManager.swift */,
 				2C104D2A1C4D6BA10097E0AD /* GameViewController.swift */,
-				2CF9F5111C502E18004B01E5 /* GameStartScene.swift */,
 				2C104D281C4D6BA10097E0AD /* GameScene.swift */,
 				2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */,
 				2C104D2C1C4D6BA10097E0AD /* Main.storyboard */,
@@ -182,7 +179,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CA8E6251C5176200001F2DA /* ScoreManager.swift in Sources */,
-				2CF9F5121C502E18004B01E5 /* GameStartScene.swift in Sources */,
 				2C104D291C4D6BA10097E0AD /* GameScene.swift in Sources */,
 				2C104D2B1C4D6BA10097E0AD /* GameViewController.swift in Sources */,
 				2C677D1B1C4EC57C00E519C9 /* GameOverScene.swift in Sources */,

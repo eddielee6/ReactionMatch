@@ -16,7 +16,7 @@ class GameViewController: UIViewController {
         
         ScoreManager.sharedInstance.authenticateLocalPlayer(self)
         
-        let scene = GameStartScene(size: view.bounds.size)
+        let scene = GameScene(size: view.bounds.size)
         let skView = self.view as! SKView
         //skView.showsFPS = true
         //skView.showsNodeCount = true

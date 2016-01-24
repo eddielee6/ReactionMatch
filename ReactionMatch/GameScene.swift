@@ -8,165 +8,157 @@
 
 import SpriteKit
 
-enum TargetType: UInt32 {
-    case Top
-    case Right
-    case Bottom
-    case Left
-    
-    private static let _count: TargetType.RawValue = {
-        var maxValue: UInt32 = 0
-        while let _ = TargetType(rawValue: ++maxValue) { }
-        return maxValue
-    }()
-    
-    static func randomType() -> TargetType {
-        let rand = arc4random_uniform(_count)
-        return TargetType(rawValue: rand)!
-    }
-}
-
 class GameScene: SKScene {
     
     let scoreLabel = SKLabelNode()
-    var player = SKShapeNode()
+    let stateLabel = SKLabelNode()
+    
+    var gameStarted: Bool = false
     var score: Int = 0
+    var levelsPlayed: Int = 0
+    
+    let baseTimeForLevel: Double = 1.2
+    let minTimeForLevel: Double = 0.4
+    var timeForLevel: Double = 1.2
     var timeRemaining: Double = 0
     
-    let possibleColours = [
-        SKColor(red: 234/255, green: 72/255, blue: 89/255, alpha: 1), // red
-        SKColor(red: 240/255, green: 221/255, blue: 41/255, alpha: 1), // yellow
-        SKColor(red: 148/255, green: 20/255, blue: 141/255, alpha: 1), // purple
-        SKColor(red: 88/255, green: 222/255, blue: 99/255, alpha: 1), // green
-        SKColor(red: 235/255, green: 94/255, blue: 0/255, alpha: 1), // orange
-        SKColor(red: 67/255, green: 213/255, blue: 222/255, alpha: 1), // cyan
-        SKColor(red: 29/255, green: 45/255, blue: 222/255, alpha: 1), // blue
-        SKColor(red: 234/255, green: 85/255, blue: 202/255, alpha: 1), // pink
-    ]
+    var player = SKShapeNode()
+    var targets = Array<SKShapeNode>()
     
     override func didMoveToView(view: SKView) {
+        setupInitialState()
+        drawNewPuzzle()
+    }
+    
+    func setupInitialState() {
         backgroundColor = SKColor.whiteColor()
-        
-        player = SKShapeNode(rectOfSize: CGSize(width: 30, height: 30), cornerRadius: 5.0)
-        player.fillColor = SKColor.redColor()
-        player.position = CGPoint(x: size.width/2, y: size.height/2)
-        player.name = "player"
-        player.zPosition = 10
-        addChild(player)
         
         // Score
         scoreLabel.text = "Score \(score)"
         scoreLabel.horizontalAlignmentMode = .Center
         scoreLabel.fontSize = 45
         scoreLabel.fontColor = SKColor.blackColor()
-        scoreLabel.position = CGPoint(x: size.width/2, y: size.height - 65)
-        scoreLabel.zPosition = 10
+        scoreLabel.position = CGPoint(x: size.width/2, y: size.height - 85)
         addChild(scoreLabel)
         
-        newPuzzle()
+        // Game State
+        stateLabel.text = "Ready"
+        stateLabel.horizontalAlignmentMode = .Center
+        stateLabel.fontSize = 30
+        stateLabel.fontColor = SKColor.blackColor()
+        stateLabel.position = CGPoint(x: size.width/2, y: scoreLabel.position.y - 60)
+        addChild(stateLabel)
+        
+        let blinkAction = SKAction.sequence([
+            SKAction.fadeAlphaTo(0.4, duration: 0.4),
+            SKAction.fadeAlphaTo(1, duration: 0.4)
+        ])
+        stateLabel.runAction(SKAction.repeatActionForever(blinkAction))
+        
+        // Player
+        player = SKShapeNode(rectOfSize: CGSize(width: 30, height: 30), cornerRadius: 5.0)
+        player.fillColor = SKColor.redColor()
+        player.position = CGPoint(x: size.width/2, y: size.height/2)
+        player.zPosition = 10
+        addChild(player)
     }
     
-    func getRandomColour(notColour: SKColor? = nil) -> SKColor {
-        let colourIndex = Int(arc4random_uniform(UInt32(possibleColours.count)))
-        let selectedColour = possibleColours[colourIndex]
+    func drawNewPuzzle() {
+        levelsPlayed += 1
         
-        if selectedColour == notColour {
-            return getRandomColour(notColour)
+        timeForLevel = baseTimeForLevel - Double(levelsPlayed / 5) * 0.1
+        if timeForLevel < minTimeForLevel {
+            timeForLevel = minTimeForLevel
         }
-        
-        return selectedColour
-    }
-    
-    func recolorPlayer(withColour: SKColor) {
-        player.fillColor = withColour
-    }
-    
-    func newPuzzle() {
-        removeTargets()
         
         let winningColour = getRandomColour()
         let otherColour = getRandomColour(winningColour)
-        recolorPlayer(winningColour)
-        addTargets(winningColour, otherColour: otherColour)
-        startTimer()
+        
+        player.fillColor = winningColour
+        addNewTargets(winningColour, otherColour: otherColour)
     }
     
     func stopTimer() {
         removeActionForKey("GameTimer")
-        self.timeRemaining = 1
     }
     
-    func startTimer() {
-        self.timeRemaining = 1
+    func resetTimer(time: Double) {
+        self.timeRemaining = time
         
-        let timerInterval = 0.1
+        let tickInterval = 0.1
         runAction(SKAction.repeatActionForever(SKAction.sequence([
-            SKAction.waitForDuration(timerInterval),
+            SKAction.waitForDuration(tickInterval),
             SKAction.runBlock({
-                if (self.timeRemaining <= 0) {
-                    print("time expired")
+                self.timeRemaining = self.timeRemaining - tickInterval
+                
+                if self.timeRemaining <= 0 {
                     self.removeActionForKey("GameTimer")
-                    self.gameOver()
+                    self.gameOver("Times Up")
                 } else {
-                    self.timeRemaining = self.timeRemaining - timerInterval
+                    self.stateLabel.text = "\(self.getPointsForTime(self.timeRemaining)) points"
                 }
             })
         ])), withKey: "GameTimer")
     }
     
-    func removeTargets() {
-        let targets = getNodes("target")
-        removeChildrenInArray(targets)
+    func getPointsForTime(timeRemaining: Double) -> Int {
+        return Int(ceil((timeRemaining / timeForLevel) * 10))
     }
     
     func createTarget(withColour: SKColor) -> SKShapeNode {
         let target = SKShapeNode(rectOfSize: CGSize(width: 35, height: 35), cornerRadius: 5.0)
         target.fillColor = withColour
-        target.name = "target"
         target.alpha = 0
         target.zPosition = 9
         return target
     }
     
-    func addTargets(winningColour: SKColor, otherColour: SKColor) {
+    func addNewTargets(winningColour: SKColor, otherColour: SKColor) {
+        // Remove any old targets
+        removeChildrenInArray(targets)
+        targets.removeAll()
+        
         let targetDistance: CGFloat = 100
         
         let showAction = SKAction.fadeInWithDuration(0.25)
         
-        let winningTarget = TargetType.randomType()
+        let winningTarget = randomInt(1, max: 4)
         
         let topTarget = createTarget(otherColour)
         topTarget.position = CGPoint(x: size.width/2, y: (size.height/2) + targetDistance)
-        if (winningTarget == TargetType.Top) {
+        if (winningTarget == 1) {
             topTarget.fillColor = winningColour
         }
         addChild(topTarget)
+        targets.append(topTarget)
         topTarget.runAction(showAction)
         
         let rightTarget = createTarget(otherColour)
         rightTarget.position = CGPoint(x: (size.width/2) + targetDistance, y: size.height/2)
-        if (winningTarget == TargetType.Right) {
+        if (winningTarget == 2) {
             rightTarget.fillColor = winningColour
         }
         addChild(rightTarget)
+        targets.append(rightTarget)
         rightTarget.runAction(showAction)
         
         let bottomTarget = createTarget(otherColour)
         bottomTarget.position = CGPoint(x: size.width/2, y: (size.height/2) - targetDistance)
-        if (winningTarget == TargetType.Bottom) {
+        if (winningTarget == 3) {
             bottomTarget.fillColor = winningColour
         }
         addChild(bottomTarget)
+        targets.append(bottomTarget)
         bottomTarget.runAction(showAction)
         
         let leftTarget = createTarget(otherColour)
         leftTarget.position = CGPoint(x: (size.width/2) - targetDistance, y: size.height/2)
-        if (winningTarget == TargetType.Left) {
+        if (winningTarget == 4) {
             leftTarget.fillColor = winningColour
         }
         addChild(leftTarget)
+        targets.append(leftTarget)
         leftTarget.runAction(showAction)
-        
     }
     
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -199,73 +191,87 @@ class GameScene: SKScene {
         player.position = CGPointMake(newX, newY)
     }
     
-    func getNodes(ofType: String) -> Array<SKNode> {
-        return children.filter({
-            return $0.name == ofType
-        })
-    }
-    
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let targets = getNodes("target") as! Array<SKShapeNode>
-        
-        let winningTarget = targets.filter({
-            return $0.fillColor == player.fillColor
-        }).first!
-        
-        let loosingTargets = targets.filter({
-            return $0.fillColor != player.fillColor
-        })
-        
-        if player.intersectsNode(winningTarget) {
-            let pointsGained = Int(ceil(timeRemaining / 0.1))
-            
-            stopTimer()
-            
-            score += pointsGained
-            updateScore()
-            
-            runAction(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
-            
-            let resetTime = 0.25
-            
-            self.returnPlayer(resetTime)
-            
-            loosingTargets.forEach({
-                $0.runAction(SKAction.scaleBy(0, duration: resetTime))
-            })
-            
-            winningTarget.runAction(SKAction.sequence([
-                SKAction.group([
-                    SKAction.scaleBy(2, duration: resetTime),
-                    SKAction.runBlock({
-                        let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
-                        pointsGainedLabel.verticalAlignmentMode = .Center
-                        pointsGainedLabel.horizontalAlignmentMode = .Center
-                        pointsGainedLabel.fontSize = 20
-                        pointsGainedLabel.fontColor = self.invertColour(winningTarget.fillColor)
-                        pointsGainedLabel.text = "\(pointsGained)"
-                        winningTarget.addChild(pointsGainedLabel)
-                    })
-                ]),
-                SKAction.runBlock({
-                    self.newPuzzle()
-                })
-            ]))
-        } else {
-            let hitLoosingTarget = loosingTargets.contains({
-                return player.intersectsNode($0);
-            })
-            
-            if hitLoosingTarget {
-                gameOver()
-                return
-            }
-            
-            returnPlayer(0.15)
+        // Start timer after initial touch
+        if !gameStarted {
+            gameStarted = true
+            resetTimer(timeForLevel)
         }
+        
+        //let targets = getNodes("target") as! Array<SKShapeNode>
+        targets.forEach({
+            if player.intersectsNode($0) {
+                if player.fillColor == $0.fillColor {
+                    correctSelection($0)
+                } else {
+                    incorrectSelection()
+                }
+            } else {
+                failedSelection()
+            }
+        })
     }
     
-    func gameOver() {
+    func correctSelection(winningTarget: SKShapeNode) {
+        stopTimer()
+        
+        runAction(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
+        
+        // Update score
+        let pointsGained = getPointsForTime(timeRemaining)
+        score += pointsGained
+        scoreLabel.text = "Score \(score)"
+        
+        // Return player to center
+        player.runAction(
+            SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(0.25)),
+            withKey: "Return"
+        )
+        
+        // Enhance winning target
+        winningTarget.runAction(SKAction.sequence([
+            SKAction.group([
+                SKAction.scaleBy(2, duration: 0.25),
+                SKAction.runBlock({
+                    // Print points gained
+                    let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
+                    pointsGainedLabel.verticalAlignmentMode = .Center
+                    pointsGainedLabel.horizontalAlignmentMode = .Center
+                    pointsGainedLabel.fontSize = 20
+                    pointsGainedLabel.fontColor = self.invertColour(winningTarget.fillColor)
+                    pointsGainedLabel.text = "\(pointsGained)"
+                    winningTarget.addChild(pointsGainedLabel)
+                })
+            ]),
+            SKAction.runBlock({
+                self.drawNewPuzzle()
+                self.resetTimer(self.timeForLevel)
+            })
+        ]))
+        
+        // Fade out incorrect targets
+        targets.filter({
+            return $0 != winningTarget
+        }).forEach({
+            $0.runAction(SKAction.scaleBy(0, duration: 0.25))
+        })
+    }
+    
+    func incorrectSelection() {
+        gameOver("Wrong Selection")
+    }
+    
+    func failedSelection() {
+        player.runAction(
+            SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(0.15)),
+            withKey: "Return"
+        )
+    }
+    
+    func gameOver(reason: String) {
+        print("Game Over: \(reason)")
+        self.stateLabel.text = reason
+        
         runAction(SKAction.playSoundFileNamed("fail.mp3", waitForCompletion: false))
         let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
         let gameOverScene = GameOverScene(size: self.size)
@@ -273,15 +279,31 @@ class GameScene: SKScene {
         self.view?.presentScene(gameOverScene, transition: transition)
     }
     
-    func returnPlayer(withDuration: Double) {
-        player.runAction(
-            SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(withDuration)),
-            withKey: "Return"
-        )
+    
+    let possibleColours = [
+        SKColor(red: 234/255, green: 72/255, blue: 89/255, alpha: 1), // red
+        SKColor(red: 240/255, green: 221/255, blue: 41/255, alpha: 1), // yellow
+        SKColor(red: 148/255, green: 20/255, blue: 141/255, alpha: 1), // purple
+        SKColor(red: 88/255, green: 222/255, blue: 99/255, alpha: 1), // green
+        SKColor(red: 235/255, green: 94/255, blue: 0/255, alpha: 1), // orange
+        SKColor(red: 67/255, green: 213/255, blue: 222/255, alpha: 1), // cyan
+        SKColor(red: 29/255, green: 45/255, blue: 222/255, alpha: 1), // blue
+        SKColor(red: 234/255, green: 85/255, blue: 202/255, alpha: 1), // pink
+    ]
+    
+    func randomInt(min: Int, max:Int) -> Int {
+        return min + Int(arc4random_uniform(UInt32(max - min + 1)))
     }
     
-    func updateScore() {
-        scoreLabel.text = "Score \(score)"
+    func getRandomColour(notColour: SKColor? = nil) -> SKColor {
+        let colourIndex = randomInt(0, max: possibleColours.count - 1)
+        let selectedColour = possibleColours[colourIndex]
+        
+        if selectedColour == notColour {
+            return getRandomColour(notColour)
+        }
+        
+        return selectedColour
     }
     
     func invertColour(colour: SKColor) -> SKColor {
