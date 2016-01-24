@@ -191,14 +191,15 @@ class GameScene: SKScene {
         player.position = CGPointMake(newX, newY)
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         // Start timer after initial touch
         if !gameStarted {
             gameStarted = true
             resetTimer(timeForLevel)
         }
-        
-        //let targets = getNodes("target") as! Array<SKShapeNode>
+    }
+    
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         targets.forEach({
             if player.intersectsNode($0) {
                 if player.fillColor == $0.fillColor {
@@ -276,6 +277,7 @@ class GameScene: SKScene {
         let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
         let gameOverScene = GameOverScene(size: self.size)
         gameOverScene.newScore = score
+        gameOverScene.reason = reason
         self.view?.presentScene(gameOverScene, transition: transition)
     }
     
