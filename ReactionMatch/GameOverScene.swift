@@ -24,7 +24,27 @@ class GameOverScene: SKScene {
     }
     
     func setGameOverState() {
-        backgroundColor = SKColor.whiteColor()
+        // Background
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = frame
+        gradientLayer.colors = [
+            SKColor(red: 247/255, green: 247/255, blue: 247/255, alpha: 1),
+            SKColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1)
+        ].map { $0.CGColor }
+        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
+        gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
+        
+        // render the gradient to a UIImage
+        UIGraphicsBeginImageContext(frame.size)
+        gradientLayer.renderInContext(UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        let texture = SKTexture(CGImage: image.CGImage!)
+        let backgroundNode = SKSpriteNode(texture: texture)
+        backgroundNode.anchorPoint = CGPoint.zero
+        backgroundNode.zPosition = 0
+        addChild(backgroundNode)
 
         // Game Over type
         let gameEndReasonLabel = SKLabelNode()
