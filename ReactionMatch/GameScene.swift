@@ -77,7 +77,6 @@ class GameScene: SKScene {
         
         // Player
         player = SKShapeNode(rectOfSize: CGSize(width: 30, height: 30), cornerRadius: 5.0)
-        player.fillColor = SKColor.redColor()
         player.position = CGPoint(x: size.width/2, y: size.height/2)
         player.zPosition = 10
         addChild(player)
@@ -95,6 +94,7 @@ class GameScene: SKScene {
         let otherColour = getRandomColour(winningColour)
         
         player.fillColor = winningColour
+        player.strokeColor = SKColor.whiteColor()
         addNewTargets(winningColour, otherColour: otherColour)
     }
     
@@ -128,6 +128,7 @@ class GameScene: SKScene {
     func createTarget(withColour: SKColor) -> SKShapeNode {
         let target = SKShapeNode(rectOfSize: CGSize(width: 35, height: 35), cornerRadius: 5.0)
         target.fillColor = withColour
+        target.strokeColor = withColour
         target.alpha = 0
         target.zPosition = 9
         return target
@@ -148,6 +149,7 @@ class GameScene: SKScene {
         topTarget.position = CGPoint(x: size.width/2, y: (size.height/2) + targetDistance)
         if (winningTarget == 1) {
             topTarget.fillColor = winningColour
+            topTarget.strokeColor = winningColour
         }
         addChild(topTarget)
         targets.append(topTarget)
@@ -157,6 +159,7 @@ class GameScene: SKScene {
         rightTarget.position = CGPoint(x: (size.width/2) + targetDistance, y: size.height/2)
         if (winningTarget == 2) {
             rightTarget.fillColor = winningColour
+            rightTarget.strokeColor = winningColour
         }
         addChild(rightTarget)
         targets.append(rightTarget)
@@ -166,6 +169,7 @@ class GameScene: SKScene {
         bottomTarget.position = CGPoint(x: size.width/2, y: (size.height/2) - targetDistance)
         if (winningTarget == 3) {
             bottomTarget.fillColor = winningColour
+            bottomTarget.strokeColor = winningColour
         }
         addChild(bottomTarget)
         targets.append(bottomTarget)
@@ -175,6 +179,7 @@ class GameScene: SKScene {
         leftTarget.position = CGPoint(x: (size.width/2) - targetDistance, y: size.height/2)
         if (winningTarget == 4) {
             leftTarget.fillColor = winningColour
+            leftTarget.strokeColor = winningColour
         }
         addChild(leftTarget)
         targets.append(leftTarget)
