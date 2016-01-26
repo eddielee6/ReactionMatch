@@ -76,11 +76,9 @@ public class ScoreManager {
     }
     
     public func recordNewScore(score: Int) {
-        if score > getLocalHighScore() {
-            storeLocalHighScore(score)
-            if gameCentreEnabled {
-                submitScoreToGameCentre(score)
-            }
+        storeLocalHighScore(score)
+        if gameCentreEnabled {
+            submitScoreToGameCentre(score)
         }
     }
 }
