@@ -73,6 +73,7 @@ class GameScene: SKScene {
             SKAction.fadeAlphaTo(0.4, duration: 0.4),
             SKAction.fadeAlphaTo(1, duration: 0.4)
         ])
+        blinkAction.timingMode = .EaseInEaseOut
         stateLabel.runAction(SKAction.repeatActionForever(blinkAction))
         
         // Player
@@ -96,6 +97,59 @@ class GameScene: SKScene {
         player.fillColor = winningColour
         player.strokeColor = SKColor.whiteColor()
         addNewTargets(winningColour, otherColour: otherColour)
+        
+        runAction(SKAction.sequence([
+            SKAction.waitForDuration(0.5),
+            SKAction.runBlock({
+                if !self.gameStarted {
+                    self.firstPlayHint()
+                }
+            })
+        ]))
+    }
+    
+    func getWinningTarget() -> SKShapeNode? {
+        for target in targets {
+            if player.fillColor == target.fillColor {
+                return target
+            }
+        }
+        
+        return nil
+    }
+    
+    func firstPlayHint() {
+        if let winningTarget = getWinningTarget() {
+            if winningTarget.position.x > player.position.x {
+                let action = SKAction.sequence([
+                    SKAction.moveToX(player.position.x + 50, duration: 0.25),
+                    SKAction.moveToX(size.width/2, duration: 0.25)
+                ])
+                action.timingMode = .EaseInEaseOut
+                player.runAction(action)
+            } else if winningTarget.position.x < player.position.x {
+                let action = SKAction.sequence([
+                    SKAction.moveToX(player.position.x - 50, duration: 0.25),
+                    SKAction.moveToX(size.width/2, duration: 0.25)
+                ])
+                action.timingMode = .EaseInEaseOut
+                player.runAction(action)
+            } else if winningTarget.position.y > player.position.y {
+                let action = SKAction.sequence([
+                    SKAction.moveToY(player.position.y + 50, duration: 0.25),
+                    SKAction.moveToY(size.height/2, duration: 0.25)
+                ])
+                action.timingMode = .EaseInEaseOut
+                player.runAction(action)
+            } else if winningTarget.position.y < player.position.y {
+                let action = SKAction.sequence([
+                    SKAction.moveToY(player.position.y - 50, duration: 0.25),
+                    SKAction.moveToY(size.height/2, duration: 0.25)
+                ])
+                action.timingMode = .EaseInEaseOut
+                player.runAction(action)
+            }
+        }
     }
     
     func stopTimer() {
@@ -142,6 +196,7 @@ class GameScene: SKScene {
         let targetDistance: CGFloat = 100
         
         let showAction = SKAction.fadeInWithDuration(0.25)
+        showAction.timingMode = .EaseIn
         
         let winningTarget = randomInt(1, max: 4)
         
@@ -216,15 +271,13 @@ class GameScene: SKScene {
         player.position = CGPointMake(newX, newY)
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         // Start timer after initial touch
         if !gameStarted {
             gameStarted = true
             resetTimer(timeForLevel)
         }
-    }
-    
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        
         for target in targets {
             if player.intersectsNode(target) {
                 if player.fillColor == target.fillColor {
@@ -250,39 +303,44 @@ class GameScene: SKScene {
         score += pointsGained
         scoreLabel.text = "Score \(score)"
         
-        // Return player to center
-        player.runAction(
-            SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(0.25)),
-            withKey: "Return"
-        )
+        // Add points gained
+        let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
+        pointsGainedLabel.verticalAlignmentMode = .Center
+        pointsGainedLabel.horizontalAlignmentMode = .Center
+        pointsGainedLabel.fontSize = 20
+        pointsGainedLabel.fontColor = self.invertColour(winningTarget.fillColor)
+        pointsGainedLabel.text = "\(pointsGained)"
+        winningTarget.addChild(pointsGainedLabel)
         
-        // Enhance winning target
-        winningTarget.runAction(SKAction.sequence([
-            SKAction.group([
-                SKAction.scaleBy(2, duration: 0.25),
-                SKAction.runBlock({
-                    // Print points gained
-                    let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
-                    pointsGainedLabel.verticalAlignmentMode = .Center
-                    pointsGainedLabel.horizontalAlignmentMode = .Center
-                    pointsGainedLabel.fontSize = 20
-                    pointsGainedLabel.fontColor = self.invertColour(winningTarget.fillColor)
-                    pointsGainedLabel.text = "\(pointsGained)"
-                    winningTarget.addChild(pointsGainedLabel)
-                })
-            ]),
+        let resetAnimationTime = 0.25
+        
+        // Grow winning target
+        let growAction = SKAction.scaleBy(2, duration: 0.25)
+        growAction.timingMode = .EaseIn
+        winningTarget.runAction(growAction)
+        
+        // Fade out incorrect targets
+        let shrinkAction = SKAction.scaleBy(0, duration: resetAnimationTime)
+        shrinkAction.timingMode = .EaseIn
+        targets.filter({
+            return $0 != winningTarget
+        }).forEach({
+            $0.runAction(shrinkAction)
+        })
+        
+        // Return player to center
+        let returnAction = SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(resetAnimationTime))
+        returnAction.timingMode = .EaseInEaseOut
+        player.runAction(returnAction, withKey: "Return")
+        
+        // Draw new puzzle
+        runAction(SKAction.sequence([
+            SKAction.waitForDuration(resetAnimationTime),
             SKAction.runBlock({
                 self.drawNewPuzzle()
                 self.resetTimer(self.timeForLevel)
             })
         ]))
-        
-        // Fade out incorrect targets
-        targets.filter({
-            return $0 != winningTarget
-        }).forEach({
-            $0.runAction(SKAction.scaleBy(0, duration: 0.25))
-        })
     }
     
     func incorrectSelection() {
@@ -290,10 +348,9 @@ class GameScene: SKScene {
     }
     
     func failedSelection() {
-        player.runAction(
-            SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(0.15)),
-            withKey: "Return"
-        )
+        let returnAction = SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(0.15))
+        returnAction.timingMode = .EaseInEaseOut
+        player.runAction(returnAction, withKey: "Return")
     }
     
     func gameOver(reason: String) {
