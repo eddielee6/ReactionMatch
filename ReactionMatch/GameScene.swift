@@ -126,28 +126,28 @@ class GameScene: SKScene {
                     SKAction.moveToX(size.width/2, duration: 0.25)
                 ])
                 action.timingMode = .EaseInEaseOut
-                player.runAction(action)
+                player.runAction(action, withKey: "Hint")
             } else if winningTarget.position.x < player.position.x {
                 let action = SKAction.sequence([
                     SKAction.moveToX(player.position.x - 50, duration: 0.25),
                     SKAction.moveToX(size.width/2, duration: 0.25)
                 ])
                 action.timingMode = .EaseInEaseOut
-                player.runAction(action)
+                player.runAction(action, withKey: "Hint")
             } else if winningTarget.position.y > player.position.y {
                 let action = SKAction.sequence([
                     SKAction.moveToY(player.position.y + 50, duration: 0.25),
                     SKAction.moveToY(size.height/2, duration: 0.25)
                 ])
                 action.timingMode = .EaseInEaseOut
-                player.runAction(action)
+                player.runAction(action, withKey: "Hint")
             } else if winningTarget.position.y < player.position.y {
                 let action = SKAction.sequence([
                     SKAction.moveToY(player.position.y - 50, duration: 0.25),
                     SKAction.moveToY(size.height/2, duration: 0.25)
                 ])
                 action.timingMode = .EaseInEaseOut
-                player.runAction(action)
+                player.runAction(action, withKey: "Hint")
             }
         }
     }
@@ -267,6 +267,7 @@ class GameScene: SKScene {
             newY = screenCentre.y - maxMove
         }
         
+        player.removeActionForKey("Hint")
         player.removeActionForKey("Return")
         player.position = CGPointMake(newX, newY)
     }
