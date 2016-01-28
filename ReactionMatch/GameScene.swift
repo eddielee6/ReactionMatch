@@ -25,6 +25,8 @@ class GameScene: SKScene {
     var player = SKShapeNode()
     var targets = Array<SKShapeNode>()
     
+    var centerPoint: CGPoint = CGPoint.zero
+    
     override func didMoveToView(view: SKView) {
         setupInitialState()
         drawNewPuzzle()
@@ -76,9 +78,11 @@ class GameScene: SKScene {
         blinkAction.timingMode = .EaseInEaseOut
         stateLabel.runAction(SKAction.repeatActionForever(blinkAction))
         
+        centerPoint = CGPoint(x: size.width/2, y: size.height/2 - 60)
+        
         // Player
         player = SKShapeNode(rectOfSize: CGSize(width: 30, height: 30), cornerRadius: 5.0)
-        player.position = CGPoint(x: size.width/2, y: size.height/2)
+        player.position = centerPoint
         player.zPosition = 10
         addChild(player)
     }
@@ -123,28 +127,28 @@ class GameScene: SKScene {
             if winningTarget.position.x > player.position.x {
                 let action = SKAction.sequence([
                     SKAction.moveToX(player.position.x + 50, duration: 0.25),
-                    SKAction.moveToX(size.width/2, duration: 0.25)
+                    SKAction.moveToX(centerPoint.x, duration: 0.25)
                 ])
                 action.timingMode = .EaseInEaseOut
                 player.runAction(action, withKey: "Hint")
             } else if winningTarget.position.x < player.position.x {
                 let action = SKAction.sequence([
                     SKAction.moveToX(player.position.x - 50, duration: 0.25),
-                    SKAction.moveToX(size.width/2, duration: 0.25)
+                    SKAction.moveToX(centerPoint.x, duration: 0.25)
                 ])
                 action.timingMode = .EaseInEaseOut
                 player.runAction(action, withKey: "Hint")
             } else if winningTarget.position.y > player.position.y {
                 let action = SKAction.sequence([
                     SKAction.moveToY(player.position.y + 50, duration: 0.25),
-                    SKAction.moveToY(size.height/2, duration: 0.25)
+                    SKAction.moveToY(centerPoint.y, duration: 0.25)
                 ])
                 action.timingMode = .EaseInEaseOut
                 player.runAction(action, withKey: "Hint")
             } else if winningTarget.position.y < player.position.y {
                 let action = SKAction.sequence([
                     SKAction.moveToY(player.position.y - 50, duration: 0.25),
-                    SKAction.moveToY(size.height/2, duration: 0.25)
+                    SKAction.moveToY(centerPoint.y, duration: 0.25)
                 ])
                 action.timingMode = .EaseInEaseOut
                 player.runAction(action, withKey: "Hint")
@@ -201,7 +205,7 @@ class GameScene: SKScene {
         let winningTarget = randomInt(1, max: 4)
         
         let topTarget = createTarget(otherColour)
-        topTarget.position = CGPoint(x: size.width/2, y: (size.height/2) + targetDistance)
+        topTarget.position = CGPoint(x: centerPoint.x, y: centerPoint.y + targetDistance)
         if (winningTarget == 1) {
             topTarget.fillColor = winningColour
             topTarget.strokeColor = winningColour
@@ -211,7 +215,7 @@ class GameScene: SKScene {
         topTarget.runAction(showAction)
         
         let rightTarget = createTarget(otherColour)
-        rightTarget.position = CGPoint(x: (size.width/2) + targetDistance, y: size.height/2)
+        rightTarget.position = CGPoint(x: centerPoint.x + targetDistance, y: centerPoint.y)
         if (winningTarget == 2) {
             rightTarget.fillColor = winningColour
             rightTarget.strokeColor = winningColour
@@ -221,7 +225,7 @@ class GameScene: SKScene {
         rightTarget.runAction(showAction)
         
         let bottomTarget = createTarget(otherColour)
-        bottomTarget.position = CGPoint(x: size.width/2, y: (size.height/2) - targetDistance)
+        bottomTarget.position = CGPoint(x: centerPoint.x, y: centerPoint.y - targetDistance)
         if (winningTarget == 3) {
             bottomTarget.fillColor = winningColour
             bottomTarget.strokeColor = winningColour
@@ -231,7 +235,7 @@ class GameScene: SKScene {
         bottomTarget.runAction(showAction)
         
         let leftTarget = createTarget(otherColour)
-        leftTarget.position = CGPoint(x: (size.width/2) - targetDistance, y: size.height/2)
+        leftTarget.position = CGPoint(x: centerPoint.x - targetDistance, y: centerPoint.y)
         if (winningTarget == 4) {
             leftTarget.fillColor = winningColour
             leftTarget.strokeColor = winningColour
@@ -251,20 +255,18 @@ class GameScene: SKScene {
         let touchLocation = touch.locationInNode(self)
         let previousLocation = touch.previousLocationInNode(self)
         
-        let screenCentre = CGPoint(x: size.width/2, y: (size.height/2))
-        
         var newX = player.position.x + (touchLocation.x - previousLocation.x)
-        if newX > screenCentre.x + maxMove {
-            newX = screenCentre.x + maxMove
-        } else if newX < screenCentre.x - maxMove {
-            newX = screenCentre.x - maxMove
+        if newX > centerPoint.x + maxMove {
+            newX = centerPoint.x + maxMove
+        } else if newX < centerPoint.x - maxMove {
+            newX = centerPoint.x - maxMove
         }
         
         var newY = player.position.y + (touchLocation.y - previousLocation.y)
-        if newY > screenCentre.y + maxMove {
-            newY = screenCentre.y + maxMove
-        } else if newY < screenCentre.y - maxMove {
-            newY = screenCentre.y - maxMove
+        if newY > centerPoint.y + maxMove {
+            newY = centerPoint.y + maxMove
+        } else if newY < centerPoint.y - maxMove {
+            newY = centerPoint.y - maxMove
         }
         
         player.removeActionForKey("Hint")
@@ -330,7 +332,7 @@ class GameScene: SKScene {
         })
         
         // Return player to center
-        let returnAction = SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(resetAnimationTime))
+        let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(resetAnimationTime))
         returnAction.timingMode = .EaseInEaseOut
         player.runAction(returnAction, withKey: "Return")
         
@@ -349,7 +351,7 @@ class GameScene: SKScene {
     }
     
     func failedSelection() {
-        let returnAction = SKAction.moveTo(CGPoint(x: size.width/2, y: size.height/2), duration: NSTimeInterval(0.15))
+        let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.15))
         returnAction.timingMode = .EaseInEaseOut
         player.runAction(returnAction, withKey: "Return")
     }
