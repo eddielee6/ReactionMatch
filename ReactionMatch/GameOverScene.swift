@@ -7,7 +7,6 @@
 //
 
 import SpriteKit
-import GameKit
 
 class GameOverScene: SKScene {
     
@@ -16,7 +15,10 @@ class GameOverScene: SKScene {
     var newScore: Int!
     var reason: String!
     
-    var playAgainLabel = SKLabelNode()
+    let growAndShrink = SKAction.sequence([
+        SKAction.scaleBy(1.2, duration: 0.4),
+        SKAction.scaleBy(0.8333, duration: 0.4)
+    ])
     
     override func didMoveToView(view: SKView) {
         setGameOverState()
@@ -24,24 +26,8 @@ class GameOverScene: SKScene {
     }
     
     func setGameOverState() {
-        // Background
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = frame
-        gradientLayer.colors = [
-            SKColor(red: 247/255, green: 247/255, blue: 247/255, alpha: 1),
-            SKColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1)
-        ].map { $0.CGColor }
-        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
-        gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
-        
-        // render the gradient to a UIImage
-        UIGraphicsBeginImageContext(frame.size)
-        gradientLayer.renderInContext(UIGraphicsGetCurrentContext()!)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        let texture = SKTexture(CGImage: image.CGImage!)
-        let backgroundNode = SKSpriteNode(texture: texture)
+        // Set background
+        let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
         backgroundNode.anchorPoint = CGPoint.zero
         backgroundNode.zPosition = 0
         addChild(backgroundNode)
@@ -78,22 +64,37 @@ class GameOverScene: SKScene {
         }
     }
     
+    func getBackgroundTexture() -> SKTexture {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = frame
+        gradientLayer.colors = [
+            SKColor(red: 247/255, green: 247/255, blue: 247/255, alpha: 1),
+            SKColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1)
+            ].map { $0.CGColor }
+        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
+        gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
+        
+        UIGraphicsBeginImageContext(frame.size)
+        gradientLayer.renderInContext(UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return SKTexture(CGImage: image.CGImage!)
+    }
+    
     func showNewGameButton() {
         runAction(SKAction.sequence([
             SKAction.waitForDuration(NSTimeInterval(0.3)),
             SKAction.runBlock({
-                self.playAgainLabel.text = "Tap to Play Again"
-                self.playAgainLabel.fontSize = 35
-                self.playAgainLabel.fontColor = SKColor.blackColor()
-                self.playAgainLabel.verticalAlignmentMode = .Center
-                self.playAgainLabel.position = CGPoint(x: self.size.width/2, y: self.size.height/2)
-                self.addChild(self.playAgainLabel)
+                let playAgainLabel = SKLabelNode()
+                playAgainLabel.text = "Tap to Play Again"
+                playAgainLabel.fontSize = 35
+                playAgainLabel.fontColor = SKColor.blackColor()
+                playAgainLabel.verticalAlignmentMode = .Center
+                playAgainLabel.position = CGPoint(x: self.size.width/2, y: self.size.height/2)
+                self.addChild(playAgainLabel)
                 
-                let growAndShrink = SKAction.sequence([
-                    SKAction.scaleBy(1.2, duration: 0.4),
-                    SKAction.scaleBy(0.8333, duration: 0.4)
-                ])
-                self.playAgainLabel.runAction(SKAction.repeatActionForever(growAndShrink))
+                playAgainLabel.runAction(SKAction.repeatActionForever(self.growAndShrink))
             })
         ]))
     }
@@ -105,14 +106,6 @@ class GameOverScene: SKScene {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        guard let touch = touches.first else {
-//            return
-//        }
-//        
-//        let touchLocation = touch.locationInNode(self)
-//
-//        if nodeAtPoint(touchLocation) == playAgainLabel {
-            startNewGame()
-//        }
+        startNewGame()
     }
 }

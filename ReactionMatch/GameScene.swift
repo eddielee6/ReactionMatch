@@ -29,8 +29,12 @@ class GameScene: SKScene {
     let stateLabel = SKLabelNode()
     
     var gameStarted: Bool = false
-    var score: Int = 0
     var levelsPlayed: Int = 0
+    var score: Int = 0 {
+        didSet {
+            scoreLabel.text = "Score \(score)"
+        }
+    }
     
     let baseTimeForLevel: Double = 1.2
     let minTimeForLevel: Double = 0.4
@@ -51,24 +55,8 @@ class GameScene: SKScene {
     }
     
     func setupInitialState() {
-        // Background
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = frame
-        gradientLayer.colors = [
-            SKColor(red: 247/255, green: 247/255, blue: 247/255, alpha: 1),
-            SKColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1)
-        ].map { $0.CGColor }
-        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
-        gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
-        
-        // render the gradient to a UIImage
-        UIGraphicsBeginImageContext(frame.size)
-        gradientLayer.renderInContext(UIGraphicsGetCurrentContext()!)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        let texture = SKTexture(CGImage: image.CGImage!)
-        let backgroundNode = SKSpriteNode(texture: texture)
+        // Set background
+        let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
         backgroundNode.anchorPoint = CGPoint.zero
         backgroundNode.zPosition = 0
         addChild(backgroundNode)
@@ -103,6 +91,25 @@ class GameScene: SKScene {
         player.position = centerPoint
         player.zPosition = 10
         addChild(player)
+    }
+    
+    func getBackgroundTexture() -> SKTexture {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = frame
+        gradientLayer.colors = [
+            SKColor(red: 247/255, green: 247/255, blue: 247/255, alpha: 1),
+            SKColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1)
+            ].map { $0.CGColor }
+        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
+        gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
+        
+        // render the gradient to a UIImage
+        UIGraphicsBeginImageContext(frame.size)
+        gradientLayer.renderInContext(UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return SKTexture(CGImage: image.CGImage!)
     }
     
     func drawNewPuzzle() {
@@ -317,12 +324,9 @@ class GameScene: SKScene {
     func correctSelection(winningTarget: SKShapeNode) {
         stopTimer()
         
-        runAction(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
-        
         // Update score
         let pointsGained = getPointsForTime(timeRemaining)
         score += pointsGained
-        scoreLabel.text = "Score \(score)"
         
         // Add points gained
         let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
@@ -333,15 +337,13 @@ class GameScene: SKScene {
         pointsGainedLabel.text = "\(pointsGained)"
         winningTarget.addChild(pointsGainedLabel)
         
-        let resetAnimationTime = 0.25
-        
         // Grow winning target
         let growAction = SKAction.scaleBy(2, duration: 0.25)
         growAction.timingMode = .EaseIn
         winningTarget.runAction(growAction)
         
         // Fade out incorrect targets
-        let shrinkAction = SKAction.scaleBy(0, duration: resetAnimationTime)
+        let shrinkAction = SKAction.scaleBy(0, duration: 0.25)
         shrinkAction.timingMode = .EaseIn
         targets.filter({
             return $0 != winningTarget
@@ -350,13 +352,14 @@ class GameScene: SKScene {
         })
         
         // Return player to center
-        let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(resetAnimationTime))
+        let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.25))
         returnAction.timingMode = .EaseInEaseOut
         player.runAction(returnAction, withKey: "Return")
         
         // Draw new puzzle
         runAction(SKAction.sequence([
-            SKAction.waitForDuration(resetAnimationTime),
+            SKAction.playSoundFileNamed("success.wav", waitForCompletion: false),
+            SKAction.waitForDuration(0.25),
             SKAction.runBlock({
                 self.drawNewPuzzle()
                 self.resetTimer(self.timeForLevel)
@@ -365,7 +368,7 @@ class GameScene: SKScene {
     }
     
     func incorrectSelection() {
-        gameOver("Wrong Selection")
+        gameOver("Wrong Colour")
     }
     
     func failedSelection() {
