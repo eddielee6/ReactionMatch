@@ -82,7 +82,7 @@ class GameScene: SKScene {
         addChild(scoreLabel)
         
         // Game State
-        stateLabel.text = "Ready"
+        stateLabel.text = "Swipe to Play"
         stateLabel.horizontalAlignmentMode = .Center
         stateLabel.fontSize = 30
         stateLabel.fontColor = SKColor.blackColor()
@@ -142,35 +142,35 @@ class GameScene: SKScene {
     
     func firstPlayHint() {
         if let winningTarget = getWinningTarget() {
+            var action:SKAction!
+            
             if winningTarget.position.x > player.position.x {
-                let action = SKAction.sequence([
+                action = SKAction.sequence([
                     SKAction.moveToX(player.position.x + 50, duration: 0.25),
                     SKAction.moveToX(centerPoint.x, duration: 0.25)
                 ])
-                action.timingMode = .EaseInEaseOut
-                player.runAction(action, withKey: "Hint")
             } else if winningTarget.position.x < player.position.x {
-                let action = SKAction.sequence([
+                action = SKAction.sequence([
                     SKAction.moveToX(player.position.x - 50, duration: 0.25),
                     SKAction.moveToX(centerPoint.x, duration: 0.25)
                 ])
-                action.timingMode = .EaseInEaseOut
-                player.runAction(action, withKey: "Hint")
             } else if winningTarget.position.y > player.position.y {
-                let action = SKAction.sequence([
+                action = SKAction.sequence([
                     SKAction.moveToY(player.position.y + 50, duration: 0.25),
                     SKAction.moveToY(centerPoint.y, duration: 0.25)
                 ])
-                action.timingMode = .EaseInEaseOut
-                player.runAction(action, withKey: "Hint")
             } else if winningTarget.position.y < player.position.y {
-                let action = SKAction.sequence([
+                action = SKAction.sequence([
                     SKAction.moveToY(player.position.y - 50, duration: 0.25),
                     SKAction.moveToY(centerPoint.y, duration: 0.25)
                 ])
-                action.timingMode = .EaseInEaseOut
-                player.runAction(action, withKey: "Hint")
             }
+            
+            action.timingMode = .EaseInEaseOut
+            player.runAction(SKAction.repeatActionForever(SKAction.sequence([
+                SKAction.waitForDuration(1),
+                action
+            ])), withKey: "Hint")
         }
     }
     
