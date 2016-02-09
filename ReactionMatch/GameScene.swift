@@ -7,8 +7,23 @@
 //
 
 import SpriteKit
+import GameKit
 
 class GameScene: SKScene {
+    
+    let possibleColours = [
+        SKColor(red: 234/255, green: 72/255, blue: 89/255, alpha: 1), // red
+        SKColor(red: 240/255, green: 221/255, blue: 41/255, alpha: 1), // yellow
+        SKColor(red: 148/255, green: 20/255, blue: 141/255, alpha: 1), // purple
+        SKColor(red: 88/255, green: 222/255, blue: 99/255, alpha: 1), // green
+        SKColor(red: 235/255, green: 94/255, blue: 0/255, alpha: 1), // orange
+        SKColor(red: 67/255, green: 213/255, blue: 222/255, alpha: 1), // cyan
+        SKColor(red: 29/255, green: 45/255, blue: 222/255, alpha: 1), // blue
+        SKColor(red: 234/255, green: 85/255, blue: 202/255, alpha: 1), // pink
+    ]
+    
+    var colourRandom: GKRandom!
+    var winningTargetRandom: GKRandom!
     
     let scoreLabel = SKLabelNode()
     let stateLabel = SKLabelNode()
@@ -28,6 +43,9 @@ class GameScene: SKScene {
     var centerPoint: CGPoint = CGPoint.zero
     
     override func didMoveToView(view: SKView) {
+        colourRandom = GKRandomDistribution(lowestValue: 0, highestValue: possibleColours.count - 1)
+        winningTargetRandom = GKRandomDistribution(lowestValue: 1, highestValue: 4)
+        
         setupInitialState()
         drawNewPuzzle()
     }
@@ -202,7 +220,7 @@ class GameScene: SKScene {
         let showAction = SKAction.fadeInWithDuration(0.25)
         showAction.timingMode = .EaseIn
         
-        let winningTarget = randomInt(1, max: 4)
+        let winningTarget = winningTargetRandom.nextInt()
         
         let topTarget = createTarget(otherColour)
         topTarget.position = CGPoint(x: centerPoint.x, y: centerPoint.y + targetDistance)
@@ -368,25 +386,8 @@ class GameScene: SKScene {
         self.view?.presentScene(gameOverScene, transition: transition)
     }
     
-    
-    let possibleColours = [
-        SKColor(red: 234/255, green: 72/255, blue: 89/255, alpha: 1), // red
-        SKColor(red: 240/255, green: 221/255, blue: 41/255, alpha: 1), // yellow
-        SKColor(red: 148/255, green: 20/255, blue: 141/255, alpha: 1), // purple
-        SKColor(red: 88/255, green: 222/255, blue: 99/255, alpha: 1), // green
-        SKColor(red: 235/255, green: 94/255, blue: 0/255, alpha: 1), // orange
-        SKColor(red: 67/255, green: 213/255, blue: 222/255, alpha: 1), // cyan
-        SKColor(red: 29/255, green: 45/255, blue: 222/255, alpha: 1), // blue
-        SKColor(red: 234/255, green: 85/255, blue: 202/255, alpha: 1), // pink
-    ]
-    
-    func randomInt(min: Int, max:Int) -> Int {
-        return min + Int(arc4random_uniform(UInt32(max - min + 1)))
-    }
-    
     func getRandomColour(notColour: SKColor? = nil) -> SKColor {
-        let colourIndex = randomInt(0, max: possibleColours.count - 1)
-        let selectedColour = possibleColours[colourIndex]
+        let selectedColour = possibleColours[colourRandom.nextInt()]
         
         if selectedColour == notColour {
             return getRandomColour(notColour)
