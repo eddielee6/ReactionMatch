@@ -60,9 +60,11 @@ public class ScoreManager {
     }
     
     private func storeLocalHighScore(score: Int) {
-        let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
-        defaults.setObject(score, forKey: "highScore")
-        defaults.synchronize()
+        if (score > getLocalHighScore()) {
+            let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
+            defaults.setObject(score, forKey: "highScore")
+            defaults.synchronize()
+        }
     }
     
     public func getLocalHighScore() -> Int {
@@ -77,6 +79,7 @@ public class ScoreManager {
     
     public func recordNewScore(score: Int) {
         storeLocalHighScore(score)
+
         if gameCentreEnabled {
             submitScoreToGameCentre(score)
         }
