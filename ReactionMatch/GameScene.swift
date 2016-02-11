@@ -8,6 +8,7 @@
 
 import SpriteKit
 import GameKit
+import AVFoundation
 
 class GameScene: SKScene {
     
@@ -49,9 +50,23 @@ class GameScene: SKScene {
     override func didMoveToView(view: SKView) {
         colourRandom = GKRandomDistribution(lowestValue: 0, highestValue: possibleColours.count - 1)
         winningTargetRandom = GKRandomDistribution(lowestValue: 1, highestValue: 4)
+        centerPoint = CGPoint(x: size.width/2, y: size.height/2 - 60)
         
+        preloadAudio()
         setupInitialState()
         drawNewPuzzle()
+    }
+    
+    func preloadAudio() {
+        do {
+            let soundsToLoad = ["success", "fail"]
+            for sound in soundsToLoad {
+                let player = try AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource(sound, ofType: "wav")!))
+                player.prepareToPlay()
+            }
+        } catch {
+            print("Preloading audio failed")
+        }
     }
     
     func setupInitialState() {
@@ -83,8 +98,6 @@ class GameScene: SKScene {
         ])
         blinkAction.timingMode = .EaseInEaseOut
         stateLabel.runAction(SKAction.repeatActionForever(blinkAction))
-        
-        centerPoint = CGPoint(x: size.width/2, y: size.height/2 - 60)
         
         // Player
         player = SKShapeNode(rectOfSize: CGSize(width: 30, height: 30), cornerRadius: 5.0)
@@ -214,6 +227,14 @@ class GameScene: SKScene {
         target.strokeColor = withColour
         target.alpha = 0
         target.zPosition = 9
+        
+        let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
+        pointsGainedLabel.verticalAlignmentMode = .Center
+        pointsGainedLabel.horizontalAlignmentMode = .Center
+        pointsGainedLabel.fontSize = 20
+        pointsGainedLabel.name = "pointsGainedLabel"
+        target.addChild(pointsGainedLabel)
+        
         return target
     }
     
@@ -328,14 +349,18 @@ class GameScene: SKScene {
         let pointsGained = getPointsForTime(timeRemaining)
         score += pointsGained
         
+        // Play sound
+        runAction(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
+        
         // Add points gained
-        let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
-        pointsGainedLabel.verticalAlignmentMode = .Center
-        pointsGainedLabel.horizontalAlignmentMode = .Center
-        pointsGainedLabel.fontSize = 20
+        let pointsGainedLabel = winningTarget.childNodeWithName("pointsGainedLabel")! as! SKLabelNode
         pointsGainedLabel.fontColor = self.invertColour(winningTarget.fillColor)
         pointsGainedLabel.text = "\(pointsGained)"
-        winningTarget.addChild(pointsGainedLabel)
+        
+        // Return player to center
+        let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.25))
+        returnAction.timingMode = .EaseInEaseOut
+        player.runAction(returnAction, withKey: "Return")
         
         // Grow winning target
         let growAction = SKAction.scaleBy(2, duration: 0.25)
@@ -351,14 +376,8 @@ class GameScene: SKScene {
             $0.runAction(shrinkAction)
         })
         
-        // Return player to center
-        let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.25))
-        returnAction.timingMode = .EaseInEaseOut
-        player.runAction(returnAction, withKey: "Return")
-        
         // Draw new puzzle
         runAction(SKAction.sequence([
-            SKAction.playSoundFileNamed("success.wav", waitForCompletion: false),
             SKAction.waitForDuration(0.25),
             SKAction.runBlock({
                 self.drawNewPuzzle()
@@ -381,7 +400,7 @@ class GameScene: SKScene {
         print("Game Over: \(reason)")
         self.stateLabel.text = reason
         
-        runAction(SKAction.playSoundFileNamed("fail.mp3", waitForCompletion: false))
+        runAction(SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false))
         let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
         let gameOverScene = GameOverScene(size: self.size)
         gameOverScene.newScore = score
