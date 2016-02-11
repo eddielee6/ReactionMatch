@@ -153,29 +153,29 @@ class GameScene: SKScene {
             
             if winningTarget.position.x > player.position.x {
                 action = SKAction.sequence([
-                    SKAction.moveToX(player.position.x + 50, duration: 0.25),
-                    SKAction.moveToX(centerPoint.x, duration: 0.25)
+                    SKAction.moveToX(player.position.x + 50, duration: 0.3),
+                    SKAction.moveToX(centerPoint.x, duration: 0.3)
                 ])
             } else if winningTarget.position.x < player.position.x {
                 action = SKAction.sequence([
-                    SKAction.moveToX(player.position.x - 50, duration: 0.25),
-                    SKAction.moveToX(centerPoint.x, duration: 0.25)
+                    SKAction.moveToX(player.position.x - 50, duration: 0.3),
+                    SKAction.moveToX(centerPoint.x, duration: 0.3)
                 ])
             } else if winningTarget.position.y > player.position.y {
                 action = SKAction.sequence([
-                    SKAction.moveToY(player.position.y + 50, duration: 0.25),
-                    SKAction.moveToY(centerPoint.y, duration: 0.25)
+                    SKAction.moveToY(player.position.y + 50, duration: 0.3),
+                    SKAction.moveToY(centerPoint.y, duration: 0.3)
                 ])
             } else if winningTarget.position.y < player.position.y {
                 action = SKAction.sequence([
-                    SKAction.moveToY(player.position.y - 50, duration: 0.25),
-                    SKAction.moveToY(centerPoint.y, duration: 0.25)
+                    SKAction.moveToY(player.position.y - 50, duration: 0.3),
+                    SKAction.moveToY(centerPoint.y, duration: 0.3)
                 ])
             }
             
             action.timingMode = .EaseInEaseOut
             player.runAction(SKAction.repeatActionForever(SKAction.sequence([
-                SKAction.waitForDuration(1),
+                SKAction.waitForDuration(1.25),
                 action
             ])), withKey: "Hint")
         }
