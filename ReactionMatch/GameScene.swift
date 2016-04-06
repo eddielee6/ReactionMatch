@@ -8,22 +8,12 @@
 
 import SpriteKit
 import GameKit
-import AVFoundation
 
 class GameScene: SKScene {
     
-    let possibleColours = [
-        SKColor(red: 234/255, green: 72/255, blue: 89/255, alpha: 1), // red
-        SKColor(red: 240/255, green: 221/255, blue: 41/255, alpha: 1), // yellow
-        SKColor(red: 148/255, green: 20/255, blue: 141/255, alpha: 1), // purple
-        SKColor(red: 88/255, green: 222/255, blue: 99/255, alpha: 1), // green
-        SKColor(red: 235/255, green: 94/255, blue: 0/255, alpha: 1), // orange
-        SKColor(red: 67/255, green: 213/255, blue: 222/255, alpha: 1), // cyan
-        SKColor(red: 29/255, green: 45/255, blue: 222/255, alpha: 1), // blue
-        SKColor(red: 234/255, green: 85/255, blue: 202/255, alpha: 1), // pink
-    ]
+    let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
+    let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
     
-    var colourRandom: GKRandom!
     var winningTargetRandom: GKRandom!
     
     let scoreLabel = SKLabelNode()
@@ -48,25 +38,11 @@ class GameScene: SKScene {
     var centerPoint: CGPoint = CGPoint.zero
     
     override func didMoveToView(view: SKView) {
-        colourRandom = GKRandomDistribution(lowestValue: 0, highestValue: possibleColours.count - 1)
         winningTargetRandom = GKRandomDistribution(lowestValue: 1, highestValue: 4)
         centerPoint = CGPoint(x: size.width/2, y: size.height/2 - 60)
         
-        preloadAudio()
         setupInitialState()
         drawNewPuzzle()
-    }
-    
-    func preloadAudio() {
-        do {
-            let soundsToLoad = ["success", "fail"]
-            for sound in soundsToLoad {
-                let player = try AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource(sound, ofType: "wav")!))
-                player.prepareToPlay()
-            }
-        } catch {
-            print("Preloading audio failed")
-        }
     }
     
     func setupInitialState() {
@@ -350,11 +326,11 @@ class GameScene: SKScene {
         score += pointsGained
         
         // Play sound
-        runAction(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
+        runAction(successSoundAction)
         
         // Add points gained
         let pointsGainedLabel = winningTarget.childNodeWithName("pointsGainedLabel")! as! SKLabelNode
-        pointsGainedLabel.fontColor = self.invertColour(winningTarget.fillColor)
+        pointsGainedLabel.fontColor = winningTarget.fillColor.inverted
         pointsGainedLabel.text = "\(pointsGained)"
         
         // Return player to center
@@ -400,7 +376,7 @@ class GameScene: SKScene {
         print("Game Over: \(reason)")
         self.stateLabel.text = reason
         
-        runAction(SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false))
+        runAction(failSondAction)
         let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
         let gameOverScene = GameOverScene(size: self.size)
         gameOverScene.newScore = score
@@ -409,7 +385,7 @@ class GameScene: SKScene {
     }
     
     func getRandomColour(notColour: SKColor? = nil) -> SKColor {
-        let selectedColour = possibleColours[colourRandom.nextInt()]
+        let selectedColour = ShapeColor.random().value
         
         if selectedColour == notColour {
             return getRandomColour(notColour)
@@ -417,14 +393,18 @@ class GameScene: SKScene {
         
         return selectedColour
     }
-    
-    func invertColour(colour: SKColor) -> SKColor {
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        
-        colour.getRed(&r, green: &g, blue: &b, alpha: &a)
-        return SKColor(red: 1-r, green: 1-g, blue: 1-b, alpha: a)
+}
+
+extension SKColor {
+    var inverted: SKColor {
+        get {
+            var r: CGFloat = 0
+            var g: CGFloat = 0
+            var b: CGFloat = 0
+            var a: CGFloat = 0
+            
+            self.getRed(&r, green: &g, blue: &b, alpha: &a)
+            return SKColor(red: 1-r, green: 1-g, blue: 1-b, alpha: a)
+        }
     }
 }
