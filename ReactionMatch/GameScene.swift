@@ -109,8 +109,8 @@ class GameScene: SKScene {
             timeForLevel = minTimeForLevel
         }
         
-        let winningColour = getRandomColour()
-        let otherColour = getRandomColour(winningColour)
+        let winningColour = ShapeColor.random().value
+        let otherColour = ShapeColor.random(not: winningColour).value
         
         player.fillColor = winningColour
         player.strokeColor = SKColor.whiteColor()
@@ -382,16 +382,6 @@ class GameScene: SKScene {
         gameOverScene.newScore = score
         gameOverScene.reason = reason
         self.view?.presentScene(gameOverScene, transition: transition)
-    }
-    
-    func getRandomColour(notColour: SKColor? = nil) -> SKColor {
-        let selectedColour = ShapeColor.random().value
-        
-        if selectedColour == notColour {
-            return getRandomColour(notColour)
-        }
-        
-        return selectedColour
     }
 }
 
