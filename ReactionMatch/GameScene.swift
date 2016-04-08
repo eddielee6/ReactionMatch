@@ -32,7 +32,7 @@ class GameScene: SKScene {
     var timeForLevel: Double = 1.2
     var timeRemaining: Double = 0
     
-    var player = SKShapeNode()
+    var player = SKNode()
     var targets = Array<SKShapeNode>()
     
     var centerPoint: CGPoint = CGPoint.zero
@@ -112,8 +112,14 @@ class GameScene: SKScene {
         let winningColour = ShapeColor.random().value
         let otherColour = ShapeColor.random(not: winningColour).value
         
-        player.fillColor = winningColour
-        player.strokeColor = SKColor.whiteColor()
+        let playerShape = TargetShape.random()
+        let playerShapeNode = playerShape.shapeNode
+        playerShapeNode.fillColor = winningColour
+        playerShapeNode.strokeColor = SKColor.whiteColor()
+        
+        player.removeAllChildren()
+        player.addChild(playerShapeNode)
+        
         addNewTargets(winningColour, otherColour: otherColour)
         
         runAction(SKAction.sequence([
@@ -128,7 +134,7 @@ class GameScene: SKScene {
     
     func getWinningTarget() -> SKShapeNode? {
         for target in targets {
-            if player.fillColor == target.fillColor {
+            if target.name == "winner" {
                 return target
             }
         }
@@ -198,11 +204,14 @@ class GameScene: SKScene {
     }
     
     func createTarget(withColour: SKColor) -> SKShapeNode {
-        let target = SKShapeNode(rectOfSize: CGSize(width: 35, height: 35), cornerRadius: 5.0)
+        let targetShape = TargetShape.random()
+        
+        let target = targetShape.shapeNode
         target.fillColor = withColour
         target.strokeColor = withColour
         target.alpha = 0
         target.zPosition = 9
+        target.name = "target"
         
         let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
         pointsGainedLabel.verticalAlignmentMode = .Center
@@ -231,6 +240,7 @@ class GameScene: SKScene {
         if (winningTarget == 1) {
             topTarget.fillColor = winningColour
             topTarget.strokeColor = winningColour
+            topTarget.name = "winner"
         }
         addChild(topTarget)
         targets.append(topTarget)
@@ -241,6 +251,7 @@ class GameScene: SKScene {
         if (winningTarget == 2) {
             rightTarget.fillColor = winningColour
             rightTarget.strokeColor = winningColour
+            rightTarget.name = "winner"
         }
         addChild(rightTarget)
         targets.append(rightTarget)
@@ -251,6 +262,7 @@ class GameScene: SKScene {
         if (winningTarget == 3) {
             bottomTarget.fillColor = winningColour
             bottomTarget.strokeColor = winningColour
+            bottomTarget.name = "winner"
         }
         addChild(bottomTarget)
         targets.append(bottomTarget)
@@ -261,6 +273,7 @@ class GameScene: SKScene {
         if (winningTarget == 4) {
             leftTarget.fillColor = winningColour
             leftTarget.strokeColor = winningColour
+            leftTarget.name = "winner"
         }
         addChild(leftTarget)
         targets.append(leftTarget)
@@ -305,7 +318,7 @@ class GameScene: SKScene {
         
         for target in targets {
             if player.intersectsNode(target) {
-                if player.fillColor == target.fillColor {
+                if target.name == "winner" {
                     correctSelection(target)
                     break
                 } else {
