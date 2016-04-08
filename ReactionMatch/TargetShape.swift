@@ -15,6 +15,7 @@ enum TargetShape: Int {
     case Square
     case Circle
     case Triangle
+    case Star
 }
 
 extension TargetShape {
@@ -27,6 +28,8 @@ extension TargetShape {
                 return "circle"
             case .Triangle:
                 return "triangle"
+            case .Star:
+                return "star"
             }
         }
     }
@@ -42,6 +45,8 @@ extension TargetShape {
                 return SKShapeNode(ellipseOfSize: shapeSize)
             case .Triangle:
                 return SKShapeNode(triangleOfSize: shapeSize)
+            case .Star:
+                return SKShapeNode(starOfSize: shapeSize)
             }
         }
     }
@@ -86,5 +91,37 @@ extension SKShapeNode {
         CGPathAddLineToPoint(trianglePath, nil, -size.width/2, -size.height/2)
         
         path = trianglePath
+    }
+    
+    convenience init(starOfSize size: CGSize) {
+        self.init()
+        
+        let starPathPoints = [
+            CGPoint(x: 5.0, y: 0.5),
+            CGPoint(x: 6.5, y: 3.5),
+            CGPoint(x: 10.0, y: 4.0),
+            CGPoint(x: 7.5, y: 6.0),
+            CGPoint(x: 8.0, y: 9.5),
+            CGPoint(x: 5.0, y: 8.0),
+            CGPoint(x: 2.0, y: 9.5),
+            CGPoint(x: 2.5, y: 6.0),
+            CGPoint(x: 0, y: 4.0),
+            CGPoint(x: 3.5, y: 3.5)]
+        
+        let starPath = CGPathCreateMutable()
+        
+        for (i, starPathPoint) in starPathPoints.enumerate() {
+            let x = ((starPathPoint.x - 5) / 10) * size.width
+            let y = ((starPathPoint.y - 5) / 10) * size.height
+            
+            if i == 0 {
+                CGPathMoveToPoint(starPath, nil, x, y)
+            } else {
+                CGPathAddLineToPoint(starPath, nil, x, y)
+            }
+        }
+        CGPathCloseSubpath(starPath)
+        
+        path = starPath
     }
 }
