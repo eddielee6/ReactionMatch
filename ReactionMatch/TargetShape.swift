@@ -14,6 +14,7 @@ private let shapeSize = CGSize(width: 35, height: 35)
 enum TargetShape: Int {
     case Square
     case Circle
+    case Triangle
 }
 
 extension TargetShape {
@@ -24,6 +25,8 @@ extension TargetShape {
                 return "square"
             case .Circle:
                 return "circle"
+            case .Triangle:
+                return "triangle"
             }
         }
     }
@@ -37,6 +40,8 @@ extension TargetShape {
                 return SKShapeNode(rectOfSize: shapeSize, cornerRadius: 5.0)
             case .Circle:
                 return SKShapeNode(ellipseOfSize: shapeSize)
+            case .Triangle:
+                return SKShapeNode(triangleOfSize: shapeSize)
             }
         }
     }
@@ -66,5 +71,20 @@ extension TargetShape {
         }
         
         return selectedShape
+    }
+}
+
+
+extension SKShapeNode {
+    convenience init(triangleOfSize size: CGSize) {
+        self.init()
+        
+        let trianglePath = CGPathCreateMutable()
+        CGPathMoveToPoint(trianglePath, nil, -size.width/2, -size.height/2)
+        CGPathAddLineToPoint(trianglePath, nil, size.width/2, -size.height/2)
+        CGPathAddLineToPoint(trianglePath, nil, 0, size.height/2)
+        CGPathAddLineToPoint(trianglePath, nil, -size.width/2, -size.height/2)
+        
+        path = trianglePath
     }
 }
