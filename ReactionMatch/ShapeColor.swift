@@ -51,7 +51,9 @@ extension ShapeColor {
         let colorValue = randomSource.nextInt()
         return ShapeColor(rawValue: colorValue)!
     }
-    
+}
+
+extension ShapeColor {
     static func random(not notColor: SKColor) -> ShapeColor {
         let selectedColour = ShapeColor.random()
         
