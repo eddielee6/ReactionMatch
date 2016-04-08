@@ -46,7 +46,9 @@ extension TargetShape {
             case .Triangle:
                 return SKShapeNode(triangleOfSize: shapeSize)
             case .Star:
-                return SKShapeNode(starOfSize: shapeSize)
+                let visualOffset:CGFloat = 1.2 // Stars within standard rect are too small - boost them a bit
+                let starShapeSize = CGSize(width: shapeSize.width * visualOffset , height: shapeSize.height * visualOffset)
+                return SKShapeNode(fivePointStarOfSize: starShapeSize)
             }
         }
     }
@@ -93,7 +95,7 @@ extension SKShapeNode {
         path = trianglePath
     }
     
-    convenience init(starOfSize size: CGSize) {
+    convenience init(fivePointStarOfSize size: CGSize) {
         self.init()
         
         let starPathPoints = [
@@ -108,16 +110,22 @@ extension SKShapeNode {
             CGPoint(x: 0, y: 4.0),
             CGPoint(x: 3.5, y: 3.5)]
         
+        let starPathPointsGridSize:CGFloat = 10.0
+        let gridSizeOffset = starPathPointsGridSize / 2.0
+        
         let starPath = CGPathCreateMutable()
         
         for (i, starPathPoint) in starPathPoints.enumerate() {
-            let x = ((starPathPoint.x - 5) / 10) * size.width
-            let y = ((starPathPoint.y - 5) / 10) * size.height
+            let xNormalised = (starPathPoint.x - gridSizeOffset) / starPathPointsGridSize
+            let yNormalised = (starPathPoint.y - gridSizeOffset) / starPathPointsGridSize
+            
+            let xScaled = xNormalised * size.width
+            let yScaled = yNormalised * size.height
             
             if i == 0 {
-                CGPathMoveToPoint(starPath, nil, x, y)
+                CGPathMoveToPoint(starPath, nil, xScaled, yScaled)
             } else {
-                CGPathAddLineToPoint(starPath, nil, x, y)
+                CGPathAddLineToPoint(starPath, nil, xScaled, yScaled)
             }
         }
         CGPathCloseSubpath(starPath)

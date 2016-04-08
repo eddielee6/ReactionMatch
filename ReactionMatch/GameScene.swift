@@ -76,7 +76,6 @@ class GameScene: SKScene {
         stateLabel.runAction(SKAction.repeatActionForever(blinkAction))
         
         // Player
-        player = SKShapeNode(rectOfSize: CGSize(width: 30, height: 30), cornerRadius: 5.0)
         player.position = centerPoint
         player.zPosition = 10
         addChild(player)
@@ -114,6 +113,7 @@ class GameScene: SKScene {
         
         let playerShape = TargetShape.random()
         let playerShapeNode = playerShape.shapeNode
+        playerShapeNode.name = "player-shape-node"
         playerShapeNode.fillColor = winningColour
         playerShapeNode.strokeColor = SKColor.whiteColor()
         
@@ -316,14 +316,16 @@ class GameScene: SKScene {
             resetTimer(timeForLevel)
         }
         
-        for target in targets {
-            if player.intersectsNode(target) {
-                if target.name == "winner" {
-                    correctSelection(target)
-                    break
-                } else {
-                    incorrectSelection()
-                    break
+        if let playerShape = player.childNodeWithName("player-shape-node") as? SKShapeNode {
+            for target in targets {
+                if playerShape.intersectsNode(target) {
+                    if target.name == "winner" {
+                        correctSelection(target)
+                        break
+                    } else {
+                        incorrectSelection()
+                        break
+                    }
                 }
             }
         }
