@@ -99,16 +99,16 @@ extension SKShapeNode {
         self.init()
         
         let starPathPoints = [
-            CGPoint(x: 5.0, y: 0.5),
-            CGPoint(x: 6.5, y: 3.5),
-            CGPoint(x: 10.0, y: 4.0),
-            CGPoint(x: 7.5, y: 6.0),
-            CGPoint(x: 8.0, y: 9.5),
-            CGPoint(x: 5.0, y: 8.0),
-            CGPoint(x: 2.0, y: 9.5),
-            CGPoint(x: 2.5, y: 6.0),
-            CGPoint(x: 0, y: 4.0),
-            CGPoint(x: 3.5, y: 3.5)]
+            CGPoint(x: 5.0, y: 9.5),
+            CGPoint(x: 6.5, y: 6.5),
+            CGPoint(x: 10.0, y: 6.0),
+            CGPoint(x: 7.5, y: 4.0),
+            CGPoint(x: 8.0, y: 0.5),
+            CGPoint(x: 5.0, y: 2.0),
+            CGPoint(x: 2.0, y: 0.5),
+            CGPoint(x: 2.5, y: 4.0),
+            CGPoint(x: 0, y: 6.0),
+            CGPoint(x: 3.5, y: 6.5)]
         
         let starPathPointsGridSize:CGFloat = 10.0
         let gridSizeOffset = starPathPointsGridSize / 2.0
