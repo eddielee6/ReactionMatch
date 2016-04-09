@@ -9,11 +9,11 @@
 import SpriteKit
 import GameKit
 
-enum ShapeColor: Int {
+enum TargetColor: Int {
     case Red, Yellow, Purple, Green, Orange, Cyan, Blue, Pink
 }
 
-extension ShapeColor {
+extension TargetColor {
     var value: SKColor {
         get {
             switch self {
@@ -38,24 +38,24 @@ extension ShapeColor {
     }
 }
 
-extension ShapeColor {
+extension TargetColor {
     private static let randomSource = GKRandomDistribution(lowestValue: 0, highestValue: count - 1)
     
     private static let count: Int = {
         var max: Int = 0
-        while let _ = ShapeColor(rawValue: max) { max += 1 }
+        while let _ = TargetColor(rawValue: max) { max += 1 }
         return max
     }()
     
-    static func random() -> ShapeColor {
+    static func random() -> TargetColor {
         let colorValue = randomSource.nextInt()
-        return ShapeColor(rawValue: colorValue)!
+        return TargetColor(rawValue: colorValue)!
     }
 }
 
-extension ShapeColor {
-    static func random(not notColor: ShapeColor) -> ShapeColor {
-        let selectedColour = ShapeColor.random()
+extension TargetColor {
+    static func random(not notColor: TargetColor) -> TargetColor {
+        let selectedColour = TargetColor.random()
         
         if selectedColour == notColor {
             return random(not: notColor)
