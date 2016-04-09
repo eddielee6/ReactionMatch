@@ -287,6 +287,9 @@ class GameScene: SKScene {
             return
         }
         
+        player.removeActionForKey("Hint")
+        player.removeActionForKey("Return")
+        
         let maxMove: CGFloat = 120
         
         let touchLocation = touch.locationInNode(self)
@@ -306,8 +309,6 @@ class GameScene: SKScene {
             newY = centerPoint.y - maxMove
         }
         
-        player.removeActionForKey("Hint")
-        player.removeActionForKey("Return")
         player.position = CGPointMake(newX, newY)
     }
     
