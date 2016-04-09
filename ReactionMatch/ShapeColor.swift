@@ -54,10 +54,10 @@ extension ShapeColor {
 }
 
 extension ShapeColor {
-    static func random(not notColor: SKColor) -> ShapeColor {
+    static func random(not notColor: ShapeColor) -> ShapeColor {
         let selectedColour = ShapeColor.random()
         
-        if selectedColour.value == notColor {
+        if selectedColour == notColor {
             return random(not: notColor)
         }
         

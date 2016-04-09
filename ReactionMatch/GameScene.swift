@@ -14,7 +14,7 @@ class GameScene: SKScene {
     let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
     let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
     
-    var winningTargetRandom: GKRandom!
+    var winningTargetRandom = GKRandomDistribution(lowestValue: 1, highestValue: 4)
     
     let scoreLabel = SKLabelNode()
     let stateLabel = SKLabelNode()
@@ -38,14 +38,13 @@ class GameScene: SKScene {
     var centerPoint: CGPoint = CGPoint.zero
     
     override func didMoveToView(view: SKView) {
-        winningTargetRandom = GKRandomDistribution(lowestValue: 1, highestValue: 4)
-        centerPoint = CGPoint(x: size.width/2, y: size.height/2 - 60)
-        
         setupInitialState()
         drawNewPuzzle()
     }
     
     func setupInitialState() {
+        centerPoint = CGPoint(x: size.width/2, y: size.height/2 - 60)
+        
         // Set background
         let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
         backgroundNode.anchorPoint = CGPoint.zero
@@ -108,19 +107,18 @@ class GameScene: SKScene {
             timeForLevel = minTimeForLevel
         }
         
-        let winningColour = ShapeColor.random().value
-        let otherColour = ShapeColor.random(not: winningColour).value
-        
+        let playerColour = ShapeColor.random()
         let playerShape = TargetShape.random()
+        
         let playerShapeNode = playerShape.shapeNode
         playerShapeNode.name = "player-shape-node"
-        playerShapeNode.fillColor = winningColour
+        playerShapeNode.fillColor = playerColour.value
         playerShapeNode.strokeColor = SKColor.whiteColor()
         
         player.removeAllChildren()
         player.addChild(playerShapeNode)
         
-        addNewTargets(winningColour, otherColour: otherColour)
+        addNewTargets(playerColour)
         
         runAction(SKAction.sequence([
             SKAction.waitForDuration(0.5),
@@ -223,7 +221,7 @@ class GameScene: SKScene {
         return target
     }
     
-    func addNewTargets(winningColour: SKColor, otherColour: SKColor) {
+    func addNewTargets(winningColour: ShapeColor) {
         // Remove any old targets
         removeChildrenInArray(targets)
         targets.removeAll()
@@ -235,44 +233,48 @@ class GameScene: SKScene {
         
         let winningTarget = winningTargetRandom.nextInt()
         
-        let topTarget = createTarget(otherColour)
+        let topTargetColour = ShapeColor.random(not: winningColour)
+        let topTarget = createTarget(topTargetColour.value)
         topTarget.position = CGPoint(x: centerPoint.x, y: centerPoint.y + targetDistance)
         if (winningTarget == 1) {
-            topTarget.fillColor = winningColour
-            topTarget.strokeColor = winningColour
+            topTarget.fillColor = winningColour.value
+            topTarget.strokeColor = winningColour.value
             topTarget.name = "winner"
         }
         addChild(topTarget)
         targets.append(topTarget)
         topTarget.runAction(showAction)
         
-        let rightTarget = createTarget(otherColour)
+        let rightTargetColour = ShapeColor.random(not: winningColour)
+        let rightTarget = createTarget(rightTargetColour.value)
         rightTarget.position = CGPoint(x: centerPoint.x + targetDistance, y: centerPoint.y)
         if (winningTarget == 2) {
-            rightTarget.fillColor = winningColour
-            rightTarget.strokeColor = winningColour
+            rightTarget.fillColor = winningColour.value
+            rightTarget.strokeColor = winningColour.value
             rightTarget.name = "winner"
         }
         addChild(rightTarget)
         targets.append(rightTarget)
         rightTarget.runAction(showAction)
         
-        let bottomTarget = createTarget(otherColour)
+        let bottomTargetColour = ShapeColor.random(not: winningColour)
+        let bottomTarget = createTarget(bottomTargetColour.value)
         bottomTarget.position = CGPoint(x: centerPoint.x, y: centerPoint.y - targetDistance)
         if (winningTarget == 3) {
-            bottomTarget.fillColor = winningColour
-            bottomTarget.strokeColor = winningColour
+            bottomTarget.fillColor = winningColour.value
+            bottomTarget.strokeColor = winningColour.value
             bottomTarget.name = "winner"
         }
         addChild(bottomTarget)
         targets.append(bottomTarget)
         bottomTarget.runAction(showAction)
         
-        let leftTarget = createTarget(otherColour)
+        let leftTargetColour = ShapeColor.random(not: winningColour)
+        let leftTarget = createTarget(leftTargetColour.value)
         leftTarget.position = CGPoint(x: centerPoint.x - targetDistance, y: centerPoint.y)
         if (winningTarget == 4) {
-            leftTarget.fillColor = winningColour
-            leftTarget.strokeColor = winningColour
+            leftTarget.fillColor = winningColour.value
+            leftTarget.strokeColor = winningColour.value
             leftTarget.name = "winner"
         }
         addChild(leftTarget)
