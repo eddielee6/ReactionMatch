@@ -14,7 +14,10 @@ class GameScene: SKScene {
     let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
     let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
     
-    var winningTargetRandom = GKRandomDistribution(lowestValue: 1, highestValue: 4)
+    var centerPoint: CGPoint = CGPoint.zero
+    let targetDistanceFromCenterPoint: CGFloat = 100
+    let numberOfTargets: Int = 4
+    var winningTargetRandom = GKRandomDistribution(lowestValue: 0, highestValue: 3)
     
     let scoreLabel = SKLabelNode()
     let stateLabel = SKLabelNode()
@@ -33,9 +36,9 @@ class GameScene: SKScene {
     var timeRemaining: Double = 0
     
     var player = SKNode()
-    var targets = Array<SKShapeNode>()
+    var playerTarget: Target?
     
-    var centerPoint: CGPoint = CGPoint.zero
+    var targets = Array<SKShapeNode>()
     
     override func didMoveToView(view: SKView) {
         setupInitialState()
@@ -107,14 +110,14 @@ class GameScene: SKScene {
             timeForLevel = minTimeForLevel
         }
         
-        let playerTarget = Target()        
-        playerTarget.shapeNode.name = "player-shape-node"
-        playerTarget.shapeNode.strokeColor = SKColor.whiteColor()
-        
         player.removeAllChildren()
-        player.addChild(playerTarget.shapeNode)
         
-        setupTargets(winningTarget: playerTarget)
+        playerTarget = Target()
+        playerTarget!.shapeNode.strokeColor = SKColor.whiteColor()
+        
+        player.addChild(playerTarget!.shapeNode)
+        
+        setupTargets(playerTarget: playerTarget!)
         
         runAction(SKAction.sequence([
             SKAction.waitForDuration(0.5),
@@ -197,15 +200,59 @@ class GameScene: SKScene {
         return Int(ceil((timeRemaining / timeForLevel) * 10))
     }
     
-    func createTarget(withColour: SKColor) -> SKShapeNode {
-        let targetShape = TargetShape.random()
+    
+    
+    func setupTargets(playerTarget playerTarget: Target) {
+        // Remove any old targets
+        removeChildrenInArray(targets)
+        targets.removeAll()
         
-        let target = targetShape.shapeNode
-        target.fillColor = withColour
-        target.strokeColor = withColour
+        // Get new targets
+        targets = getTargets(playerTarget: playerTarget, quantity: numberOfTargets)
+        
+        let winningTargetIndex = winningTargetRandom.nextInt()
+        
+        let winningTarget = targets[winningTargetIndex]
+        winningTarget.fillColor = playerTarget.targetColor.value
+        winningTarget.strokeColor = playerTarget.targetColor.value
+        winningTarget.name = "winner"
+        
+        for (i, target) in targets.enumerate() {
+            if i == 0 {
+                target.position = CGPoint(x: centerPoint.x, y: centerPoint.y + targetDistanceFromCenterPoint)
+            } else if i == 1 {
+                target.position = CGPoint(x: centerPoint.x + targetDistanceFromCenterPoint, y: centerPoint.y)
+            } else if i == 2 {
+                target.position = CGPoint(x: centerPoint.x, y: centerPoint.y - targetDistanceFromCenterPoint)
+            } else if i == 3 {
+                target.position = CGPoint(x: centerPoint.x - targetDistanceFromCenterPoint, y: centerPoint.y)
+            }
+            
+            addChild(target)
+        }
+    }
+    
+    func getTargets(playerTarget playerTarget: Target, quantity: Int) -> [SKShapeNode] {
+        var shapeNodes = [SKShapeNode]()
+        for _ in 0..<quantity {
+            let targetColor = TargetColor.random(not: playerTarget.targetColor)
+            let targetShape = TargetShape.random()
+            shapeNodes.append(getTarget(color: targetColor, shape: targetShape))
+        }
+        return shapeNodes
+    }
+    
+    func getTarget(color color: TargetColor, shape: TargetShape) -> SKShapeNode {
+        let target = shape.shapeNode
+        target.fillColor = color.value
+        target.strokeColor = color.value
         target.alpha = 0
         target.zPosition = 9
         target.name = "target"
+        
+        let showAction = SKAction.fadeInWithDuration(0.25)
+        showAction.timingMode = .EaseIn
+        target.runAction(showAction)
         
         let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
         pointsGainedLabel.verticalAlignmentMode = .Center
@@ -215,67 +262,6 @@ class GameScene: SKScene {
         target.addChild(pointsGainedLabel)
         
         return target
-    }
-    
-    func setupTargets(winningTarget winningTarget: Target) {
-        // Remove any old targets
-        removeChildrenInArray(targets)
-        targets.removeAll()
-        
-        let targetDistance: CGFloat = 100
-        
-        let showAction = SKAction.fadeInWithDuration(0.25)
-        showAction.timingMode = .EaseIn
-        
-        let winningTargetIndex = winningTargetRandom.nextInt()
-        
-        let topTargetColour = TargetColor.random(not: winningTarget.targetColor)
-        let topTarget = createTarget(topTargetColour.value)
-        topTarget.position = CGPoint(x: centerPoint.x, y: centerPoint.y + targetDistance)
-        if (winningTargetIndex == 1) {
-            topTarget.fillColor = winningTarget.targetColor.value
-            topTarget.strokeColor = winningTarget.targetColor.value
-            topTarget.name = "winner"
-        }
-        addChild(topTarget)
-        targets.append(topTarget)
-        topTarget.runAction(showAction)
-        
-        let rightTargetColour = TargetColor.random(not: winningTarget.targetColor)
-        let rightTarget = createTarget(rightTargetColour.value)
-        rightTarget.position = CGPoint(x: centerPoint.x + targetDistance, y: centerPoint.y)
-        if (winningTargetIndex == 2) {
-            rightTarget.fillColor = winningTarget.targetColor.value
-            rightTarget.strokeColor = winningTarget.targetColor.value
-            rightTarget.name = "winner"
-        }
-        addChild(rightTarget)
-        targets.append(rightTarget)
-        rightTarget.runAction(showAction)
-        
-        let bottomTargetColour = TargetColor.random(not: winningTarget.targetColor)
-        let bottomTarget = createTarget(bottomTargetColour.value)
-        bottomTarget.position = CGPoint(x: centerPoint.x, y: centerPoint.y - targetDistance)
-        if (winningTargetIndex == 3) {
-            bottomTarget.fillColor = winningTarget.targetColor.value
-            bottomTarget.strokeColor = winningTarget.targetColor.value
-            bottomTarget.name = "winner"
-        }
-        addChild(bottomTarget)
-        targets.append(bottomTarget)
-        bottomTarget.runAction(showAction)
-        
-        let leftTargetColour = TargetColor.random(not: winningTarget.targetColor)
-        let leftTarget = createTarget(leftTargetColour.value)
-        leftTarget.position = CGPoint(x: centerPoint.x - targetDistance, y: centerPoint.y)
-        if (winningTargetIndex == 4) {
-            leftTarget.fillColor = winningTarget.targetColor.value
-            leftTarget.strokeColor = winningTarget.targetColor.value
-            leftTarget.name = "winner"
-        }
-        addChild(leftTarget)
-        targets.append(leftTarget)
-        leftTarget.runAction(showAction)
     }
     
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -315,7 +301,7 @@ class GameScene: SKScene {
             resetTimer(timeForLevel)
         }
         
-        if let playerShape = player.childNodeWithName("player-shape-node") as? SKShapeNode {
+        if let playerShape = playerTarget?.shapeNode {
             for target in targets {
                 if playerShape.intersectsNode(target) {
                     if target.name == "winner" {

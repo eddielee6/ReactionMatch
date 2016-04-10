@@ -14,6 +14,12 @@ struct Target {
     let targetShape: TargetShape
     let shapeNode: SKShapeNode
     
+    var name: String {
+        get {
+            return "\(targetColor.name)-\(targetShape.name)"
+        }
+    }
+    
     init (targetColor: TargetColor, targetShape: TargetShape) {
         self.targetColor = targetColor
         self.targetShape = targetShape

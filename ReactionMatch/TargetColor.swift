@@ -14,6 +14,31 @@ enum TargetColor: Int {
 }
 
 extension TargetColor {
+    var name: String {
+        get {
+            switch self {
+            case .Red:
+                return "red"
+            case .Yellow:
+                return "yellow"
+            case .Purple:
+                return "purple"
+            case .Green:
+                return "green"
+            case .Orange:
+                return "orange"
+            case .Cyan:
+                return "cyan"
+            case .Blue:
+                return "blue"
+            case .Pink:
+                return "pink"
+            }
+        }
+    }
+}
+
+extension TargetColor {
     var value: SKColor {
         get {
             switch self {
