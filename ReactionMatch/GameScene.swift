@@ -8,6 +8,7 @@
 
 import SpriteKit
 import GameKit
+import Foundation
 
 class GameScene: SKScene {
     
@@ -16,7 +17,8 @@ class GameScene: SKScene {
     
     var centerPoint: CGPoint = CGPoint.zero
     let targetDistanceFromCenterPoint: CGFloat = 100
-    let numberOfTargets: Int = 4
+    let numberOfTargets: Int = 8
+    
     var winningTargetRandom = GKRandomDistribution(lowestValue: 0, highestValue: 3)
     
     let scoreLabel = SKLabelNode()
@@ -81,6 +83,23 @@ class GameScene: SKScene {
         player.position = centerPoint
         player.zPosition = 10
         addChild(player)
+    }
+    
+    func getTargetPositions(quantity numberOfTargets: Int) -> [CGPoint] {
+        var targetPositions = [CGPoint]()
+        
+        let degreesBetweenTargets = 360 / numberOfTargets
+        
+        for degrees in 0.stride(to: 360, by: degreesBetweenTargets) {
+            let radians = Double(degrees) * M_PI / 180.0
+            
+            let targetX = CGFloat(cos(radians)) * targetDistanceFromCenterPoint + centerPoint.x;
+            let targetY = CGFloat(sin(radians)) * targetDistanceFromCenterPoint + centerPoint.y;
+            
+            targetPositions.append(CGPoint(x: targetX, y: targetY))
+        }
+        
+        return targetPositions
     }
     
     func getBackgroundTexture() -> SKTexture {
@@ -208,7 +227,7 @@ class GameScene: SKScene {
         targets.removeAll()
         
         // Get new targets
-        targets = getTargets(playerTarget: playerTarget, quantity: numberOfTargets)
+        targets = getTargetNodes(playerTarget: playerTarget, quantity: numberOfTargets)
         
         let winningTargetIndex = winningTargetRandom.nextInt()
         
@@ -217,32 +236,28 @@ class GameScene: SKScene {
         winningTarget.strokeColor = playerTarget.targetColor.value
         winningTarget.name = "winner"
         
-        for (i, target) in targets.enumerate() {
-            if i == 0 {
-                target.position = CGPoint(x: centerPoint.x, y: centerPoint.y + targetDistanceFromCenterPoint)
-            } else if i == 1 {
-                target.position = CGPoint(x: centerPoint.x + targetDistanceFromCenterPoint, y: centerPoint.y)
-            } else if i == 2 {
-                target.position = CGPoint(x: centerPoint.x, y: centerPoint.y - targetDistanceFromCenterPoint)
-            } else if i == 3 {
-                target.position = CGPoint(x: centerPoint.x - targetDistanceFromCenterPoint, y: centerPoint.y)
-            }
-            
+        for target in targets {
             addChild(target)
         }
     }
     
-    func getTargets(playerTarget playerTarget: Target, quantity: Int) -> [SKShapeNode] {
+    func getTargetNodes(playerTarget playerTarget: Target, quantity: Int) -> [SKShapeNode] {
+        let targetPositions = getTargetPositions(quantity: quantity)
         var shapeNodes = [SKShapeNode]()
-        for _ in 0..<quantity {
+        for position in targetPositions {
             let targetColor = TargetColor.random(not: playerTarget.targetColor)
             let targetShape = TargetShape.random()
-            shapeNodes.append(getTarget(color: targetColor, shape: targetShape))
+            
+            
+            let targetNode = getTargetNode(color: targetColor, shape: targetShape)
+            targetNode.position = position
+            
+            shapeNodes.append(targetNode)
         }
         return shapeNodes
     }
     
-    func getTarget(color color: TargetColor, shape: TargetShape) -> SKShapeNode {
+    func getTargetNode(color color: TargetColor, shape: TargetShape) -> SKShapeNode {
         let target = shape.shapeNode
         target.fillColor = color.value
         target.strokeColor = color.value
