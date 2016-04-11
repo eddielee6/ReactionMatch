@@ -17,9 +17,9 @@ class GameScene: SKScene {
     
     var centerPoint: CGPoint = CGPoint.zero
     let targetDistanceFromCenterPoint: CGFloat = 100
-    let numberOfTargets: Int = 8
     
-    var winningTargetRandom = GKRandomDistribution(lowestValue: 0, highestValue: 3)
+    
+    let numberOfTargets: Int = 4
     
     let scoreLabel = SKLabelNode()
     let stateLabel = SKLabelNode()
@@ -160,8 +160,7 @@ class GameScene: SKScene {
     
     func firstPlayHint() {
         if let winningTarget = getWinningTarget() {
-            
-            let hintPoint = CGPoint(x: (centerPoint.x + winningTarget.position.x)/2, y: (centerPoint.y + winningTarget.position.y)/2)
+            let hintPoint = (centerPoint + winningTarget.position) / 2
             
             let hintAction = SKAction.sequence([
                 SKAction.moveTo(hintPoint, duration: 0.3),
@@ -212,7 +211,8 @@ class GameScene: SKScene {
         // Get new targets
         targets = getTargetNodes(playerTarget: playerTarget, quantity: numberOfTargets)
         
-        let winningTargetIndex = winningTargetRandom.nextInt()
+        let random = GKRandomDistribution(lowestValue: 0, highestValue: numberOfTargets - 1)
+        let winningTargetIndex = random.nextInt()
         
         let winningTarget = targets[winningTargetIndex]
         winningTarget.fillColor = playerTarget.targetColor.value
@@ -270,26 +270,15 @@ class GameScene: SKScene {
         player.removeActionForKey("Hint")
         player.removeActionForKey("Return")
         
-        let maxMove: CGFloat = 120
-        
         let touchLocation = touch.locationInNode(self)
         let previousLocation = touch.previousLocationInNode(self)
         
-        var newX = player.position.x + (touchLocation.x - previousLocation.x)
-        if newX > centerPoint.x + maxMove {
-            newX = centerPoint.x + maxMove
-        } else if newX < centerPoint.x - maxMove {
-            newX = centerPoint.x - maxMove
-        }
         
-        var newY = player.position.y + (touchLocation.y - previousLocation.y)
-        if newY > centerPoint.y + maxMove {
-            newY = centerPoint.y + maxMove
-        } else if newY < centerPoint.y - maxMove {
-            newY = centerPoint.y - maxMove
-        }
         
-        player.position = CGPointMake(newX, newY)
+        let newPosition = player.position + (touchLocation - previousLocation)
+        player.position = newPosition
+        
+        
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -381,18 +370,16 @@ class GameScene: SKScene {
         gameOverScene.reason = reason
         self.view?.presentScene(gameOverScene, transition: transition)
     }
-}
-
-extension SKColor {
-    var inverted: SKColor {
-        get {
-            var r: CGFloat = 0
-            var g: CGFloat = 0
-            var b: CGFloat = 0
-            var a: CGFloat = 0
-            
-            self.getRed(&r, green: &g, blue: &b, alpha: &a)
-            return SKColor(red: 1-r, green: 1-g, blue: 1-b, alpha: a)
+    
+    override func update(currentTime: NSTimeInterval) {
+        let playerMaxDistanceFromCenterPoint = targetDistanceFromCenterPoint * 1.2
+        
+        let distance = (player.position - centerPoint).length()
+        if distance > playerMaxDistanceFromCenterPoint {
+            let offset = player.position - centerPoint
+            let direction = offset.normalized()
+            let cappedPosition = (direction * playerMaxDistanceFromCenterPoint) + centerPoint
+            player.position = cappedPosition
         }
     }
 }
