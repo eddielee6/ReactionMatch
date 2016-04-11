@@ -160,34 +160,17 @@ class GameScene: SKScene {
     
     func firstPlayHint() {
         if let winningTarget = getWinningTarget() {
-            var action:SKAction!
             
-            if winningTarget.position.x > player.position.x {
-                action = SKAction.sequence([
-                    SKAction.moveToX(player.position.x + 50, duration: 0.3),
-                    SKAction.moveToX(centerPoint.x, duration: 0.3)
-                ])
-            } else if winningTarget.position.x < player.position.x {
-                action = SKAction.sequence([
-                    SKAction.moveToX(player.position.x - 50, duration: 0.3),
-                    SKAction.moveToX(centerPoint.x, duration: 0.3)
-                ])
-            } else if winningTarget.position.y > player.position.y {
-                action = SKAction.sequence([
-                    SKAction.moveToY(player.position.y + 50, duration: 0.3),
-                    SKAction.moveToY(centerPoint.y, duration: 0.3)
-                ])
-            } else if winningTarget.position.y < player.position.y {
-                action = SKAction.sequence([
-                    SKAction.moveToY(player.position.y - 50, duration: 0.3),
-                    SKAction.moveToY(centerPoint.y, duration: 0.3)
-                ])
-            }
+            let hintPoint = CGPoint(x: (centerPoint.x + winningTarget.position.x)/2, y: (centerPoint.y + winningTarget.position.y)/2)
             
-            action.timingMode = .EaseInEaseOut
+            let hintAction = SKAction.sequence([
+                SKAction.moveTo(hintPoint, duration: 0.3),
+                SKAction.moveTo(centerPoint, duration: 0.3)])
+            
+            hintAction.timingMode = .EaseInEaseOut
             player.runAction(SKAction.repeatActionForever(SKAction.sequence([
                 SKAction.waitForDuration(1.25),
-                action
+                hintAction
             ])), withKey: "Hint")
         }
     }
