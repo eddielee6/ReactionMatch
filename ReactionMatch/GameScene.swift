@@ -10,11 +10,19 @@ import SpriteKit
 import GameKit
 import Foundation
 
+enum GameMode {
+    case ColorMatch
+    case ShapeMatch
+    case ExactMatch
+}
+
 class GameScene: SKScene {
     
     let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
     let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
     let fadeInAction = SKAction.fadeInWithDuration(0.25)
+    
+    let gameMode: GameMode = .ShapeMatch
     
     var centerPoint: CGPoint = CGPoint.zero
     let targetDistanceFromCenterPoint: CGFloat = 100    
@@ -38,7 +46,8 @@ class GameScene: SKScene {
     var timeRemaining: Double = 0
     
     var player: TargetShapeNode?
-    var targets = Array<TargetShapeNode>()
+    var targets: Array<TargetShapeNode>?
+    var winningTarget: TargetShapeNode?
     
     override func didMoveToView(view: SKView) {
         setupInitialState()
@@ -133,18 +142,8 @@ class GameScene: SKScene {
         ]))
     }
     
-    func getWinningTarget() -> SKShapeNode? {
-        for target in targets {
-            if target.name == "winner" {
-                return target
-            }
-        }
-        
-        return nil
-    }
-    
     func firstPlayHint() {
-        if let winningTarget = getWinningTarget() {
+        if let winningTarget = winningTarget {
             let hintPoint = (centerPoint + winningTarget.position) / 2
             
             let hintAction = SKAction.sequence([
@@ -188,8 +187,10 @@ class GameScene: SKScene {
     
     func setupTargetsFor(playerColor playerColor: TargetColor, playerShape: TargetShape) {
         // Remove any old targets
-        removeChildrenInArray(targets)
-        targets.removeAll()
+        if var existingTargets = targets {
+            removeChildrenInArray(existingTargets)
+            existingTargets.removeAll()
+        }
         
         // Get new target positions
         let targetPositions = calculatePositionForTargets(quantity: numberOfTargets)
@@ -199,11 +200,10 @@ class GameScene: SKScene {
         let winningTargetIndex = random.nextInt()
         
         // Create targets
+        var newTargets = [TargetShapeNode]()
         for (i, position) in targetPositions.enumerate() {
-            let targetColor = TargetColor.random(not: playerColor)
-            let targetShape = TargetShape.random()
             
-            let targetNode = TargetShapeNode(targetColor: targetColor, targetShape: targetShape)
+            let targetNode = createTargetShapeNode(playerColor: playerColor, playerShape: playerShape, isWinning: i == winningTargetIndex)
             
             targetNode.position = position
             
@@ -211,17 +211,53 @@ class GameScene: SKScene {
             targetNode.alpha = 0
             targetNode.runAction(fadeInAction)
             
-            // Color winning target correctly
             if i == winningTargetIndex {
-                targetNode.fillColor = playerColor.value
-                targetNode.strokeColor = playerColor.value
-                targetNode.name = "winner"
+                winningTarget = targetNode
             }
             
-            addChild(targetNode)
-            
-            targets.append(targetNode)
+            newTargets.append(targetNode)
         }
+        
+        for newTarget in newTargets {
+            addChild(newTarget)
+        }
+        
+        targets = newTargets
+    }
+    
+    func createTargetShapeNode(playerColor playerColor: TargetColor, playerShape: TargetShape, isWinning: Bool) -> TargetShapeNode {
+        var targetColor: TargetColor
+        var targetShape: TargetShape
+        
+        if isWinning {
+            switch gameMode {
+            case .ColorMatch:
+                targetColor = playerColor
+                targetShape = TargetShape.random()
+            case .ShapeMatch:
+                targetColor = TargetColor.random()
+                targetShape = playerShape
+            case .ExactMatch:
+                targetColor = playerColor
+                targetShape = playerShape
+            }
+        } else {
+            switch gameMode {
+            case .ColorMatch:
+                targetColor = TargetColor.random(not: playerColor)
+                targetShape = TargetShape.random()
+            case .ShapeMatch:
+                targetColor = TargetColor.random()
+                targetShape = TargetShape.random(not: playerShape)
+            case .ExactMatch:
+                targetColor = TargetColor.random(not: playerColor)
+                targetShape = TargetShape.random(not: playerShape)
+            }
+        }
+        
+        let targetNode = TargetShapeNode(targetColor: targetColor, targetShape: targetShape)
+        
+        return targetNode
     }
     
     func calculatePositionForTargets(quantity numberOfTargets: Int) -> [CGPoint] {
@@ -269,7 +305,7 @@ class GameScene: SKScene {
         // Fade out incorrect targets
         let shrinkAction = SKAction.scaleBy(0, duration: 0.25)
         shrinkAction.timingMode = .EaseIn
-        targets.filter({
+        targets!.filter({
             return $0 != winningTarget
         }).forEach({
             $0.runAction(shrinkAction)
@@ -332,13 +368,12 @@ class GameScene: SKScene {
             resetTimer(timeForLevel)
         }
         
-        if let currentPlayer = player {
-            for target in targets {
-                if currentPlayer.intersectsNode(target) {
-                    if target.name == "winner" {
-                        correctSelection(target)
-                        break
-                    } else {
+        if let currentPlayer = player, targets = targets, winningTarget = winningTarget {
+            if currentPlayer.intersectsNode(winningTarget) {
+                correctSelection(winningTarget)
+            } else {
+                for target in targets {
+                    if currentPlayer.intersectsNode(target) {
                         incorrectSelection()
                         break
                     }
