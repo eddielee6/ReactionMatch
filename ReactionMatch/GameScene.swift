@@ -17,8 +17,7 @@ class GameScene: SKScene {
     let fadeInAction = SKAction.fadeInWithDuration(0.25)
     
     var centerPoint: CGPoint = CGPoint.zero
-    let targetDistanceFromCenterPoint: CGFloat = 100
-    
+    let targetDistanceFromCenterPoint: CGFloat = 100    
     
     let numberOfTargets: Int = 4
     
@@ -38,10 +37,8 @@ class GameScene: SKScene {
     var timeForLevel: Double = 1.2
     var timeRemaining: Double = 0
     
-    var player = SKNode()
-    var playerTarget: Target?
-    
-    var targets = Array<SKShapeNode>()
+    var player: TargetShapeNode?
+    var targets = Array<TargetShapeNode>()
     
     override func didMoveToView(view: SKView) {
         setupInitialState()
@@ -81,11 +78,6 @@ class GameScene: SKScene {
         ])
         blinkAction.timingMode = .EaseInEaseOut
         stateLabel.runAction(SKAction.repeatActionForever(blinkAction))
-        
-        // Player
-        player.position = centerPoint
-        player.zPosition = 10
-        addChild(player)
     }
     
     func getBackgroundTexture() -> SKTexture {
@@ -115,14 +107,21 @@ class GameScene: SKScene {
             timeForLevel = minTimeForLevel
         }
         
-        player.removeAllChildren()
+        // Remove any existing player
+        if let existingPlayer = player {
+            existingPlayer.removeFromParent()
+        }
         
-        playerTarget = Target()
-        playerTarget!.shapeNode.strokeColor = SKColor.whiteColor()
+        // Setup new player
+        let newPlayer = TargetShapeNode.randomShapeNode()
+        newPlayer.strokeColor = SKColor.whiteColor()
+        newPlayer.position = centerPoint
+        newPlayer.zPosition = 10
+        addChild(newPlayer)
         
-        player.addChild(playerTarget!.shapeNode)
+        player = newPlayer
         
-        setupTargets(playerTarget: playerTarget!)
+        setupTargetsFor(playerColor: newPlayer.targetColor, playerShape: newPlayer.targetShape)
         
         runAction(SKAction.sequence([
             SKAction.waitForDuration(0.5),
@@ -151,9 +150,9 @@ class GameScene: SKScene {
             let hintAction = SKAction.sequence([
                 SKAction.moveTo(hintPoint, duration: 0.3),
                 SKAction.moveTo(centerPoint, duration: 0.3)])
-            
             hintAction.timingMode = .EaseInEaseOut
-            player.runAction(SKAction.repeatActionForever(SKAction.sequence([
+            
+            player!.runAction(SKAction.repeatActionForever(SKAction.sequence([
                 SKAction.waitForDuration(1.25),
                 hintAction
             ])), withKey: "Hint")
@@ -185,40 +184,43 @@ class GameScene: SKScene {
     
     func getPointsForTime(timeRemaining: Double) -> Int {
         return Int(ceil((timeRemaining / timeForLevel) * 10))
-    }
+    }    
     
-    
-    
-    func setupTargets(playerTarget playerTarget: Target) {
+    func setupTargetsFor(playerColor playerColor: TargetColor, playerShape: TargetShape) {
         // Remove any old targets
         removeChildrenInArray(targets)
         targets.removeAll()
         
-        // Get new targets
-        targets = createTargetNodesFor(playerTarget: playerTarget, quantity: numberOfTargets)
-        
+        // Get new target positions
         let targetPositions = calculatePositionForTargets(quantity: numberOfTargets)
         
-        assert(targets.count == targetPositions.count, "Misaligned Targets and Positions")
-        
-        let random = GKRandomDistribution(lowestValue: 0, highestValue: numberOfTargets - 1)
+        // Pick winning target
+        let random = GKRandomDistribution(lowestValue: 0, highestValue: targetPositions.count - 1)
         let winningTargetIndex = random.nextInt()
         
+        // Create targets
         for (i, position) in targetPositions.enumerate() {
+            let targetColor = TargetColor.random(not: playerColor)
+            let targetShape = TargetShape.random()
             
-            targets[i].position = position
+            let targetNode = TargetShapeNode(targetColor: targetColor, targetShape: targetShape)
+            
+            targetNode.position = position
             
             // Fade in
-            targets[i].alpha = 0
-            targets[i].runAction(fadeInAction)
+            targetNode.alpha = 0
+            targetNode.runAction(fadeInAction)
             
+            // Color winning target correctly
             if i == winningTargetIndex {
-                targets[i].fillColor = playerTarget.targetColor.value
-                targets[i].strokeColor = playerTarget.targetColor.value
-                targets[i].name = "winner"
+                targetNode.fillColor = playerColor.value
+                targetNode.strokeColor = playerColor.value
+                targetNode.name = "winner"
             }
             
-            addChild(targets[i])
+            addChild(targetNode)
+            
+            targets.append(targetNode)
         }
     }
     
@@ -239,35 +241,6 @@ class GameScene: SKScene {
         return targetPositions
     }
     
-    func createTargetNodesFor(playerTarget playerTarget: Target, quantity: Int) -> [SKShapeNode] {
-        var shapeNodes = [SKShapeNode]()
-        for _ in 0..<quantity {
-            let targetColor = TargetColor.random(not: playerTarget.targetColor)
-            let targetShape = TargetShape.random()
-            
-            shapeNodes.append(createTargetNodeWith(color: targetColor, shape: targetShape))
-        }
-        return shapeNodes
-    }
-    
-    func createTargetNodeWith(color color: TargetColor, shape: TargetShape) -> SKShapeNode {
-        let target = shape.shapeNode
-        target.fillColor = color.value
-        target.strokeColor = color.value
-        target.zPosition = 9
-        
-        let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
-        pointsGainedLabel.verticalAlignmentMode = .Center
-        pointsGainedLabel.horizontalAlignmentMode = .Center
-        pointsGainedLabel.fontSize = 20
-        pointsGainedLabel.name = "pointsGainedLabel"
-        target.addChild(pointsGainedLabel)
-        
-        return target
-    }
-    
-    
-    
     func correctSelection(winningTarget: SKShapeNode) {
         stopTimer()
         
@@ -286,7 +259,7 @@ class GameScene: SKScene {
         // Return player to center
         let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.25))
         returnAction.timingMode = .EaseInEaseOut
-        player.runAction(returnAction, withKey: "Return")
+        player!.runAction(returnAction, withKey: "Return")
         
         // Grow winning target
         let growAction = SKAction.scaleBy(2, duration: 0.25)
@@ -319,7 +292,7 @@ class GameScene: SKScene {
     func failedSelection() {
         let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.15))
         returnAction.timingMode = .EaseInEaseOut
-        player.runAction(returnAction, withKey: "Return")
+        player!.runAction(returnAction, withKey: "Return")
     }
     
     func gameOver(reason: String) {
@@ -340,14 +313,16 @@ class GameScene: SKScene {
             return
         }
         
-        player.removeActionForKey("Hint")
-        player.removeActionForKey("Return")
-        
         let touchLocation = touch.locationInNode(self)
         let previousLocation = touch.previousLocationInNode(self)
         
-        let newPosition = player.position + (touchLocation - previousLocation)
-        player.position = newPosition
+        if let currentPlayer = player {
+            currentPlayer.removeActionForKey("Hint")
+            currentPlayer.removeActionForKey("Return")
+            
+            let newPosition = currentPlayer.position + (touchLocation - previousLocation)
+            currentPlayer.position = newPosition
+        }
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -357,9 +332,9 @@ class GameScene: SKScene {
             resetTimer(timeForLevel)
         }
         
-        if let playerShape = playerTarget?.shapeNode {
+        if let currentPlayer = player {
             for target in targets {
-                if playerShape.intersectsNode(target) {
+                if currentPlayer.intersectsNode(target) {
                     if target.name == "winner" {
                         correctSelection(target)
                         break
@@ -377,12 +352,14 @@ class GameScene: SKScene {
     override func update(currentTime: NSTimeInterval) {
         let playerMaxDistanceFromCenterPoint = targetDistanceFromCenterPoint * 1.2
         
-        let distance = (player.position - centerPoint).length()
-        if distance > playerMaxDistanceFromCenterPoint {
-            let offset = player.position - centerPoint
-            let direction = offset.normalized()
-            let cappedPosition = (direction * playerMaxDistanceFromCenterPoint) + centerPoint
-            player.position = cappedPosition
+        if let currentPlayer = player {
+            let distance = (currentPlayer.position - centerPoint).length()
+            if distance > playerMaxDistanceFromCenterPoint {
+                let offset = currentPlayer.position - centerPoint
+                let direction = offset.normalized()
+                let cappedPosition = (direction * playerMaxDistanceFromCenterPoint) + centerPoint
+                currentPlayer.position = cappedPosition
+            }
         }
     }
 }
