@@ -14,6 +14,7 @@ class GameScene: SKScene {
     
     let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
     let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
+    let fadeInAction = SKAction.fadeInWithDuration(0.25)
     
     var centerPoint: CGPoint = CGPoint.zero
     let targetDistanceFromCenterPoint: CGFloat = 100
@@ -50,6 +51,8 @@ class GameScene: SKScene {
     func setupInitialState() {
         centerPoint = CGPoint(x: size.width/2, y: size.height/2 - 60)
         
+        fadeInAction.timingMode = .EaseIn
+        
         // Set background
         let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
         backgroundNode.anchorPoint = CGPoint.zero
@@ -83,23 +86,6 @@ class GameScene: SKScene {
         player.position = centerPoint
         player.zPosition = 10
         addChild(player)
-    }
-    
-    func getTargetPositions(quantity numberOfTargets: Int) -> [CGPoint] {
-        var targetPositions = [CGPoint]()
-        
-        let degreesBetweenTargets = 360 / numberOfTargets
-        
-        for degrees in 0.stride(to: 360, by: degreesBetweenTargets) {
-            let radians = Double(degrees) * M_PI / 180.0
-            
-            let targetX = CGFloat(cos(radians)) * targetDistanceFromCenterPoint + centerPoint.x;
-            let targetY = CGFloat(sin(radians)) * targetDistanceFromCenterPoint + centerPoint.y;
-            
-            targetPositions.append(CGPoint(x: targetX, y: targetY))
-        }
-        
-        return targetPositions
     }
     
     func getBackgroundTexture() -> SKTexture {
@@ -209,48 +195,66 @@ class GameScene: SKScene {
         targets.removeAll()
         
         // Get new targets
-        targets = getTargetNodes(playerTarget: playerTarget, quantity: numberOfTargets)
+        targets = createTargetNodesFor(playerTarget: playerTarget, quantity: numberOfTargets)
+        
+        let targetPositions = calculatePositionForTargets(quantity: numberOfTargets)
+        
+        assert(targets.count == targetPositions.count, "Misaligned Targets and Positions")
         
         let random = GKRandomDistribution(lowestValue: 0, highestValue: numberOfTargets - 1)
         let winningTargetIndex = random.nextInt()
         
-        let winningTarget = targets[winningTargetIndex]
-        winningTarget.fillColor = playerTarget.targetColor.value
-        winningTarget.strokeColor = playerTarget.targetColor.value
-        winningTarget.name = "winner"
-        
-        for target in targets {
-            addChild(target)
+        for (i, position) in targetPositions.enumerate() {
+            
+            targets[i].position = position
+            
+            // Fade in
+            targets[i].alpha = 0
+            targets[i].runAction(fadeInAction)
+            
+            if i == winningTargetIndex {
+                targets[i].fillColor = playerTarget.targetColor.value
+                targets[i].strokeColor = playerTarget.targetColor.value
+                targets[i].name = "winner"
+            }
+            
+            addChild(targets[i])
         }
     }
     
-    func getTargetNodes(playerTarget playerTarget: Target, quantity: Int) -> [SKShapeNode] {
-        let targetPositions = getTargetPositions(quantity: quantity)
+    func calculatePositionForTargets(quantity numberOfTargets: Int) -> [CGPoint] {
+        var targetPositions = [CGPoint]()
+        
+        let degreesBetweenTargets = 360 / numberOfTargets
+        
+        for degrees in 0.stride(to: 360, by: degreesBetweenTargets) {
+            let radians = Double(degrees) * M_PI / 180.0
+            
+            let targetX = CGFloat(cos(radians)) * targetDistanceFromCenterPoint + centerPoint.x;
+            let targetY = CGFloat(sin(radians)) * targetDistanceFromCenterPoint + centerPoint.y;
+            
+            targetPositions.append(CGPoint(x: targetX, y: targetY))
+        }
+        
+        return targetPositions
+    }
+    
+    func createTargetNodesFor(playerTarget playerTarget: Target, quantity: Int) -> [SKShapeNode] {
         var shapeNodes = [SKShapeNode]()
-        for position in targetPositions {
+        for _ in 0..<quantity {
             let targetColor = TargetColor.random(not: playerTarget.targetColor)
             let targetShape = TargetShape.random()
             
-            
-            let targetNode = getTargetNode(color: targetColor, shape: targetShape)
-            targetNode.position = position
-            
-            shapeNodes.append(targetNode)
+            shapeNodes.append(createTargetNodeWith(color: targetColor, shape: targetShape))
         }
         return shapeNodes
     }
     
-    func getTargetNode(color color: TargetColor, shape: TargetShape) -> SKShapeNode {
+    func createTargetNodeWith(color color: TargetColor, shape: TargetShape) -> SKShapeNode {
         let target = shape.shapeNode
         target.fillColor = color.value
         target.strokeColor = color.value
-        target.alpha = 0
         target.zPosition = 9
-        target.name = "target"
-        
-        let showAction = SKAction.fadeInWithDuration(0.25)
-        showAction.timingMode = .EaseIn
-        target.runAction(showAction)
         
         let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
         pointsGainedLabel.verticalAlignmentMode = .Center
@@ -262,48 +266,7 @@ class GameScene: SKScene {
         return target
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        guard let touch = touches.first else {
-            return
-        }
-        
-        player.removeActionForKey("Hint")
-        player.removeActionForKey("Return")
-        
-        let touchLocation = touch.locationInNode(self)
-        let previousLocation = touch.previousLocationInNode(self)
-        
-        
-        
-        let newPosition = player.position + (touchLocation - previousLocation)
-        player.position = newPosition
-        
-        
-    }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        // Start timer after initial touch
-        if !gameStarted {
-            gameStarted = true
-            resetTimer(timeForLevel)
-        }
-        
-        if let playerShape = playerTarget?.shapeNode {
-            for target in targets {
-                if playerShape.intersectsNode(target) {
-                    if target.name == "winner" {
-                        correctSelection(target)
-                        break
-                    } else {
-                        incorrectSelection()
-                        break
-                    }
-                }
-            }
-        }
-        
-        failedSelection()
-    }
     
     func correctSelection(winningTarget: SKShapeNode) {
         stopTimer()
@@ -369,6 +332,46 @@ class GameScene: SKScene {
         gameOverScene.newScore = score
         gameOverScene.reason = reason
         self.view?.presentScene(gameOverScene, transition: transition)
+    }
+    
+    
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        guard let touch = touches.first else {
+            return
+        }
+        
+        player.removeActionForKey("Hint")
+        player.removeActionForKey("Return")
+        
+        let touchLocation = touch.locationInNode(self)
+        let previousLocation = touch.previousLocationInNode(self)
+        
+        let newPosition = player.position + (touchLocation - previousLocation)
+        player.position = newPosition
+    }
+    
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        // Start timer after initial touch
+        if !gameStarted {
+            gameStarted = true
+            resetTimer(timeForLevel)
+        }
+        
+        if let playerShape = playerTarget?.shapeNode {
+            for target in targets {
+                if playerShape.intersectsNode(target) {
+                    if target.name == "winner" {
+                        correctSelection(target)
+                        break
+                    } else {
+                        incorrectSelection()
+                        break
+                    }
+                }
+            }
+        }
+        
+        failedSelection()
     }
     
     override func update(currentTime: NSTimeInterval) {
