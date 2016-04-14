@@ -31,7 +31,6 @@ class GameScene: SKScene {
     
     let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
     let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
-    let fadeInAction = SKAction.fadeInWithDuration(0.25)
     
     
     var centerPoint: CGPoint = CGPoint.zero
@@ -62,8 +61,6 @@ class GameScene: SKScene {
     
     func setupInitialState() {
         centerPoint = CGPoint(x: size.width/2, y: size.height/2 - 60)
-        
-        fadeInAction.timingMode = .EaseIn
         
         // Set background
         let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
@@ -132,15 +129,16 @@ class GameScene: SKScene {
         newPlayer.strokeColor = SKColor.whiteColor()
         newPlayer.position = centerPoint
         newPlayer.zPosition = 10
-        addChild(newPlayer)
-        
-        player = newPlayer
         
         let bonusTargets:Int = Int(floor(Double(levelsPlayed / newTargetAfterTurn))) * newTargetIncrement
         var numberOfTargets: Int = minNumberOfTargets + bonusTargets
         numberOfTargets = numberOfTargets > maxNumberOfTargets ? maxNumberOfTargets : numberOfTargets
         
         setupTargetsFor(newPlayer, numberOfTargets: numberOfTargets)
+        
+        // Add new player
+        addChild(newPlayer)
+        player = newPlayer
         
         runAction(SKAction.sequence([
             SKAction.waitForDuration(0.5),
@@ -209,25 +207,46 @@ class GameScene: SKScene {
         let random = GKRandomDistribution(lowestValue: 0, highestValue: targetPositions.count - 1)
         let winningTargetIndex = random.nextInt()
         
+        let targetAnimationDuration = 0.25
+        
+        // Create Fade Action
+        let fadeInAction = SKAction.fadeInWithDuration(targetAnimationDuration)
+        fadeInAction.timingMode = .EaseIn
+        
+        // Create Grow Action
+        let growAction = SKAction.scaleTo(1.0, duration: targetAnimationDuration)
+        growAction.timingMode = .EaseIn
+        
         // Create targets
         var newTargets = [TargetShapeNode]()
         for (i, position) in targetPositions.enumerate() {
             
             let targetNode = createTargetShapeNode(playerTargetNode, isWinning: i == winningTargetIndex)
             
-            targetNode.position = position
-            
-            // Fade in
-            targetNode.alpha = 0
-            targetNode.runAction(fadeInAction)
-            
             if i == winningTargetIndex {
                 winningTarget = targetNode
             }
             
+            // Invisible in center
+            targetNode.alpha = 0
+            targetNode.setScale(0)
+            targetNode.position = centerPoint
+            
+            // Create move action
+            let moveToPositionAction = SKAction.moveTo(position, duration: targetAnimationDuration)
+            moveToPositionAction.timingMode = .EaseIn
+            
+            // Animate
+            targetNode.runAction(SKAction.group([
+                fadeInAction,
+                moveToPositionAction,
+                growAction
+            ]))
+            
             newTargets.append(targetNode)
         }
         
+        // Add targets to screen
         for newTarget in newTargets {
             addChild(newTarget)
         }
