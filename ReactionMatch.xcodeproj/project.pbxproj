@@ -95,7 +95,6 @@
 				2C104D281C4D6BA10097E0AD /* GameScene.swift */,
 				2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */,
 				2C104D2C1C4D6BA10097E0AD /* Main.storyboard */,
-				2C104D311C4D6BA10097E0AD /* LaunchScreen.storyboard */,
 				2C104D341C4D6BA10097E0AD /* Info.plist */,
 			);
 			path = ReactionMatch;
@@ -104,6 +103,7 @@
 		2C4811DA1C53F3E4007BD90B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				2C104D311C4D6BA10097E0AD /* LaunchScreen.storyboard */,
 				2C99B7221C581950003C5AFF /* iTunesArtwork.png */,
 				2C99B7231C581950003C5AFF /* iTunesArtwork@2x.png */,
 				2C4811DB1C53F43E007BD90B /* Sounds */,
