@@ -18,19 +18,25 @@ enum GameMode {
 
 class GameScene: SKScene {
     
+    let gameMode: GameMode = .ShapeMatch // How accuratly should shapes be matched
+    
+    let minNumberOfTargets: Int = 2 // Starting number of targets on screen
+    let maxNumberOfTargets: Int = 8 // Cap on how many targets per game
+    let newTargetAfterTurn: Int = 5 // Turns between new targets being added
+    let newTargetIncrement: Int = 2 // Number of targets to add each increment
+    
+    let maxTimeForLevel: Double = 1.2 // Starting time allowed for per level
+    let minTimeForLevel: Double = 0.4 // Cap on minimum amount of time per level
+    
+    
     let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
     let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
     let fadeInAction = SKAction.fadeInWithDuration(0.25)
     
-    let gameMode: GameMode = .ShapeMatch
     
     var centerPoint: CGPoint = CGPoint.zero
     let targetDistanceFromCenterPoint: CGFloat = 100    
     
-    let numberOfTargets: Int = 4
-    
-    let scoreLabel = SKLabelNode()
-    let stateLabel = SKLabelNode()
     
     var gameStarted: Bool = false
     var levelsPlayed: Int = 0
@@ -39,11 +45,11 @@ class GameScene: SKScene {
             scoreLabel.text = "Score \(score)"
         }
     }
-    
-    let baseTimeForLevel: Double = 1.2
-    let minTimeForLevel: Double = 0.4
     var timeForLevel: Double = 1.2
     var timeRemaining: Double = 0
+    
+    let scoreLabel = SKLabelNode()
+    let stateLabel = SKLabelNode()
     
     var player: TargetShapeNode?
     var targets: Array<TargetShapeNode>?
@@ -111,7 +117,7 @@ class GameScene: SKScene {
     func drawNewPuzzle() {
         levelsPlayed += 1
         
-        timeForLevel = baseTimeForLevel - Double(levelsPlayed / 5) * 0.1
+        timeForLevel = maxTimeForLevel - Double(levelsPlayed / 5) * 0.1
         if timeForLevel < minTimeForLevel {
             timeForLevel = minTimeForLevel
         }
@@ -130,7 +136,11 @@ class GameScene: SKScene {
         
         player = newPlayer
         
-        setupTargetsFor(playerColor: newPlayer.targetColor, playerShape: newPlayer.targetShape)
+        let bonusTargets:Int = Int(floor(Double(levelsPlayed / newTargetAfterTurn))) * newTargetIncrement
+        var numberOfTargets: Int = minNumberOfTargets + bonusTargets
+        numberOfTargets = numberOfTargets > maxNumberOfTargets ? maxNumberOfTargets : numberOfTargets
+        
+        setupTargetsFor(newPlayer, numberOfTargets: numberOfTargets)
         
         runAction(SKAction.sequence([
             SKAction.waitForDuration(0.5),
@@ -185,7 +195,7 @@ class GameScene: SKScene {
         return Int(ceil((timeRemaining / timeForLevel) * 10))
     }    
     
-    func setupTargetsFor(playerColor playerColor: TargetColor, playerShape: TargetShape) {
+    func setupTargetsFor(playerTargetNode: TargetShapeNode, numberOfTargets: Int) {
         // Remove any old targets
         if var existingTargets = targets {
             removeChildrenInArray(existingTargets)
@@ -203,7 +213,7 @@ class GameScene: SKScene {
         var newTargets = [TargetShapeNode]()
         for (i, position) in targetPositions.enumerate() {
             
-            let targetNode = createTargetShapeNode(playerColor: playerColor, playerShape: playerShape, isWinning: i == winningTargetIndex)
+            let targetNode = createTargetShapeNode(playerTargetNode, isWinning: i == winningTargetIndex)
             
             targetNode.position = position
             
@@ -225,33 +235,33 @@ class GameScene: SKScene {
         targets = newTargets
     }
     
-    func createTargetShapeNode(playerColor playerColor: TargetColor, playerShape: TargetShape, isWinning: Bool) -> TargetShapeNode {
+    func createTargetShapeNode(playerTargetNode: TargetShapeNode, isWinning: Bool) -> TargetShapeNode {
         var targetColor: TargetColor
         var targetShape: TargetShape
         
         if isWinning {
             switch gameMode {
             case .ColorMatch:
-                targetColor = playerColor
+                targetColor = playerTargetNode.targetColor
                 targetShape = TargetShape.random()
             case .ShapeMatch:
                 targetColor = TargetColor.random()
-                targetShape = playerShape
+                targetShape = playerTargetNode.targetShape
             case .ExactMatch:
-                targetColor = playerColor
-                targetShape = playerShape
+                targetColor = playerTargetNode.targetColor
+                targetShape = playerTargetNode.targetShape
             }
         } else {
             switch gameMode {
             case .ColorMatch:
-                targetColor = TargetColor.random(not: playerColor)
+                targetColor = TargetColor.random(not: playerTargetNode.targetColor)
                 targetShape = TargetShape.random()
             case .ShapeMatch:
                 targetColor = TargetColor.random()
-                targetShape = TargetShape.random(not: playerShape)
+                targetShape = TargetShape.random(not: playerTargetNode.targetShape)
             case .ExactMatch:
-                targetColor = TargetColor.random(not: playerColor)
-                targetShape = TargetShape.random(not: playerShape)
+                targetColor = TargetColor.random(not: playerTargetNode.targetColor)
+                targetShape = TargetShape.random(not: playerTargetNode.targetShape)
             }
         }
         
