@@ -46,7 +46,8 @@ class GameScene: SKScene {
         }
     }
     
-    var gameStarted: Bool = false
+    var hasStartedPlaying: Bool = false
+    
     var levelsPlayed: Int = 0
     var score: Int = 0 {
         didSet {
@@ -146,11 +147,6 @@ class GameScene: SKScene {
     func drawNewPuzzle() {
         levelsPlayed += 1
         
-        timeForLevel = maxTimeForLevel - Double(levelsPlayed / 5) * 0.1
-        if timeForLevel < minTimeForLevel {
-            timeForLevel = minTimeForLevel
-        }
-        
         // Setup new player
         let newPlayer = TargetShapeNode.randomShapeNode()
         newPlayer.name = playerNodeName
@@ -167,38 +163,47 @@ class GameScene: SKScene {
         // Add new player
         addChild(newPlayer)
         
-        runAction(SKAction.sequence([
-            SKAction.waitForDuration(0.5),
-            SKAction.runBlock({
-                if !self.gameStarted {
-                    self.firstPlayHint()
-                }
-            })
-        ]))
+        // Start timer
+        timeForLevel = maxTimeForLevel - Double(levelsPlayed / 5) * 0.1
+        if timeForLevel < minTimeForLevel {
+            timeForLevel = minTimeForLevel
+        }
+        
+        if hasStartedPlaying {
+            startTimer(timeForLevel)
+        } else {
+            playHintAnimation()
+        }
     }
     
-    func firstPlayHint() {
-        if let correctTarget = correctTarget, playerNode = playerNode {
-            let hintPoint = (centerPoint + correctTarget.position) / 2
-            
-            let hintAction = SKAction.sequence([
-                SKAction.moveTo(hintPoint, duration: 0.3),
-                SKAction.moveTo(centerPoint, duration: 0.3)])
-            hintAction.timingMode = .EaseInEaseOut
-            
-            playerNode.runAction(SKAction.repeatActionForever(SKAction.sequence([
+    func playHintAnimation() {
+        guard let correctTarget = correctTarget, playerNode = playerNode else {
+            print("Failed to play hint animation")
+            return
+        }
+        
+        let hintPoint = (centerPoint + correctTarget.position) / 2
+        
+        let hintAction = SKAction.sequence([
+            SKAction.moveTo(hintPoint, duration: 0.3),
+            SKAction.moveTo(centerPoint, duration: 0.3)])
+        hintAction.timingMode = .EaseInEaseOut
+        
+        playerNode.runAction(SKAction.sequence([
+            SKAction.waitForDuration(0.5),
+            SKAction.repeatActionForever(SKAction.sequence([
                 SKAction.waitForDuration(1.25),
                 hintAction
-            ])), withKey: "Hint")
-        }
+            ]))
+        ]), withKey: "Hint")
     }
     
     func stopTimer() {
         removeActionForKey("GameTimer")
     }
     
-    func resetTimer(time: Double) {
-        self.timeRemaining = time
+    func startTimer(time: Double) {
+        timeRemaining = time
         
         let tickInterval = 0.1
         runAction(SKAction.repeatActionForever(SKAction.sequence([
@@ -383,13 +388,12 @@ class GameScene: SKScene {
             SKAction.waitForDuration(gameResetAnimationDuration),
             SKAction.runBlock({
                 self.drawNewPuzzle()
-                self.resetTimer(self.timeForLevel)
             })
         ]))
     }
     
     func incorrectSelection() {
-        gameOver("Wrong Colour")
+        gameOver("Incorrect")
     }
     
     func failedSelection() {
@@ -436,9 +440,9 @@ class GameScene: SKScene {
         }
         
         // Start timer after initial touch
-        if !gameStarted {
-            gameStarted = true
-            resetTimer(timeForLevel)
+        if !hasStartedPlaying {
+            hasStartedPlaying = true
+            startTimer(timeForLevel)
         }
         
         // Check for correct selection
