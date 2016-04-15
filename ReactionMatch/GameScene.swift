@@ -384,10 +384,7 @@ class GameScene: SKScene {
         
         if let correctTarget = correctTarget {
             // Display points gained
-            if let winningTargetPointsLabel = correctTarget.childNodeWithName("pointsGainedLabel") as? SKLabelNode {
-                winningTargetPointsLabel.fontColor = correctTarget.fillColor.inverted
-                winningTargetPointsLabel.text = "\(pointsGained)"
-            }
+            correctTarget.setPointsGained(pointsGained)
             
             // Grow winning target
             let growAction = SKAction.scaleBy(2, duration: successAnimationDuration)

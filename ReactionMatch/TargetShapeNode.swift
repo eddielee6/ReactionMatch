@@ -13,6 +13,8 @@ class TargetShapeNode: SKShapeNode {
     let targetColor: TargetColor
     let targetShape: TargetShape
     
+    private let pointsGainedLabel: SKLabelNode
+    
     private let targetSize = CGSize(width: 40, height: 40)
     
     var shapeName: String {
@@ -25,22 +27,23 @@ class TargetShapeNode: SKShapeNode {
         self.targetColor = targetColor
         self.targetShape = targetShape
         
+        self.pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
+        
         super.init()
+        
+        pointsGainedLabel.verticalAlignmentMode = .Center
+        pointsGainedLabel.horizontalAlignmentMode = .Center
+        pointsGainedLabel.fontSize = 20
+        self.addChild(pointsGainedLabel)
         
         self.path = self.targetShape.getShapeNode(targetSize).path
         self.fillColor = self.targetColor.value
         self.strokeColor = self.targetColor.value
-        
-        addPointsLabel()
     }
     
-    private func addPointsLabel() {
-        let pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
-        pointsGainedLabel.verticalAlignmentMode = .Center
-        pointsGainedLabel.horizontalAlignmentMode = .Center
-        pointsGainedLabel.fontSize = 20
-        pointsGainedLabel.name = "pointsGainedLabel"
-        self.addChild(pointsGainedLabel)
+    func setPointsGained(points: Int) {
+        pointsGainedLabel.fontColor = targetColor.value.inverted
+        pointsGainedLabel.text = String(points)
     }
     
     required init?(coder aDecoder: NSCoder) {
