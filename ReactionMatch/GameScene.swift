@@ -25,8 +25,13 @@ class GameScene: SKScene {
     let newTargetAfterTurn: Int = 5 // Turns between new targets being added
     let newTargetIncrement: Int = 2 // Number of targets to add each increment
     
-    let maxTimeForLevel: Double = 1.2 // Starting time allowed for per level
-    let minTimeForLevel: Double = 0.4 // Cap on minimum amount of time per level
+    let maxTimeForLevel: NSTimeInterval = 1.2 // Starting time allowed for per level
+    let minTimeForLevel: NSTimeInterval = 0.4 // Cap on minimum amount of time per level
+    
+    var timerRunning: Bool = false
+    var timeForLevel: NSTimeInterval = 0
+    var timeRemainingForLevel: NSTimeInterval = 0
+    
     
     let successAnimationDuration: Double = 0.25
     let setupNewGameAnimationDuration: Double = 0.25
@@ -57,8 +62,6 @@ class GameScene: SKScene {
             scoreLabel.text = "Score \(score)"
         }
     }
-    var timeForLevel: Double = 1.2
-    var timeRemaining: Double = 0
     
     let scoreLabel = SKLabelNode()
     let stateLabel = SKLabelNode()
@@ -192,7 +195,7 @@ class GameScene: SKScene {
             SKAction.waitForDuration(setupNewGameAnimationDuration),
             SKAction.runBlock({
                 if self.hasStartedPlaying {
-                    self.startTimer(self.timeForLevel)
+                    self.setTimer(self.timeForLevel)
                 } else {
                     self.playHintAnimation()
                 }
@@ -222,31 +225,13 @@ class GameScene: SKScene {
         ]), withKey: "Hint")
     }
     
-    func stopTimer() {
-        removeActionForKey("GameTimer")
+    func setTimer(timeForLevel: NSTimeInterval) {
+        timeRemainingForLevel = timeForLevel
+        timerRunning = true
     }
     
-    func startTimer(time: Double) {
-        timeRemaining = time
-        
-        let tickInterval = 0.1
-        runAction(SKAction.repeatActionForever(SKAction.sequence([
-            SKAction.waitForDuration(tickInterval),
-            SKAction.runBlock({
-                self.timeRemaining = self.timeRemaining - tickInterval
-                
-                if self.timeRemaining <= 0 {
-                    if self.getPlayerCollisionState() == .CorrectTarget {
-                        self.playerMadeCorrectSelection()
-                    } else {
-                        self.removeActionForKey("GameTimer")
-                        self.gameOver("Times Up")
-                    }
-                } else {
-                    self.stateLabel.text = "\(self.getPointsForTime(self.timeRemaining)) points"
-                }
-            })
-        ])), withKey: "GameTimer")
+    func stopTimer() {
+        timerRunning = false
     }
     
     func getPointsForTime(timeRemaining: Double) -> Int {
@@ -393,7 +378,7 @@ class GameScene: SKScene {
         stopTimer()
         
         // Update score
-        let pointsGained = getPointsForTime(timeRemaining)
+        let pointsGained = getPointsForTime(timeRemainingForLevel)
         score += pointsGained
         
         // Play sound
@@ -489,7 +474,7 @@ class GameScene: SKScene {
         // Start timer after initial touch
         if !hasStartedPlaying {
             hasStartedPlaying = true
-            startTimer(timeForLevel)
+            setTimer(timeForLevel)
         }
         
         switch(getPlayerCollisionState()) {
@@ -502,7 +487,38 @@ class GameScene: SKScene {
         }
     }
     
+    
+    var lastUpdateTime: NSTimeInterval = 0
     override func update(currentTime: NSTimeInterval) {
+        let deltaTime = lastUpdateTime > 0 ? currentTime - lastUpdateTime : 0
+        lastUpdateTime = currentTime
+        
+        boundsCheckPlayerNode()
+        
+        updateTimer(deltaTime)
+    }
+    
+    func updateTimer(deltaTime: NSTimeInterval) {
+        guard timerRunning == true else {
+            return
+        }
+        
+        timeRemainingForLevel -= deltaTime
+        
+        let currentPointsAvailable = getPointsForTime(timeRemainingForLevel)
+        stateLabel.text = "\(currentPointsAvailable) points"
+        
+        if timeRemainingForLevel <= 0 {
+            if getPlayerCollisionState() == .CorrectTarget {
+                playerMadeCorrectSelection()
+            } else {
+                //removeActionForKey("GameTimer")
+                gameOver("Times Up")
+            }
+        }
+    }
+
+    func boundsCheckPlayerNode() {
         if let playerNode = playerNode {
             let distance = (playerNode.position - centerPoint).length()
             if distance > maxPlayerDistanceFromCenterPoint {
