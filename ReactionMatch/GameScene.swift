@@ -10,13 +10,13 @@ import SpriteKit
 import GameKit
 import Foundation
 
-enum GameMode {
-    case ColorMatch
-    case ShapeMatch
-    case ExactMatch
-}
-
 class GameScene: SKScene {
+    
+    enum GameMode {
+        case ExactMatch // Easy
+        case ColorMatch // Medium
+        case ShapeMatch // Hard
+    }
     
     let gameMode: GameMode = .ShapeMatch // How accuratly should shapes be matched
     
@@ -36,9 +36,9 @@ class GameScene: SKScene {
     let successAnimationDuration: Double = 0.25
     let setupNewGameAnimationDuration: Double = 0.25
     
-    
+    let soundsEnabled: Bool = true
     let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
-    let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
+    let failSoundAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
     
     
     let targetDistanceFromCenterPoint: CGFloat = 110
@@ -378,7 +378,9 @@ class GameScene: SKScene {
         score += pointsGained
         
         // Play sound
-        runAction(successSoundAction)
+        if soundsEnabled {
+            runAction(successSoundAction)
+        }
         
         if let correctTarget = correctTarget {
             // Display points gained
@@ -442,7 +444,10 @@ class GameScene: SKScene {
         print("Game Over: \(reason)")
         self.stateLabel.text = reason
         
-        runAction(failSondAction)
+        if soundsEnabled {
+            runAction(failSoundAction)
+        }
+        
         let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
         let gameOverScene = GameOverScene(size: self.size)
         gameOverScene.newScore = score
