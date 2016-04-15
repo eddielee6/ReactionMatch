@@ -15,6 +15,7 @@
 		2C104D331C4D6BA10097E0AD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C104D311C4D6BA10097E0AD /* LaunchScreen.storyboard */; };
 		2C401ADC1C6D135100932BC6 /* fail.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C401ADB1C6D135100932BC6 /* fail.wav */; };
 		2C4811DF1C53F458007BD90B /* success.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C4811DD1C53F458007BD90B /* success.wav */; };
+		2C4BB7DF1CC17410005E766C /* MuteSwitchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4BB7DE1CC17410005E766C /* MuteSwitchNode.swift */; };
 		2C60A5411CB5A86800AE40B4 /* TargetColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C60A5401CB5A86800AE40B4 /* TargetColor.swift */; };
 		2C677D1B1C4EC57C00E519C9 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */; };
 		2C99B7241C581950003C5AFF /* iTunesArtwork.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C99B7221C581950003C5AFF /* iTunesArtwork.png */; };
@@ -39,6 +40,7 @@
 		2C104D341C4D6BA10097E0AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2C401ADB1C6D135100932BC6 /* fail.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = fail.wav; path = Resources/Sounds/fail.wav; sourceTree = "<group>"; };
 		2C4811DD1C53F458007BD90B /* success.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = success.wav; path = Resources/Sounds/success.wav; sourceTree = "<group>"; };
+		2C4BB7DE1CC17410005E766C /* MuteSwitchNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MuteSwitchNode.swift; sourceTree = "<group>"; };
 		2C60A5401CB5A86800AE40B4 /* TargetColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetColor.swift; sourceTree = "<group>"; };
 		2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
 		2C99B7221C581950003C5AFF /* iTunesArtwork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = iTunesArtwork.png; path = Resources/iTunesArtwork.png; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 				2C104D241C4D6BA10097E0AD /* AppDelegate.swift */,
 				2CA8E6241C5176200001F2DA /* ScoreManager.swift */,
 				2C104D2A1C4D6BA10097E0AD /* GameViewController.swift */,
+				2C4BB7DE1CC17410005E766C /* MuteSwitchNode.swift */,
 				2CC6D5F71CBD1AD900857F85 /* TargetShapeNode.swift */,
 				2C60A5401CB5A86800AE40B4 /* TargetColor.swift */,
 				2CD8EDBD1CB7A4F6005B6492 /* TargetShape.swift */,
@@ -218,6 +221,7 @@
 				2CD8EDBE1CB7A4F6005B6492 /* TargetShape.swift in Sources */,
 				2CC6D5F81CBD1AD900857F85 /* TargetShapeNode.swift in Sources */,
 				2C9B9F231CBC28390015DDE4 /* SKColorExtentions.swift in Sources */,
+				2C4BB7DF1CC17410005E766C /* MuteSwitchNode.swift in Sources */,
 				2C104D2B1C4D6BA10097E0AD /* GameViewController.swift in Sources */,
 				2CC6D5FA1CBD24FB00857F85 /* SKShapeNodeExtentions.swift in Sources */,
 				2C60A5411CB5A86800AE40B4 /* TargetColor.swift in Sources */,
