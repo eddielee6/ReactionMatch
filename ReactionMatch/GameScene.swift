@@ -12,6 +12,13 @@ import Foundation
 
 class GameScene: SKScene {
     
+    enum StackingOrder: CGFloat {
+        case BackgroundImage
+        case Target
+        case PlayerTarget
+        case Interface
+    }
+    
     enum GameMode {
         case ExactMatch // Easy
         case ColorMatch // Medium
@@ -103,7 +110,7 @@ class GameScene: SKScene {
         // Set background
         let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
         backgroundNode.anchorPoint = CGPoint.zero
-        backgroundNode.zPosition = 0
+        backgroundNode.zPosition = StackingOrder.BackgroundImage.rawValue
         addChild(backgroundNode)
         
         // Score
@@ -112,6 +119,7 @@ class GameScene: SKScene {
         scoreLabel.fontSize = 45
         scoreLabel.fontColor = SKColor.blackColor()
         scoreLabel.position = CGPoint(x: size.width/2, y: size.height - 85)
+        scoreLabel.zPosition = StackingOrder.Interface.rawValue
         addChild(scoreLabel)
         
         // Game State
@@ -120,6 +128,7 @@ class GameScene: SKScene {
         stateLabel.fontSize = 30
         stateLabel.fontColor = SKColor.blackColor()
         stateLabel.position = CGPoint(x: size.width/2, y: scoreLabel.position.y - 60)
+        stateLabel.zPosition = StackingOrder.Interface.rawValue
         addChild(stateLabel)
         
         let blinkAction = SKAction.sequence([
@@ -159,7 +168,7 @@ class GameScene: SKScene {
         newPlayer.position = centerPoint
         newPlayer.alpha = 0
         newPlayer.setScale(0)
-        newPlayer.zPosition = 10
+        newPlayer.zPosition = StackingOrder.PlayerTarget.rawValue
         
         // Create Fade Action
         let fadeInAction = SKAction.fadeInWithDuration(setupNewGameAnimationDuration)
@@ -319,6 +328,7 @@ class GameScene: SKScene {
         }
         
         let targetNode = TargetShapeNode(targetColor: targetColor, targetShape: targetShape)
+        targetNode.zPosition = StackingOrder.Target.rawValue
         
         return targetNode
     }
