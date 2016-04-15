@@ -13,7 +13,7 @@ class TargetShapeNode: SKShapeNode {
     let targetColor: TargetColor
     let targetShape: TargetShape
     
-    private let targetSize = CGSize(width: 35, height: 35)
+    private let targetSize = CGSize(width: 40, height: 40)
     
     var shapeName: String {
         get {

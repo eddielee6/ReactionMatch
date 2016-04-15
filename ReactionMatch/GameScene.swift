@@ -41,7 +41,7 @@ class GameScene: SKScene {
     let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
     
     
-    let targetDistanceFromCenterPoint: CGFloat = 100
+    let targetDistanceFromCenterPoint: CGFloat = 110
     var centerPoint: CGPoint {
         get {
             let centerPointVerticalOffset: CGFloat = -60
