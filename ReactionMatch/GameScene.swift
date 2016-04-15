@@ -28,7 +28,7 @@ class GameScene: SKScene {
     let maxTimeForLevel: NSTimeInterval = 1.2 // Starting time allowed for per level
     let minTimeForLevel: NSTimeInterval = 0.4 // Cap on minimum amount of time per level
     
-    var timerRunning: Bool = false
+    var isPlayingLevel: Bool = false
     var timeForLevel: NSTimeInterval = 0
     var timeRemainingForLevel: NSTimeInterval = 0
     
@@ -185,17 +185,18 @@ class GameScene: SKScene {
         
         setupTargetsFor(newPlayer, numberOfTargets: numberOfTargets)
         
-        
+        // Set timer for level
         timeForLevel = maxTimeForLevel - Double(levelsPlayed / 5) * 0.1
         if timeForLevel < minTimeForLevel {
             timeForLevel = minTimeForLevel
         }
+        setTimer(timeForLevel)
         
         runAction(SKAction.sequence([
             SKAction.waitForDuration(setupNewGameAnimationDuration),
             SKAction.runBlock({
                 if self.hasStartedPlaying {
-                    self.setTimer(self.timeForLevel)
+                    self.isPlayingLevel = true
                 } else {
                     self.playHintAnimation()
                 }
@@ -227,11 +228,6 @@ class GameScene: SKScene {
     
     func setTimer(timeForLevel: NSTimeInterval) {
         timeRemainingForLevel = timeForLevel
-        timerRunning = true
-    }
-    
-    func stopTimer() {
-        timerRunning = false
     }
     
     func getPointsForTime(timeRemaining: Double) -> Int {
@@ -300,9 +296,9 @@ class GameScene: SKScene {
             switch gameMode {
             case .ColorMatch:
                 targetColor = playerTargetNode.targetColor
-                targetShape = TargetShape.random()
+                targetShape = TargetShape.random(not: playerTargetNode.targetShape)
             case .ShapeMatch:
-                targetColor = TargetColor.random()
+                targetColor = TargetColor.random(not: playerTargetNode.targetColor)
                 targetShape = playerTargetNode.targetShape
             case .ExactMatch:
                 targetColor = playerTargetNode.targetColor
@@ -375,7 +371,7 @@ class GameScene: SKScene {
     }
     
     func playerMadeCorrectSelection() {
-        stopTimer()
+        isPlayingLevel = false
         
         // Update score
         let pointsGained = getPointsForTime(timeRemainingForLevel)
@@ -441,6 +437,8 @@ class GameScene: SKScene {
     }
     
     func gameOver(reason: String) {
+        isPlayingLevel = false
+        
         print("Game Over: \(reason)")
         self.stateLabel.text = reason
         
@@ -453,6 +451,15 @@ class GameScene: SKScene {
     }
     
     
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        // Start timer after initial touch
+        if !hasStartedPlaying {
+            hasStartedPlaying = true
+            setTimer(timeForLevel)
+            isPlayingLevel = true
+        }
+    }
+    
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         guard let touch = touches.first else {
             return
@@ -460,21 +467,14 @@ class GameScene: SKScene {
         
         let touchLocation = touch.locationInNode(self)
         let previousLocation = touch.previousLocationInNode(self)
+        let touchMoveVector = touchLocation - previousLocation
         
-        if let playerNode = playerNode {
-            playerNode.removeActionForKey("Hint")
-            playerNode.removeActionForKey("Return")
-            
-            let newPosition = playerNode.position + (touchLocation - previousLocation)
-            playerNode.position = newPosition
-        }
+        movePlayerNode(touchMoveVector)
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        // Start timer after initial touch
-        if !hasStartedPlaying {
-            hasStartedPlaying = true
-            setTimer(timeForLevel)
+        guard isPlayingLevel else {
+            return
         }
         
         switch(getPlayerCollisionState()) {
@@ -487,19 +487,45 @@ class GameScene: SKScene {
         }
     }
     
+    func movePlayerNode(moveVector: CGPoint) {
+        guard isPlayingLevel else {
+            return
+        }
+        
+        guard let playerNode = playerNode else {
+            return
+        }
+        
+        // Remove position actions
+        playerNode.removeActionForKey("Hint")
+        playerNode.removeActionForKey("Return")
+        
+        var newPlayerNodePosition = playerNode.position + moveVector
+        
+        // Bounds check player
+        let distance = (newPlayerNodePosition - centerPoint).length()
+        if distance > maxPlayerDistanceFromCenterPoint {
+            let offset = newPlayerNodePosition - centerPoint
+            let direction = offset.normalized()
+            let cappedPosition = (direction * maxPlayerDistanceFromCenterPoint) + centerPoint
+            newPlayerNodePosition = cappedPosition
+        }
+        
+        // Move to new position
+        playerNode.position = newPlayerNodePosition
+    }
+    
     
     var lastUpdateTime: NSTimeInterval = 0
     override func update(currentTime: NSTimeInterval) {
         let deltaTime = lastUpdateTime > 0 ? currentTime - lastUpdateTime : 0
         lastUpdateTime = currentTime
         
-        boundsCheckPlayerNode()
-        
         updateTimer(deltaTime)
     }
     
     func updateTimer(deltaTime: NSTimeInterval) {
-        guard timerRunning == true else {
+        guard isPlayingLevel else {
             return
         }
         
@@ -512,20 +538,7 @@ class GameScene: SKScene {
             if getPlayerCollisionState() == .CorrectTarget {
                 playerMadeCorrectSelection()
             } else {
-                //removeActionForKey("GameTimer")
                 gameOver("Times Up")
-            }
-        }
-    }
-
-    func boundsCheckPlayerNode() {
-        if let playerNode = playerNode {
-            let distance = (playerNode.position - centerPoint).length()
-            if distance > maxPlayerDistanceFromCenterPoint {
-                let offset = playerNode.position - centerPoint
-                let direction = offset.normalized()
-                let cappedPosition = (direction * maxPlayerDistanceFromCenterPoint) + centerPoint
-                playerNode.position = cappedPosition
             }
         }
     }
