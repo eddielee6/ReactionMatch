@@ -28,6 +28,9 @@ class GameScene: SKScene {
     let maxTimeForLevel: Double = 1.2 // Starting time allowed for per level
     let minTimeForLevel: Double = 0.4 // Cap on minimum amount of time per level
     
+    let successAnimationDuration: Double = 0.25
+    let setupNewGameAnimationDuration: Double = 0.25
+    
     
     let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
     let failSondAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
@@ -59,7 +62,6 @@ class GameScene: SKScene {
     
     let scoreLabel = SKLabelNode()
     let stateLabel = SKLabelNode()
-    
     
     let playerNodeName: String = "player"
     var playerNode: TargetShapeNode? {
@@ -152,28 +154,50 @@ class GameScene: SKScene {
         newPlayer.name = playerNodeName
         newPlayer.strokeColor = SKColor.whiteColor()
         newPlayer.position = centerPoint
+        newPlayer.alpha = 0
+        newPlayer.setScale(0)
         newPlayer.zPosition = 10
         
+        // Create Fade Action
+        let fadeInAction = SKAction.fadeInWithDuration(setupNewGameAnimationDuration)
+        fadeInAction.timingMode = .EaseIn
+        
+        // Create Grow Action
+        let growAction = SKAction.scaleTo(1.0, duration: setupNewGameAnimationDuration)
+        growAction.timingMode = .EaseIn
+        
+        // Animate
+        newPlayer.runAction(SKAction.group([
+            fadeInAction,
+            growAction
+        ]))
+        
+        // Add new player
+        addChild(newPlayer)
+        
+        // Add targets
         let bonusTargets:Int = Int(floor(Double(levelsPlayed / newTargetAfterTurn))) * newTargetIncrement
         var numberOfTargets: Int = minNumberOfTargets + bonusTargets
         numberOfTargets = numberOfTargets > maxNumberOfTargets ? maxNumberOfTargets : numberOfTargets
         
         setupTargetsFor(newPlayer, numberOfTargets: numberOfTargets)
         
-        // Add new player
-        addChild(newPlayer)
         
-        // Start timer
         timeForLevel = maxTimeForLevel - Double(levelsPlayed / 5) * 0.1
         if timeForLevel < minTimeForLevel {
             timeForLevel = minTimeForLevel
         }
         
-        if hasStartedPlaying {
-            startTimer(timeForLevel)
-        } else {
-            playHintAnimation()
-        }
+        runAction(SKAction.sequence([
+            SKAction.waitForDuration(setupNewGameAnimationDuration),
+            SKAction.runBlock({
+                if self.hasStartedPlaying {
+                    self.startTimer(self.timeForLevel)
+                } else {
+                    self.playHintAnimation()
+                }
+            })
+        ]))
     }
     
     func playHintAnimation() {
@@ -212,8 +236,12 @@ class GameScene: SKScene {
                 self.timeRemaining = self.timeRemaining - tickInterval
                 
                 if self.timeRemaining <= 0 {
-                    self.removeActionForKey("GameTimer")
-                    self.gameOver("Times Up")
+                    if self.getPlayerCollisionState() == .CorrectTarget {
+                        self.playerMadeCorrectSelection()
+                    } else {
+                        self.removeActionForKey("GameTimer")
+                        self.gameOver("Times Up")
+                    }
                 } else {
                     self.stateLabel.text = "\(self.getPointsForTime(self.timeRemaining)) points"
                 }
@@ -234,14 +262,12 @@ class GameScene: SKScene {
         let random = GKRandomDistribution(lowestValue: 0, highestValue: targetPositions.count - 1)
         let winningTargetIndex = random.nextInt()
         
-        let targetAnimationDuration = 0.25
-        
         // Create Fade Action
-        let fadeInAction = SKAction.fadeInWithDuration(targetAnimationDuration)
+        let fadeInAction = SKAction.fadeInWithDuration(setupNewGameAnimationDuration)
         fadeInAction.timingMode = .EaseIn
         
         // Create Grow Action
-        let growAction = SKAction.scaleTo(1.0, duration: targetAnimationDuration)
+        let growAction = SKAction.scaleTo(1.0, duration: setupNewGameAnimationDuration)
         growAction.timingMode = .EaseIn
         
         // Create targets
@@ -262,7 +288,7 @@ class GameScene: SKScene {
             targetNode.position = centerPoint
             
             // Create move action
-            let moveToPositionAction = SKAction.moveTo(position, duration: targetAnimationDuration)
+            let moveToPositionAction = SKAction.moveTo(position, duration: setupNewGameAnimationDuration)
             moveToPositionAction.timingMode = .EaseIn
             
             // Animate
@@ -333,7 +359,37 @@ class GameScene: SKScene {
         return targetPositions
     }
     
-    func correctSelection() {
+
+    enum PlayerCollisionState {
+        case CorrectTarget
+        case IncorrectTarget
+        case NoTarget
+    }
+    
+    func getPlayerCollisionState() -> PlayerCollisionState {
+        guard let playerNode = playerNode, correctTarget = correctTarget else {
+            print("Failed to get player collision state")
+            return .NoTarget
+        }
+        
+        // Check for correct selection
+        if playerNode.intersectsNode(correctTarget) {
+            return .CorrectTarget
+        }
+        
+        // Check for incorrect selection
+        let playerIntersectsIncorrectTarget = incorrectTargets
+            .map({ playerNode.intersectsNode($0) })
+            .reduce(false, combine: { $0 || $1 })
+        
+        if playerIntersectsIncorrectTarget {
+            return .IncorrectTarget
+        }
+        
+        return .NoTarget
+    }
+    
+    func playerMadeCorrectSelection() {
         stopTimer()
         
         // Update score
@@ -343,19 +399,6 @@ class GameScene: SKScene {
         // Play sound
         runAction(successSoundAction)
         
-        let gameResetAnimationDuration = 0.25
-        
-        // Animate removal of current player node
-        if let playerNode = playerNode {
-            playerNode.runAction(SKAction.sequence([
-                SKAction.group([
-                    SKAction.fadeInWithDuration(gameResetAnimationDuration),
-                    SKAction.scaleTo(0, duration: gameResetAnimationDuration)
-                ]),
-                SKAction.removeFromParent()
-            ]))
-        }
-        
         if let correctTarget = correctTarget {
             // Display points gained
             if let winningTargetPointsLabel = correctTarget.childNodeWithName("pointsGainedLabel") as? SKLabelNode {
@@ -364,7 +407,7 @@ class GameScene: SKScene {
             }
             
             // Grow winning target
-            let growAction = SKAction.scaleBy(2, duration: gameResetAnimationDuration)
+            let growAction = SKAction.scaleBy(2, duration: successAnimationDuration)
             growAction.timingMode = .EaseIn
             correctTarget.runAction(SKAction.sequence([
                 growAction,
@@ -374,7 +417,7 @@ class GameScene: SKScene {
         
         
         // Fade out incorrect targets
-        let shrinkAction = SKAction.scaleBy(0, duration: gameResetAnimationDuration)
+        let shrinkAction = SKAction.scaleBy(0, duration: successAnimationDuration)
         shrinkAction.timingMode = .EaseIn
         incorrectTargets.forEach({
             $0.runAction(SKAction.sequence([
@@ -383,20 +426,28 @@ class GameScene: SKScene {
             ]))
         })
         
-        // Draw new puzzle
-        runAction(SKAction.sequence([
-            SKAction.waitForDuration(gameResetAnimationDuration),
-            SKAction.runBlock({
-                self.drawNewPuzzle()
-            })
-        ]))
+        // Animate removal of current player node
+        if let playerNode = playerNode {
+            playerNode.runAction(SKAction.sequence([
+                SKAction.group([
+                    SKAction.fadeInWithDuration(successAnimationDuration),
+                    SKAction.scaleTo(0, duration: successAnimationDuration)
+                ]),
+                SKAction.removeFromParent(),
+                
+                // Draw new puzzle
+                SKAction.runBlock({
+                    self.drawNewPuzzle()
+                })
+            ]))
+        }
     }
     
-    func incorrectSelection() {
+    func playerMadeIncorrectSelection() {
         gameOver("Incorrect")
     }
     
-    func failedSelection() {
+    func playerMadeNoSelection() {
         if let playerNode = playerNode {
             let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.15))
             returnAction.timingMode = .EaseInEaseOut
@@ -435,34 +486,20 @@ class GameScene: SKScene {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        guard let playerNode = playerNode, correctTarget = correctTarget else {
-            return
-        }
-        
         // Start timer after initial touch
         if !hasStartedPlaying {
             hasStartedPlaying = true
             startTimer(timeForLevel)
         }
         
-        // Check for correct selection
-        if playerNode.intersectsNode(correctTarget) {
-            correctSelection()
-            return
+        switch(getPlayerCollisionState()) {
+        case .CorrectTarget:
+            playerMadeCorrectSelection()
+        case .IncorrectTarget:
+            playerMadeIncorrectSelection()
+        case .NoTarget:
+            playerMadeNoSelection()
         }
-        
-        // Check for incorrect selection
-        let playerIntersectsIncorrectTarget = incorrectTargets
-            .map({ playerNode.intersectsNode($0) })
-            .reduce(false, combine: { $0 || $1 })
-        
-        if playerIntersectsIncorrectTarget {
-            incorrectSelection()
-            return
-        }
-        
-        // Check for failed selection
-        failedSelection()
     }
     
     override func update(currentTime: NSTimeInterval) {
