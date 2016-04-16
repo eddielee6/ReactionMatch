@@ -113,11 +113,6 @@ class GameScene: SKScene {
         backgroundNode.zPosition = StackingOrder.BackgroundImage.rawValue
         addChild(backgroundNode)
         
-        
-        let muteSwitch = MuteSwitchNode()
-        muteSwitch.position = CGPoint(x: size.width/2, y: size.height/3)
-        addChild(muteSwitch)
-        
         // Score
         scoreLabel.text = "Score \(score)"
         scoreLabel.horizontalAlignmentMode = .Center

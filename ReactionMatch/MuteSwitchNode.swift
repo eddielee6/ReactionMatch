@@ -12,15 +12,7 @@ import SpriteKit
 class MuteSwitchNode: SKSpriteNode {
     
     private let soundOnTexture = SKTexture(imageNamed: "sound-on")
-    private let soundOnSelectedTexture = SKTexture(imageNamed: "sound-on-selected")
     private let soundOffTexture = SKTexture(imageNamed: "sound-off")
-    private let soundOffSelectedTexture = SKTexture(imageNamed: "sound-off-selected")
-    
-    private var selected: Bool = false {
-        didSet {
-            setTexture()
-        }
-    }
     
     enum AudioState: Int {
         case Off
@@ -68,18 +60,9 @@ class MuteSwitchNode: SKSpriteNode {
     private func setTexture() {
         switch audioState {
         case .On:
-            if selected {
-                setTexture(soundOnSelectedTexture)
-            } else {
-                setTexture(soundOnTexture)
-            }
-            
+            setTexture(soundOnTexture)
         case .Off:
-            if selected {
-                setTexture(soundOffSelectedTexture)
-            } else {
-                setTexture(soundOffTexture)
-            }
+            setTexture(soundOffTexture)
         }
     }
     
@@ -99,20 +82,7 @@ class MuteSwitchNode: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        selected = true
-    }
-    
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if let parentNode = parent, touch = touches.first {
-            let touchLocation = touch.locationInNode(parentNode)
-            selected = self.containsPoint(touchLocation)
-        }
-    }
-    
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        selected = false
-        
         if let parentNode = parent, touch = touches.first {
             let touchLocation = touch.locationInNode(parentNode)
             
