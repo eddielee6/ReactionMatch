@@ -64,7 +64,7 @@ class GameScene: SKScene {
     var hasStartedPlaying: Bool = false
     
     var levelsPlayed: Int = 0
-    var score: Int = 0 {
+    var score: Int64 = 0 {
         didSet {
             scoreLabel.text = "Score \(score)"
         }

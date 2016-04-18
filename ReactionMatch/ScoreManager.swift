@@ -9,79 +9,122 @@
 import UIKit
 import GameKit
 
+public protocol ScoreManagerFocusDelegate {
+    func scoreManagerWillTakeFocus()
+    func scoreManagerDidResignFocus()
+}
+
 public class ScoreManager {
+    
     public static let sharedInstance = ScoreManager()
     
+    public var focusDelegate: ScoreManagerFocusDelegate?
+    
     private let leaderboardIdentifier: String = "me.eddielee.ReactionMatch.TopScore"
-    public var gameCentreEnabled: Bool = false
+    private var gameCentreEnabled: Bool = false
+    
+    
+    // MARK: Authentication
     
     public func authenticateLocalPlayer(viewController: UIViewController) {
-        let localPlayer: GKLocalPlayer = GKLocalPlayer.localPlayer()
+        let localPlayer = GKLocalPlayer.localPlayer()
         
-        localPlayer.authenticateHandler = {(GameCentreLoginViewController, error) -> Void in
-            if GameCentreLoginViewController != nil {
-                viewController.presentViewController(GameCentreLoginViewController!, animated: true, completion: nil)
-            } else {
-                self.gameCentreEnabled = localPlayer.authenticated
+        var scoreManagerDidTakeFocus: Bool = false
+        
+        localPlayer.authenticateHandler = { (GameCentreLoginViewController, error) -> () in
+            if let gameCentreLoginViewController = GameCentreLoginViewController {
                 
-                if self.gameCentreEnabled {
-                    self.syncLocalScoreWithGameCentre()
+                if let focusDelegate = self.focusDelegate {
+                    focusDelegate.scoreManagerWillTakeFocus()
+                    scoreManagerDidTakeFocus = true
+                }
+                
+                viewController.presentViewController(gameCentreLoginViewController, animated: true, completion: nil)
+                
+            } else {
+                if scoreManagerDidTakeFocus {
+                    if let focusDelegate = self.focusDelegate {
+                        focusDelegate.scoreManagerDidResignFocus()
+                    }
+                }
+                
+                if localPlayer.authenticated {
+                    self.gameCentreEnabled = true
+                    self.updateLocalHighScore()
+                } else {
+                    self.gameCentreEnabled = false
                 }
             }
         }
     }
     
-    private func syncLocalScoreWithGameCentre() {
-        let leaderBoardRequest = GKLeaderboard()
-        leaderBoardRequest.identifier = leaderboardIdentifier
+    private func updateLocalHighScore() {
+        let localPlayer = GKLocalPlayer.localPlayer()
+        let localPlayerLeaderBoard = GKLeaderboard(players: [localPlayer])
         
-        leaderBoardRequest.loadScoresWithCompletionHandler { (scores, error) -> Void in
-            if let gameCentreScore = leaderBoardRequest.localPlayerScore {
-                let currentLocalHighScore = self.getLocalHighScore()
-                let gameCentreHighScore = Int(gameCentreScore.value)
-                if  gameCentreHighScore > currentLocalHighScore {
-                    self.storeLocalHighScore(gameCentreHighScore)
-                } else if currentLocalHighScore > gameCentreHighScore {
-                    self.submitScoreToGameCentre(currentLocalHighScore)
+        localPlayerLeaderBoard.identifier = leaderboardIdentifier
+        
+        localPlayerLeaderBoard.loadScoresWithCompletionHandler { (scores, error) -> () in
+            if let localPlayerGameCentreHighScore = localPlayerLeaderBoard.localPlayerScore {
+                if localPlayerGameCentreHighScore.value != self.getLocalHighScore() {
+                    self.setLocalHighScore(localPlayerGameCentreHighScore.value)
                 }
             }
         }
     }
     
-    private func submitScoreToGameCentre(score: Int) {
+    
+    // MARK: Score Recording
+    
+    public func recordNewScore(newScore: Int64) {
+        updateLocalHighScore(newScore)
+        
+        if gameCentreEnabled {
+            submitScoreToGameCentre(newScore)
+        }
+    }
+    
+    private func updateLocalHighScore(newScore: Int64) {
+        if newScore > getLocalHighScore() {
+            setLocalHighScore(newScore)
+        }
+    }
+    
+    private func submitScoreToGameCentre(score: Int64) {
         let scoreToSubmit = GKScore(leaderboardIdentifier: leaderboardIdentifier)
         scoreToSubmit.value = Int64(score)
         
-        GKScore.reportScores([scoreToSubmit], withCompletionHandler: { (error: NSError?) -> Void in
-            if error != nil {
-                print(error!.localizedDescription)
+        GKScore.reportScores([scoreToSubmit], withCompletionHandler: { (error: NSError?) -> () in
+            if let error = error {
+                print(error.localizedDescription)
             }
         })
     }
     
-    private func storeLocalHighScore(score: Int) {
-        if (score > getLocalHighScore()) {
-            let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
-            defaults.setObject(score, forKey: "highScore")
-            defaults.synchronize()
-        }
+    
+    // MARK: Get High Score
+    
+    public func getHighScore() -> Int64 {
+        return self.getLocalHighScore()
     }
     
-    public func getLocalHighScore() -> Int {
+    
+    // MARK: Local Cache
+    
+    private func setLocalHighScore(score: Int64) {
         let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
         
-        if let highScore = defaults.objectForKey("highScore") as? Int {
-            return highScore
+        defaults.setObject(NSNumber(longLong: score), forKey: "highScore")
+        defaults.synchronize()
+    }
+    
+    private func getLocalHighScore() -> Int64 {
+        let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
+        
+        if let highScore = defaults.objectForKey("highScore") as? NSNumber {
+            return highScore.longLongValue
         }
         
         return 0
-    }
-    
-    public func recordNewScore(score: Int) {
-        storeLocalHighScore(score)
-
-        if gameCentreEnabled {
-            submitScoreToGameCentre(score)
-        }
     }
 }

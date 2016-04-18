@@ -8,22 +8,54 @@
 
 import UIKit
 import SpriteKit
+import AVFoundation
 
-class GameViewController: UIViewController {
+class GameViewController: UIViewController, ScoreManagerFocusDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setAudioSessionCategory(AVAudioSessionCategoryAmbient)
+        
+        ScoreManager.sharedInstance.focusDelegate = self
         ScoreManager.sharedInstance.authenticateLocalPlayer(self)
         
-        let scene = GameScene(size: view.bounds.size)
-        let skView = self.view as! SKView
-        //skView.showsFPS = true
-        //skView.showsNodeCount = true
-        scene.scaleMode = .ResizeFill
-        skView.presentScene(scene)
+        if let skView = self.view as? SKView {
+            skView.ignoresSiblingOrder = true
+            //skView.showsFPS = true
+            //skView.showsNodeCount = true
+            
+            let scene = GameScene(size: view.bounds.size)
+            scene.scaleMode = .ResizeFill
+            
+            skView.presentScene(scene)
+        }
     }
-
+    
+    func setAudioSessionCategory(audioSessionCategory: String) {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(audioSessionCategory)
+        } catch {
+            print(error)
+        }
+    }
+    
+    
+    // MARK: ScoreManagerFocusDelegate
+    
+    func scoreManagerWillTakeFocus() {
+        if let skView = self.view as? SKView {
+            skView.paused = true
+        }
+    }
+    
+    func scoreManagerDidResignFocus() {
+        if let skView = self.view as? SKView {
+            skView.paused = false
+        }
+    }
+    
+    
     override func prefersStatusBarHidden() -> Bool {
         return true
     }

@@ -10,9 +10,14 @@ import SpriteKit
 
 class GameOverScene: SKScene {
     
+    enum StackingOrder: CGFloat {
+        case BackgroundImage
+        case Interface
+    }
+    
     let scoreManager = ScoreManager.sharedInstance
     
-    var newScore: Int!
+    var newScore: Int64!
     var reason: String!
     
     let growAndShrink = SKAction.sequence([
@@ -29,7 +34,7 @@ class GameOverScene: SKScene {
         // Set background
         let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
         backgroundNode.anchorPoint = CGPoint.zero
-        backgroundNode.zPosition = 0
+        backgroundNode.zPosition = StackingOrder.BackgroundImage.rawValue
         addChild(backgroundNode)
 
         // Game Over type
@@ -39,9 +44,10 @@ class GameOverScene: SKScene {
         gameEndReasonLabel.fontSize = 45
         gameEndReasonLabel.fontColor = SKColor.blackColor()
         gameEndReasonLabel.position = CGPoint(x: size.width/2, y: size.height - 85)
+        gameEndReasonLabel.zPosition = StackingOrder.Interface.rawValue
         addChild(gameEndReasonLabel)
         
-        let currentHighScore = scoreManager.getLocalHighScore()
+        let currentHighScore = scoreManager.getHighScore()
         
         scoreManager.recordNewScore(newScore)
         
@@ -50,6 +56,7 @@ class GameOverScene: SKScene {
         scoreLabel.fontSize = 30
         scoreLabel.fontColor = SKColor.blackColor()
         scoreLabel.position = CGPoint(x: size.width/2, y: gameEndReasonLabel.position.y - 60)
+        scoreLabel.zPosition = StackingOrder.Interface.rawValue
         addChild(scoreLabel)
         
         if newScore > currentHighScore {
@@ -92,6 +99,7 @@ class GameOverScene: SKScene {
                 playAgainLabel.fontColor = SKColor.blackColor()
                 playAgainLabel.verticalAlignmentMode = .Center
                 playAgainLabel.position = CGPoint(x: self.size.width/2, y: self.size.height/2)
+                playAgainLabel.zPosition = StackingOrder.Interface.rawValue
                 self.addChild(playAgainLabel)
                 
                 playAgainLabel.runAction(SKAction.repeatActionForever(self.growAndShrink))
