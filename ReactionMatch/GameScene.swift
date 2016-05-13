@@ -8,11 +8,10 @@
 
 import SpriteKit
 import GameKit
-import Foundation
 
 class GameScene: SKScene {
     
-    enum StackingOrder: CGFloat {
+    enum NodeStackingOrder: CGFloat {
         case BackgroundImage
         case Target
         case PlayerTarget
@@ -35,29 +34,26 @@ class GameScene: SKScene {
     let maxTimeForLevel: NSTimeInterval = 1.2 // Starting time allowed for per level
     let minTimeForLevel: NSTimeInterval = 0.4 // Cap on minimum amount of time per level
     
+    let successAnimationDuration: Double = 0.25 // Time taken to animate to new levels
+    let setupNewGameAnimationDuration: Double = 0.25 // Time taken to animate to game start
+    
+    let targetDistanceFromCenterPoint: CGFloat = 110
+    var maxPlayerDistanceFromCenterPoint: CGFloat {
+        get {
+            return targetDistanceFromCenterPoint * 1.2
+        }
+    }
+    
+    let soundsEnabled: Bool = true
+    
     var isPlayingLevel: Bool = false
     var timeForLevel: NSTimeInterval = 0
     var timeRemainingForLevel: NSTimeInterval = 0
     
-    
-    let successAnimationDuration: Double = 0.25
-    let setupNewGameAnimationDuration: Double = 0.25
-    
-    let soundsEnabled: Bool = true
-    let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
-    let failSoundAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
-    
-    
-    let targetDistanceFromCenterPoint: CGFloat = 110
     var centerPoint: CGPoint {
         get {
             let centerPointVerticalOffset: CGFloat = -60
             return CGPoint(x: size.width/2, y: size.height/2 + centerPointVerticalOffset)
-        }
-    }
-    var maxPlayerDistanceFromCenterPoint: CGFloat {
-        get {
-            return targetDistanceFromCenterPoint * 1.2
         }
     }
     
@@ -69,6 +65,9 @@ class GameScene: SKScene {
             scoreLabel.text = "Score \(score)"
         }
     }
+    
+    let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
+    let failSoundAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
     
     let scoreLabel = SKLabelNode()
     let stateLabel = SKLabelNode()
@@ -85,9 +84,7 @@ class GameScene: SKScene {
         get {
             var incorrectTargetNodes = [TargetShapeNode]()
             enumerateChildNodesWithName(incorrectTargetNodeName) { node, _ in
-                if let targetNode = node as? TargetShapeNode {
-                    incorrectTargetNodes.append(targetNode)
-                }
+                incorrectTargetNodes.append(node as! TargetShapeNode)
             }
             return incorrectTargetNodes
         }
@@ -100,35 +97,34 @@ class GameScene: SKScene {
         }
     }
     
-    
     override func didMoveToView(view: SKView) {
-        setupInitialState()
+        setBackground()
+        setHud()
         drawNewPuzzle()
     }
     
-    func setupInitialState() {
-        // Set background
+    func setBackground() {
         let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
         backgroundNode.anchorPoint = CGPoint.zero
-        backgroundNode.zPosition = StackingOrder.BackgroundImage.rawValue
+        backgroundNode.zPosition = NodeStackingOrder.BackgroundImage.rawValue
         addChild(backgroundNode)
-        
-        // Score
+    }
+    
+    func setHud() {
         scoreLabel.text = "Score \(score)"
         scoreLabel.horizontalAlignmentMode = .Center
         scoreLabel.fontSize = 45
         scoreLabel.fontColor = SKColor.blackColor()
         scoreLabel.position = CGPoint(x: size.width/2, y: size.height - 85)
-        scoreLabel.zPosition = StackingOrder.Interface.rawValue
+        scoreLabel.zPosition = NodeStackingOrder.Interface.rawValue
         addChild(scoreLabel)
         
-        // Game State
         stateLabel.text = "Swipe to Play"
         stateLabel.horizontalAlignmentMode = .Center
         stateLabel.fontSize = 30
         stateLabel.fontColor = SKColor.blackColor()
         stateLabel.position = CGPoint(x: size.width/2, y: scoreLabel.position.y - 60)
-        stateLabel.zPosition = StackingOrder.Interface.rawValue
+        stateLabel.zPosition = NodeStackingOrder.Interface.rawValue
         addChild(stateLabel)
         
         let blinkAction = SKAction.sequence([
@@ -168,7 +164,7 @@ class GameScene: SKScene {
         newPlayer.position = centerPoint
         newPlayer.alpha = 0
         newPlayer.setScale(0)
-        newPlayer.zPosition = StackingOrder.PlayerTarget.rawValue
+        newPlayer.zPosition = NodeStackingOrder.PlayerTarget.rawValue
         
         // Create Fade Action
         let fadeInAction = SKAction.fadeInWithDuration(setupNewGameAnimationDuration)
@@ -188,10 +184,7 @@ class GameScene: SKScene {
         addChild(newPlayer)
         
         // Add targets
-        let bonusTargets:Int = Int(floor(Double(levelsPlayed / newTargetAfterTurn))) * newTargetIncrement
-        var numberOfTargets: Int = minNumberOfTargets + bonusTargets
-        numberOfTargets = numberOfTargets > maxNumberOfTargets ? maxNumberOfTargets : numberOfTargets
-        
+        let numberOfTargets = getNumberOfTargetsForLevelsPlayed(levelsPlayed)
         setupTargetsFor(newPlayer, numberOfTargets: numberOfTargets)
         
         // Set timer for level
@@ -207,19 +200,21 @@ class GameScene: SKScene {
                 if self.hasStartedPlaying {
                     self.isPlayingLevel = true
                 } else {
-                    self.playHintAnimation()
+                    self.playHintAnimationForPlayer(newPlayer, toNode: self.correctTarget!)
                 }
             })
         ]))
     }
     
-    func playHintAnimation() {
-        guard let correctTarget = correctTarget, playerNode = playerNode else {
-            print("Failed to play hint animation")
-            return
-        }
-        
-        let hintPoint = (centerPoint + correctTarget.position) / 2
+    func getNumberOfTargetsForLevelsPlayed(levelsPlayed: Int) -> Int {
+        let bonusTargets = Int(floor(Double(levelsPlayed / newTargetAfterTurn))) * newTargetIncrement
+        var numberOfTargets = minNumberOfTargets + bonusTargets
+        numberOfTargets = numberOfTargets > maxNumberOfTargets ? maxNumberOfTargets : numberOfTargets
+        return numberOfTargets
+    }
+    
+    func playHintAnimationForPlayer(playerNode: TargetShapeNode, toNode targetNode: TargetShapeNode) {
+        let hintPoint = (centerPoint + targetNode.position) / 2
         
         let hintAction = SKAction.sequence([
             SKAction.moveTo(hintPoint, duration: 0.3),
@@ -264,18 +259,13 @@ class GameScene: SKScene {
         var newTargets = [TargetShapeNode]()
         for (i, position) in targetPositions.enumerate() {
             
-            let targetNode = createTargetShapeNode(playerTargetNode, isWinning: i == winningTargetIndex)
-            
-            if i == winningTargetIndex {
-                targetNode.name = correctTargetNodeName
-            } else {
-                targetNode.name = incorrectTargetNodeName
-            }
+            let targetNode = getTargetShapeNodeFor(playerTargetNode.targetColor, playerNodeShape: playerTargetNode.targetShape, isWinning: i == winningTargetIndex)
             
             // Invisible in center
             targetNode.alpha = 0
             targetNode.setScale(0)
             targetNode.position = centerPoint
+            targetNode.zPosition = NodeStackingOrder.Target.rawValue
             
             // Create move action
             let moveToPositionAction = SKAction.moveTo(position, duration: setupNewGameAnimationDuration)
@@ -297,38 +287,43 @@ class GameScene: SKScene {
         }
     }
     
-    func createTargetShapeNode(playerTargetNode: TargetShapeNode, isWinning: Bool) -> TargetShapeNode {
+    func getTargetShapeNodeFor(playerNodeColor: TargetColor, playerNodeShape: TargetShape, isWinning: Bool) -> TargetShapeNode {
         var targetColor: TargetColor
         var targetShape: TargetShape
         
         if isWinning {
             switch gameMode {
             case .ColorMatch:
-                targetColor = playerTargetNode.targetColor
-                targetShape = TargetShape.random(not: playerTargetNode.targetShape)
+                targetColor = playerNodeColor
+                targetShape = TargetShape.random(not: playerNodeShape)
             case .ShapeMatch:
-                targetColor = TargetColor.random(not: playerTargetNode.targetColor)
-                targetShape = playerTargetNode.targetShape
+                targetColor = TargetColor.random(not: playerNodeColor)
+                targetShape = playerNodeShape
             case .ExactMatch:
-                targetColor = playerTargetNode.targetColor
-                targetShape = playerTargetNode.targetShape
+                targetColor = playerNodeColor
+                targetShape = playerNodeShape
             }
         } else {
             switch gameMode {
             case .ColorMatch:
-                targetColor = TargetColor.random(not: playerTargetNode.targetColor)
+                targetColor = TargetColor.random(not: playerNodeColor)
                 targetShape = TargetShape.random()
             case .ShapeMatch:
                 targetColor = TargetColor.random()
-                targetShape = TargetShape.random(not: playerTargetNode.targetShape)
+                targetShape = TargetShape.random(not: playerNodeShape)
             case .ExactMatch:
-                targetColor = TargetColor.random(not: playerTargetNode.targetColor)
-                targetShape = TargetShape.random(not: playerTargetNode.targetShape)
+                targetColor = TargetColor.random(not: playerNodeColor)
+                targetShape = TargetShape.random(not: playerNodeShape)
             }
         }
         
         let targetNode = TargetShapeNode(targetColor: targetColor, targetShape: targetShape)
-        targetNode.zPosition = StackingOrder.Target.rawValue
+        
+        if isWinning {
+            targetNode.name = correctTargetNodeName
+        } else {
+            targetNode.name = incorrectTargetNodeName
+        }
         
         return targetNode
     }
@@ -350,18 +345,129 @@ class GameScene: SKScene {
         return targetPositions
     }
     
-
+    func player(playerNode: TargetShapeNode, didSelectCorrectTarget correctTarget: TargetShapeNode, withIncorrectTargets incorrectTargets: [TargetShapeNode]) {
+        isPlayingLevel = false
+        
+        // Update score
+        let pointsGained = getPointsForTime(timeRemainingForLevel)
+        score += pointsGained
+        
+        playSound(successSoundAction)
+        
+        // Display points gained
+        correctTarget.setPointsGained(pointsGained)
+        
+        // Grow winning target
+        let growAction = SKAction.scaleBy(2, duration: successAnimationDuration)
+        growAction.timingMode = .EaseIn
+        correctTarget.runAction(SKAction.sequence([
+            growAction,
+            SKAction.removeFromParent()
+        ]))
+        
+        // Fade out incorrect targets
+        let shrinkAction = SKAction.scaleBy(0, duration: successAnimationDuration)
+        shrinkAction.timingMode = .EaseIn
+        incorrectTargets.forEach({
+            $0.runAction(SKAction.sequence([
+                shrinkAction,
+                SKAction.removeFromParent()
+            ]))
+        })
+        
+        // Animate removal of current player node
+        playerNode.runAction(SKAction.sequence([
+            SKAction.group([
+                SKAction.fadeInWithDuration(successAnimationDuration),
+                SKAction.scaleTo(0, duration: successAnimationDuration)
+            ]),
+            SKAction.removeFromParent(),
+            
+            // Draw new puzzle
+            SKAction.runBlock({
+                self.drawNewPuzzle()
+            })
+        ]))
+    }
+    
+    func playerDidSelectIncorrectTarget() {
+        gameOver("Incorrect")
+    }
+    
+    func returnPlayerToCenterPoint(playerNode: TargetShapeNode) {
+        let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.15))
+        returnAction.timingMode = .EaseInEaseOut
+        playerNode.runAction(returnAction, withKey: "Return")
+    }
+    
+    func gameOver(reason: String) {
+        isPlayingLevel = false
+        
+        print("Game Over: \(reason)")
+        self.stateLabel.text = reason
+        
+        playSound(failSoundAction)
+        
+        let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
+        let gameOverScene = GameOverScene(size: self.size)
+        gameOverScene.newScore = score
+        self.view?.presentScene(gameOverScene, transition: transition)
+    }
+    
+    func playSound(soundAction: SKAction) {
+        if soundsEnabled {
+            runAction(soundAction)
+        }
+    }
+    
+    func movePlayerNode(playerNode: TargetShapeNode, withVector vector: CGPoint) {
+        // Remove position actions
+        playerNode.removeActionForKey("Hint")
+        playerNode.removeActionForKey("Return")
+        
+        var newPlayerNodePosition = playerNode.position + vector
+        
+        // Bounds check player
+        let distance = (newPlayerNodePosition - centerPoint).length()
+        if distance > maxPlayerDistanceFromCenterPoint {
+            let offset = newPlayerNodePosition - centerPoint
+            let direction = offset.normalized()
+            let cappedPosition = (direction * maxPlayerDistanceFromCenterPoint) + centerPoint
+            newPlayerNodePosition = cappedPosition
+        }
+        
+        // Move to new position
+        playerNode.position = newPlayerNodePosition
+    }
+    
+    
+    
+    
+    func updateLevelWithDeltaTime(deltaTime: NSTimeInterval) {
+        timeRemainingForLevel -= deltaTime
+        
+        let currentPointsAvailable = getPointsForTime(timeRemainingForLevel)
+        stateLabel.text = "\(currentPointsAvailable) points"
+        
+        if timeRemainingForLevel <= 0 {
+            if timeRemainingForLevel <= 0 {
+                let collisionState = getCollisionStateForPlayer(playerNode!, withCorrectTarget: correctTarget!, andIncorrectTargets: incorrectTargets)
+                if collisionState == .CorrectTarget {
+                    player(playerNode!, didSelectCorrectTarget: correctTarget!, withIncorrectTargets: incorrectTargets)
+                } else {
+                    gameOver("Times Up")
+                }
+            }
+        }
+    }
+    
     enum PlayerCollisionState {
         case CorrectTarget
         case IncorrectTarget
         case NoTarget
     }
     
-    func getPlayerCollisionState() -> PlayerCollisionState {
-        guard let playerNode = playerNode, correctTarget = correctTarget else {
-            print("Failed to get player collision state")
-            return .NoTarget
-        }
+    func getCollisionStateForPlayer(playerNode: TargetShapeNode, withCorrectTarget correctTarget: TargetShapeNode, andIncorrectTargets incorrectTargets: [TargetShapeNode]) -> PlayerCollisionState {
         
         // Check for correct selection
         if playerNode.intersectsNode(correctTarget) {
@@ -380,95 +486,37 @@ class GameScene: SKScene {
         return .NoTarget
     }
     
-    func playerMadeCorrectSelection() {
-        isPlayingLevel = false
-        
-        // Update score
-        let pointsGained = getPointsForTime(timeRemainingForLevel)
-        score += pointsGained
-        
-        // Play sound
-        if soundsEnabled {
-            runAction(successSoundAction)
-        }
-        
-        if let correctTarget = correctTarget {
-            // Display points gained
-            correctTarget.setPointsGained(pointsGained)
-            
-            // Grow winning target
-            let growAction = SKAction.scaleBy(2, duration: successAnimationDuration)
-            growAction.timingMode = .EaseIn
-            correctTarget.runAction(SKAction.sequence([
-                growAction,
-                SKAction.removeFromParent()
-            ]))
-        }
-        
-        
-        // Fade out incorrect targets
-        let shrinkAction = SKAction.scaleBy(0, duration: successAnimationDuration)
-        shrinkAction.timingMode = .EaseIn
-        incorrectTargets.forEach({
-            $0.runAction(SKAction.sequence([
-                shrinkAction,
-                SKAction.removeFromParent()
-            ]))
-        })
-        
-        // Animate removal of current player node
-        if let playerNode = playerNode {
-            playerNode.runAction(SKAction.sequence([
-                SKAction.group([
-                    SKAction.fadeInWithDuration(successAnimationDuration),
-                    SKAction.scaleTo(0, duration: successAnimationDuration)
-                ]),
-                SKAction.removeFromParent(),
-                
-                // Draw new puzzle
-                SKAction.runBlock({
-                    self.drawNewPuzzle()
-                })
-            ]))
+    func player(playerNode: TargetShapeNode, didEndMoveWithCorrectTarget correctTarget: TargetShapeNode, andIncorrectTargets incorrectTargets: [TargetShapeNode]) {
+        let collisionState = getCollisionStateForPlayer(playerNode, withCorrectTarget: correctTarget, andIncorrectTargets: incorrectTargets)
+        switch(collisionState) {
+        case .CorrectTarget:
+            player(playerNode, didSelectCorrectTarget: correctTarget, withIncorrectTargets: incorrectTargets)
+        case .IncorrectTarget:
+            playerDidSelectIncorrectTarget()
+        case .NoTarget:
+            returnPlayerToCenterPoint(playerNode)
         }
     }
     
-    func playerMadeIncorrectSelection() {
-        gameOver("Incorrect")
-    }
-    
-    func playerMadeNoSelection() {
-        if let playerNode = playerNode {
-            let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.15))
-            returnAction.timingMode = .EaseInEaseOut
-            playerNode.runAction(returnAction, withKey: "Return")
+    var lastUpdateTime: NSTimeInterval = 0
+    override func update(currentTime: NSTimeInterval) {
+        let deltaTime = lastUpdateTime > 0 ? currentTime - lastUpdateTime : 0
+        lastUpdateTime = currentTime
+        
+        if isPlayingLevel {
+            updateLevelWithDeltaTime(deltaTime)
         }
     }
-    
-    func gameOver(reason: String) {
-        isPlayingLevel = false
-        
-        print("Game Over: \(reason)")
-        self.stateLabel.text = reason
-        
-        if soundsEnabled {
-            runAction(failSoundAction)
-        }
-        
-        let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
-        let gameOverScene = GameOverScene(size: self.size)
-        gameOverScene.newScore = score
-        gameOverScene.reason = reason
-        self.view?.presentScene(gameOverScene, transition: transition)
-    }
-    
-    
+}
+
+// Handle input
+extension GameScene {
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         // Start timer after initial touch
         if !hasStartedPlaying {
             hasStartedPlaying = true
-            setTimer(timeForLevel)
             isPlayingLevel = true
+            setTimer(timeForLevel)
         }
     }
     
@@ -479,9 +527,12 @@ class GameScene: SKScene {
         
         let touchLocation = touch.locationInNode(self)
         let previousLocation = touch.previousLocationInNode(self)
-        let touchMoveVector = touchLocation - previousLocation
         
-        movePlayerNode(touchMoveVector)
+        guard isPlayingLevel else {
+            return
+        }
+        
+        movePlayerNode(playerNode!, withVector: touchLocation - previousLocation)
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -489,69 +540,6 @@ class GameScene: SKScene {
             return
         }
         
-        switch(getPlayerCollisionState()) {
-        case .CorrectTarget:
-            playerMadeCorrectSelection()
-        case .IncorrectTarget:
-            playerMadeIncorrectSelection()
-        case .NoTarget:
-            playerMadeNoSelection()
-        }
-    }
-    
-    func movePlayerNode(moveVector: CGPoint) {
-        guard isPlayingLevel else {
-            return
-        }
-        
-        guard let playerNode = playerNode else {
-            return
-        }
-        
-        // Remove position actions
-        playerNode.removeActionForKey("Hint")
-        playerNode.removeActionForKey("Return")
-        
-        var newPlayerNodePosition = playerNode.position + moveVector
-        
-        // Bounds check player
-        let distance = (newPlayerNodePosition - centerPoint).length()
-        if distance > maxPlayerDistanceFromCenterPoint {
-            let offset = newPlayerNodePosition - centerPoint
-            let direction = offset.normalized()
-            let cappedPosition = (direction * maxPlayerDistanceFromCenterPoint) + centerPoint
-            newPlayerNodePosition = cappedPosition
-        }
-        
-        // Move to new position
-        playerNode.position = newPlayerNodePosition
-    }
-    
-    
-    var lastUpdateTime: NSTimeInterval = 0
-    override func update(currentTime: NSTimeInterval) {
-        let deltaTime = lastUpdateTime > 0 ? currentTime - lastUpdateTime : 0
-        lastUpdateTime = currentTime
-        
-        updateTimer(deltaTime)
-    }
-    
-    func updateTimer(deltaTime: NSTimeInterval) {
-        guard isPlayingLevel else {
-            return
-        }
-        
-        timeRemainingForLevel -= deltaTime
-        
-        let currentPointsAvailable = getPointsForTime(timeRemainingForLevel)
-        stateLabel.text = "\(currentPointsAvailable) points"
-        
-        if timeRemainingForLevel <= 0 {
-            if getPlayerCollisionState() == .CorrectTarget {
-                playerMadeCorrectSelection()
-            } else {
-                gameOver("Times Up")
-            }
-        }
+        player(playerNode!, didEndMoveWithCorrectTarget: correctTarget!, andIncorrectTargets: incorrectTargets)
     }
 }
