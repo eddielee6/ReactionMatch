@@ -9,7 +9,7 @@
 import SpriteKit
 import GameKit
 
-class GameScene: SKScene {
+class MatchingGameScene: SKScene {
     
     enum NodeStackingOrder: CGFloat {
         case BackgroundImage
@@ -62,6 +62,22 @@ class GameScene: SKScene {
     var levelsPlayed: Int = 0
     var score: Int64 = 0 {
         didSet {
+            if score > 0 && oldValue <= 0 {
+                let fadeInAction = SKAction.fadeInWithDuration(0.25)
+                fadeInAction.timingMode = .EaseIn
+                scoreLabel.runAction(fadeInAction)
+            } else if score <= 0 && oldValue > 0 {
+                let fadeOutAction = SKAction.fadeOutWithDuration(0.25)
+                fadeOutAction.timingMode = .EaseIn
+                scoreLabel.runAction(fadeOutAction)
+            }
+            
+            let growAction = SKAction.scaleBy(1.25, duration: 0.25)
+            scoreLabel.runAction(SKAction.sequence([
+                growAction,
+                growAction.reversedAction()
+            ]))
+            
             scoreLabel.text = "Score \(score)"
         }
     }
@@ -97,11 +113,40 @@ class GameScene: SKScene {
         }
     }
     
+    
     override func didMoveToView(view: SKView) {
         setBackground()
         setHud()
         drawNewPuzzle()
     }
+    
+    var lastUpdateTime: NSTimeInterval = 0
+    override func update(currentTime: NSTimeInterval) {
+        let deltaTime = lastUpdateTime > 0 ? currentTime - lastUpdateTime : 0
+        lastUpdateTime = currentTime
+        
+        if isPlayingLevel {
+            updateLevelWithDeltaTime(deltaTime)
+        }
+    }
+    
+    func setTimer(timeForLevel: NSTimeInterval) {
+        timeRemainingForLevel = timeForLevel
+    }
+    
+    func getPointsForTime(timeRemaining: Double) -> Int {
+        return Int(ceil((timeRemaining / timeForLevel) * 10))
+    }
+    
+    func playSound(soundAction: SKAction) {
+        if soundsEnabled {
+            runAction(soundAction)
+        }
+    }
+    
+    
+    
+    // MARK: Interface Setup
     
     func setBackground() {
         let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
@@ -112,6 +157,7 @@ class GameScene: SKScene {
     
     func setHud() {
         scoreLabel.text = "Score \(score)"
+        scoreLabel.alpha = 0
         scoreLabel.horizontalAlignmentMode = .Center
         scoreLabel.fontSize = 45
         scoreLabel.fontColor = SKColor.blackColor()
@@ -141,7 +187,7 @@ class GameScene: SKScene {
         gradientLayer.colors = [
             SKColor(red: 247/255, green: 247/255, blue: 247/255, alpha: 1),
             SKColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1)
-            ].map { $0.CGColor }
+        ].map { $0.CGColor }
         gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
         gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
         
@@ -153,6 +199,10 @@ class GameScene: SKScene {
         
         return SKTexture(CGImage: image.CGImage!)
     }
+    
+    
+    
+    // MARK: Game Setup
     
     func drawNewPuzzle() {
         levelsPlayed += 1
@@ -212,31 +262,6 @@ class GameScene: SKScene {
         numberOfTargets = numberOfTargets > maxNumberOfTargets ? maxNumberOfTargets : numberOfTargets
         return numberOfTargets
     }
-    
-    func playHintAnimationForPlayer(playerNode: TargetShapeNode, toNode targetNode: TargetShapeNode) {
-        let hintPoint = (centerPoint + targetNode.position) / 2
-        
-        let hintAction = SKAction.sequence([
-            SKAction.moveTo(hintPoint, duration: 0.3),
-            SKAction.moveTo(centerPoint, duration: 0.3)])
-        hintAction.timingMode = .EaseInEaseOut
-        
-        playerNode.runAction(SKAction.sequence([
-            SKAction.waitForDuration(0.5),
-            SKAction.repeatActionForever(SKAction.sequence([
-                SKAction.waitForDuration(1.25),
-                hintAction
-            ]))
-        ]), withKey: "Hint")
-    }
-    
-    func setTimer(timeForLevel: NSTimeInterval) {
-        timeRemainingForLevel = timeForLevel
-    }
-    
-    func getPointsForTime(timeRemaining: Double) -> Int {
-        return Int(ceil((timeRemaining / timeForLevel) * 10))
-    }    
     
     func setupTargetsFor(playerTargetNode: TargetShapeNode, numberOfTargets: Int) {
         
@@ -345,6 +370,27 @@ class GameScene: SKScene {
         return targetPositions
     }
     
+    
+    
+    // MARK: Gameplay
+    
+    func playHintAnimationForPlayer(playerNode: TargetShapeNode, toNode targetNode: TargetShapeNode) {
+        let hintPoint = (centerPoint + targetNode.position) / 2
+        
+        let hintAction = SKAction.sequence([
+            SKAction.moveTo(hintPoint, duration: 0.3),
+            SKAction.moveTo(centerPoint, duration: 0.3)])
+        hintAction.timingMode = .EaseInEaseOut
+        
+        playerNode.runAction(SKAction.sequence([
+            SKAction.waitForDuration(0.5),
+            SKAction.repeatActionForever(SKAction.sequence([
+                SKAction.waitForDuration(1.25),
+                hintAction
+            ]))
+        ]), withKey: "Hint")
+    }
+    
     func player(playerNode: TargetShapeNode, didSelectCorrectTarget correctTarget: TargetShapeNode, withIncorrectTargets incorrectTargets: [TargetShapeNode]) {
         isPlayingLevel = false
         
@@ -414,12 +460,6 @@ class GameScene: SKScene {
         self.view?.presentScene(gameOverScene, transition: transition)
     }
     
-    func playSound(soundAction: SKAction) {
-        if soundsEnabled {
-            runAction(soundAction)
-        }
-    }
-    
     func movePlayerNode(playerNode: TargetShapeNode, withVector vector: CGPoint) {
         // Remove position actions
         playerNode.removeActionForKey("Hint")
@@ -439,9 +479,6 @@ class GameScene: SKScene {
         // Move to new position
         playerNode.position = newPlayerNodePosition
     }
-    
-    
-    
     
     func updateLevelWithDeltaTime(deltaTime: NSTimeInterval) {
         timeRemainingForLevel -= deltaTime
@@ -497,20 +534,13 @@ class GameScene: SKScene {
             returnPlayerToCenterPoint(playerNode)
         }
     }
-    
-    var lastUpdateTime: NSTimeInterval = 0
-    override func update(currentTime: NSTimeInterval) {
-        let deltaTime = lastUpdateTime > 0 ? currentTime - lastUpdateTime : 0
-        lastUpdateTime = currentTime
-        
-        if isPlayingLevel {
-            updateLevelWithDeltaTime(deltaTime)
-        }
-    }
 }
 
-// Handle input
-extension GameScene {
+
+
+// MARK: Handle input
+
+extension MatchingGameScene {
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         // Start timer after initial touch
         if !hasStartedPlaying {

@@ -10,7 +10,7 @@ import UIKit
 import SpriteKit
 import AVFoundation
 
-class GameViewController: UIViewController, ScoreManagerFocusDelegate {
+class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +25,7 @@ class GameViewController: UIViewController, ScoreManagerFocusDelegate {
             //skView.showsFPS = true
             //skView.showsNodeCount = true
             
-            let scene = GameScene(size: view.bounds.size)
+            let scene = MatchingGameScene(size: view.bounds.size)
             scene.scaleMode = .ResizeFill
             
             skView.presentScene(scene)

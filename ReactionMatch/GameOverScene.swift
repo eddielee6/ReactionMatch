@@ -109,7 +109,7 @@ class GameOverScene: SKScene {
     
     func startNewGame() {
         let reveal = SKTransition.doorwayWithDuration(0.5)
-        let scene = GameScene(size: self.size)
+        let scene = MatchingGameScene(size: self.size)
         self.view?.presentScene(scene, transition:reveal)
     }
     
