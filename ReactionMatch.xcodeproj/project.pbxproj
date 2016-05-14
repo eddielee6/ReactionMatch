@@ -19,6 +19,8 @@
 		2C60A5411CB5A86800AE40B4 /* TargetColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C60A5401CB5A86800AE40B4 /* TargetColor.swift */; };
 		2C677D1B1C4EC57C00E519C9 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */; };
 		2C7806D51CE731440072F8A8 /* Textures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7806D41CE731440072F8A8 /* Textures.swift */; };
+		2C7806D71CE73C060072F8A8 /* CGSizeExtentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7806D61CE73C060072F8A8 /* CGSizeExtentions.swift */; };
+		2C7806D91CE75A390072F8A8 /* TimeIndicatorNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7806D81CE75A390072F8A8 /* TimeIndicatorNode.swift */; };
 		2C9B9F201CBC27EF0015DDE4 /* CGPointExtentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9B9F1F1CBC27EF0015DDE4 /* CGPointExtentions.swift */; };
 		2C9B9F231CBC28390015DDE4 /* SKColorExtentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9B9F221CBC28390015DDE4 /* SKColorExtentions.swift */; };
 		2CA8E6251C5176200001F2DA /* ScoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA8E6241C5176200001F2DA /* ScoreManager.swift */; };
@@ -43,6 +45,8 @@
 		2C60A5401CB5A86800AE40B4 /* TargetColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetColor.swift; sourceTree = "<group>"; };
 		2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
 		2C7806D41CE731440072F8A8 /* Textures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Textures.swift; sourceTree = "<group>"; };
+		2C7806D61CE73C060072F8A8 /* CGSizeExtentions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGSizeExtentions.swift; sourceTree = "<group>"; };
+		2C7806D81CE75A390072F8A8 /* TimeIndicatorNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeIndicatorNode.swift; sourceTree = "<group>"; };
 		2C9B9F1F1CBC27EF0015DDE4 /* CGPointExtentions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGPointExtentions.swift; sourceTree = "<group>"; };
 		2C9B9F221CBC28390015DDE4 /* SKColorExtentions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKColorExtentions.swift; sourceTree = "<group>"; };
 		2CA8E6241C5176200001F2DA /* ScoreManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScoreManager.swift; sourceTree = "<group>"; };
@@ -90,6 +94,7 @@
 				2C4811DA1C53F3E4007BD90B /* Resources */,
 				2C104D241C4D6BA10097E0AD /* AppDelegate.swift */,
 				2CA8E6241C5176200001F2DA /* ScoreManager.swift */,
+				2C7806D81CE75A390072F8A8 /* TimeIndicatorNode.swift */,
 				2CC6D5F71CBD1AD900857F85 /* TargetShapeNode.swift */,
 				2C60A5401CB5A86800AE40B4 /* TargetColor.swift */,
 				2CD8EDBD1CB7A4F6005B6492 /* TargetShape.swift */,
@@ -135,6 +140,7 @@
 				2C9B9F1F1CBC27EF0015DDE4 /* CGPointExtentions.swift */,
 				2C9B9F221CBC28390015DDE4 /* SKColorExtentions.swift */,
 				2CC6D5F91CBD24FB00857F85 /* SKShapeNodeExtentions.swift */,
+				2C7806D61CE73C060072F8A8 /* CGSizeExtentions.swift */,
 			);
 			name = Extentions;
 			sourceTree = "<group>";
@@ -223,6 +229,8 @@
 				2C104D291C4D6BA10097E0AD /* MatchingGameScene.swift in Sources */,
 				2CD8EDBE1CB7A4F6005B6492 /* TargetShape.swift in Sources */,
 				2CC6D5F81CBD1AD900857F85 /* TargetShapeNode.swift in Sources */,
+				2C7806D71CE73C060072F8A8 /* CGSizeExtentions.swift in Sources */,
+				2C7806D91CE75A390072F8A8 /* TimeIndicatorNode.swift in Sources */,
 				2C9B9F231CBC28390015DDE4 /* SKColorExtentions.swift in Sources */,
 				2C104D2B1C4D6BA10097E0AD /* MatchingGameViewController.swift in Sources */,
 				2CC6D5FA1CBD24FB00857F85 /* SKShapeNodeExtentions.swift in Sources */,
