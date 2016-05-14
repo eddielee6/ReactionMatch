@@ -16,18 +16,20 @@ public protocol ScoreManagerFocusDelegate {
 
 public class ScoreManager {
     
-    public static let sharedInstance = ScoreManager()
+    static let sharedInstance = ScoreManager()
     
-    public var focusDelegate: ScoreManagerFocusDelegate?
+    var focusDelegate: ScoreManagerFocusDelegate?
     
-    private let leaderboardIdentifier: String = "me.eddielee.ReactionMatch.TopScore"
     private var gameCentreEnabled: Bool = false
+    private var localPlayer: GKLocalPlayer!
     
     
     // MARK: Authentication
     
     public func authenticateLocalPlayer(viewController: UIViewController) {
-        let localPlayer = GKLocalPlayer.localPlayer()
+        print("authenticateLocalPlayer")
+        
+        localPlayer = GKLocalPlayer.localPlayer()
         
         var scoreManagerDidTakeFocus: Bool = false
         
@@ -39,6 +41,8 @@ public class ScoreManager {
                     scoreManagerDidTakeFocus = true
                 }
                 
+                print("will present gameCentreLoginViewController")
+                
                 viewController.presentViewController(gameCentreLoginViewController, animated: true, completion: nil)
                 
             } else {
@@ -48,9 +52,11 @@ public class ScoreManager {
                     }
                 }
                 
-                if localPlayer.authenticated {
+                print("localPlayer.authenticated: \(self.localPlayer.authenticated)")
+                
+                if self.localPlayer.authenticated {
                     self.gameCentreEnabled = true
-                    self.updateLocalHighScore()
+                    self.updateLocalHighScores()
                 } else {
                     self.gameCentreEnabled = false
                 }
@@ -58,40 +64,56 @@ public class ScoreManager {
         }
     }
     
-    private func updateLocalHighScore() {
-        let localPlayer = GKLocalPlayer.localPlayer()
+    private func updateLocalHighScores() {
+        for gameType in [GameType.Classic, GameType.V2] {
+            updateLocalHighScoreForGameType(gameType)
+        }
+    }
+    
+    private func updateLocalHighScoreForGameType(gameType: GameType) {
+        print("will updateLocalHighScoreForGameType: \(gameType.name)")
+        
         let localPlayerLeaderBoard = GKLeaderboard(players: [localPlayer])
         
-        localPlayerLeaderBoard.identifier = leaderboardIdentifier
+        localPlayerLeaderBoard.identifier = gameType.leaderboardIdentifier
         
         localPlayerLeaderBoard.loadScoresWithCompletionHandler { (scores, error) -> () in
-            if let localPlayerGameCentreHighScore = localPlayerLeaderBoard.localPlayerScore {
-                if localPlayerGameCentreHighScore.value != self.getLocalHighScore() {
-                    self.setLocalHighScore(localPlayerGameCentreHighScore.value)
-                }
+            guard error == nil else {
+                print(error)
+                return
+            }
+            
+            let gameCentreHighScore = localPlayerLeaderBoard.localPlayerScore?.value
+            let localHighScore = self.getLocalHighScoreForGameType(gameType)
+            
+            print("updating high score for game type \(gameType.name)")
+            print("gameCentreHighScore: \(gameCentreHighScore)")
+            print("localHighScore: \(localHighScore)")
+            
+            if gameCentreHighScore != localHighScore {
+                self.setLocalHighScore(gameCentreHighScore ?? 0, forGameType: gameType)
             }
         }
     }
     
     
     // MARK: Score Recording
-    
-    public func recordNewScore(newScore: Int64) {
-        updateLocalHighScore(newScore)
+    func recordNewScore(newScore: Int64, forGameType gameType: GameType) {
+        updateLocalHighScore(newScore, forGameType: gameType)
         
         if gameCentreEnabled {
-            submitScoreToGameCentre(newScore)
+            submitScoreToGameCentre(newScore, forGameType: gameType)
         }
     }
     
-    private func updateLocalHighScore(newScore: Int64) {
-        if newScore > getLocalHighScore() {
-            setLocalHighScore(newScore)
+    private func updateLocalHighScore(newScore: Int64, forGameType gameType: GameType) {
+        if newScore > getLocalHighScoreForGameType(gameType) {
+            setLocalHighScore(newScore, forGameType: gameType)
         }
     }
     
-    private func submitScoreToGameCentre(score: Int64) {
-        let scoreToSubmit = GKScore(leaderboardIdentifier: leaderboardIdentifier)
+    private func submitScoreToGameCentre(score: Int64, forGameType gameType: GameType) {
+        let scoreToSubmit = GKScore(leaderboardIdentifier: gameType.leaderboardIdentifier)
         scoreToSubmit.value = Int64(score)
         
         GKScore.reportScores([scoreToSubmit], withCompletionHandler: { (error: NSError?) -> () in
@@ -103,25 +125,23 @@ public class ScoreManager {
     
     
     // MARK: Get High Score
-    
-    public func getHighScore() -> Int64 {
-        return self.getLocalHighScore()
+    func getHighScoreForGameType(gameType: GameType) -> Int64 {
+        return getLocalHighScoreForGameType(gameType)
     }
     
     
     // MARK: Local Cache
-    
-    private func setLocalHighScore(score: Int64) {
+    private func setLocalHighScore(score: Int64, forGameType gameType: GameType) {
         let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
         
-        defaults.setObject(NSNumber(longLong: score), forKey: "highScore")
+        defaults.setObject(NSNumber(longLong: score), forKey: "highScore-\(gameType.name)")
         defaults.synchronize()
     }
     
-    private func getLocalHighScore() -> Int64 {
+    private func getLocalHighScoreForGameType(gameType: GameType) -> Int64 {
         let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
         
-        if let highScore = defaults.objectForKey("highScore") as? NSNumber {
+        if let highScore = defaults.objectForKey("highScore-\(gameType.name)") as? NSNumber {
             return highScore.longLongValue
         }
         

@@ -10,13 +10,14 @@ import SpriteKit
 import GameKit
 import CoreImage
 
-struct GameSettings {
+struct MatchingGameSettings {
     enum GameMode {
         case ExactMatch // Match Colour and Shape
         case ColorMatch // Match Colour Only (all squares)
         case ShapeMatch // Match Shape, Ignore Colour
     }
     
+    var gameType: GameType = .V2
     var gameMode: GameMode = .ShapeMatch // How accuratly should shapes be matched
     var soundsEnabled = true
     var minNumberOfTargets: Int = 2 // Starting number of targets on screen
@@ -36,7 +37,7 @@ class MatchingGameScene: SKScene {
         case GameOverInterface
     }
 
-    var settings: GameSettings = GameSettings()
+    var settings: MatchingGameSettings = MatchingGameSettings()
     
     // MARK: Constants
     private let scoreManager = ScoreManager.sharedInstance
@@ -534,8 +535,8 @@ extension MatchingGameScene {
         
         playSound(failSoundAction)
         
-        let currentHighScore = scoreManager.getHighScore()
-        scoreManager.recordNewScore(score)
+        let currentHighScore = scoreManager.getHighScoreForGameType(settings.gameType)
+        scoreManager.recordNewScore(score, forGameType: settings.gameType)
         
         showHighScoreLabel(score, isHighScore: score > currentHighScore)
         blurScene()
@@ -568,7 +569,7 @@ extension MatchingGameScene {
         addChild(scoreLabel)
         
         let highScoreLabel = SKLabelNode()
-        highScoreLabel.text = "High Score \(scoreManager.getHighScore())"
+        highScoreLabel.text = "High Score \(scoreManager.getHighScoreForGameType(settings.gameType))"
         highScoreLabel.alpha = 0
         highScoreLabel.horizontalAlignmentMode = .Center
         highScoreLabel.fontSize = 30
