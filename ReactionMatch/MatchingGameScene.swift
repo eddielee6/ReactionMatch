@@ -10,6 +10,21 @@ import SpriteKit
 import GameKit
 import CoreImage
 
+struct GameSettings {
+    enum GameMode {
+        case ExactMatch // Match Colour and Shape
+        case ColorMatch // Match Colour Only (all squares)
+        case ShapeMatch // Match Shape, Ignore Colour
+    }
+    
+    var gameMode: GameMode = .ShapeMatch // How accuratly should shapes be matched
+    var soundsEnabled = true
+    var minNumberOfTargets: Int = 2 // Starting number of targets on screen
+    var maxNumberOfTargets: Int = 8 // Cap on how many targets per game
+    var newTargetAfterTurn: Int = 5 // Turns between new targets being added
+    var newTargetIncrement: Int = 2 // Number of targets to add each increment
+}
+
 class MatchingGameScene: SKScene {
     
     private enum NodeStackingOrder: CGFloat {
@@ -20,28 +35,14 @@ class MatchingGameScene: SKScene {
         case Interface
         case GameOverInterface
     }
-    
-    
-    // MARK: Settings
-    enum GameMode {
-        case ExactMatch // Easy
-        case ColorMatch // Medium
-        case ShapeMatch // Hard
-    }
-    
-    var gameMode: GameMode = .ShapeMatch // How accuratly should shapes be matched
-    var soundsEnabled = true
-    
+
+    var settings: GameSettings = GameSettings()
     
     // MARK: Constants
     private let scoreManager = ScoreManager.sharedInstance
     
     private let successAnimationDuration: Double = 0.25 // Time taken to animate to new levels
     private let setupNewGameAnimationDuration: Double = 0.25 // Time taken to animate to game start
-    private let minNumberOfTargets: Int = 2 // Starting number of targets on screen
-    private let maxNumberOfTargets: Int = 8 // Cap on how many targets per game
-    private let newTargetAfterTurn: Int = 5 // Turns between new targets being added
-    private let newTargetIncrement: Int = 2 // Number of targets to add each increment
     
     private var centerPoint: CGPoint {
         return CGPoint(x: size.width/2, y: size.height/2)
@@ -212,7 +213,7 @@ class MatchingGameScene: SKScene {
     }
     
     private func getNewPlayerNode() -> TargetShapeNode {
-        let newPlayer = TargetShapeNode.randomShapeNode()
+        let newPlayer = settings.gameMode == .ColorMatch ? TargetShapeNode(targetShape: TargetShape.Square) : TargetShapeNode.randomShapeNode()
         newPlayer.name = playerNodeName
         newPlayer.strokeColor = SKColor.whiteColor()
         newPlayer.position = centerPoint
@@ -264,9 +265,12 @@ class MatchingGameScene: SKScene {
     }
     
     private func getNumberOfTargetsForLevelsPlayed(levelsPlayed: Int) -> Int {
-        let bonusTargets = Int(floor(Double(levelsPlayed / newTargetAfterTurn))) * newTargetIncrement
-        var numberOfTargets = minNumberOfTargets + bonusTargets
-        numberOfTargets = numberOfTargets > maxNumberOfTargets ? maxNumberOfTargets : numberOfTargets
+        var bonusTargets = 0
+        if settings.newTargetIncrement > 0 && settings.newTargetAfterTurn > 0 {
+            bonusTargets = Int(floor(Double(levelsPlayed / settings.newTargetAfterTurn))) * settings.newTargetIncrement
+        }
+        var numberOfTargets = settings.minNumberOfTargets + bonusTargets
+        numberOfTargets = numberOfTargets > settings.maxNumberOfTargets ? settings.maxNumberOfTargets : numberOfTargets
         return numberOfTargets
     }
     
@@ -314,10 +318,10 @@ class MatchingGameScene: SKScene {
         var targetShape: TargetShape
         
         if isWinning {
-            switch gameMode {
+            switch settings.gameMode {
             case .ColorMatch:
                 targetColor = playerNodeColor
-                targetShape = TargetShape.random(not: playerNodeShape)
+                targetShape = TargetShape.Square
             case .ShapeMatch:
                 targetColor = TargetColor.random(not: playerNodeColor)
                 targetShape = playerNodeShape
@@ -326,10 +330,10 @@ class MatchingGameScene: SKScene {
                 targetShape = playerNodeShape
             }
         } else {
-            switch gameMode {
+            switch settings.gameMode {
             case .ColorMatch:
                 targetColor = TargetColor.random(not: playerNodeColor)
-                targetShape = TargetShape.random()
+                targetShape = TargetShape.Square
             case .ShapeMatch:
                 targetColor = TargetColor.random()
                 targetShape = TargetShape.random(not: playerNodeShape)
@@ -381,7 +385,7 @@ class MatchingGameScene: SKScene {
     }
     
     private func playSound(soundAction: SKAction) {
-        if soundsEnabled {
+        if settings.soundsEnabled {
             runAction(soundAction)
         }
     }
@@ -598,6 +602,7 @@ extension MatchingGameScene {
     
     private func restartGame() {
         let newGameScene = MatchingGameScene(size: self.size)
+        newGameScene.settings = settings
         self.view?.presentScene(newGameScene)
     }
 }
@@ -642,7 +647,7 @@ extension MatchingGameScene {
         }
         
         let guidanceLabel = SKLabelNode()
-        guidanceLabel.text = gameMode == .ColorMatch ? "Match the Colour" : "Match the Shape"
+        guidanceLabel.text = settings.gameMode == .ColorMatch ? "Match the Colour" : "Match the Shape"
         guidanceLabel.horizontalAlignmentMode = .Center
         guidanceLabel.fontSize = 30
         guidanceLabel.fontColor = SKColor.blackColor()

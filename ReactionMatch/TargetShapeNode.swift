@@ -41,6 +41,10 @@ class TargetShapeNode: SKShapeNode {
         self.strokeColor = self.targetColor.value
     }
     
+    convenience init (targetShape: TargetShape) {
+        self.init(targetColor: TargetColor.random(), targetShape: TargetShape.Square)
+    }
+    
     func setPointsGained(points: Int) {
         pointsGainedLabel.fontColor = targetColor.value.inverted
         pointsGainedLabel.text = String(points)

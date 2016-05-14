@@ -12,6 +12,12 @@ import AVFoundation
 
 class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate {
     
+    enum GameType {
+        case Classic, Pro
+    }
+    
+    let gameType: GameType = .Classic
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -25,10 +31,25 @@ class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate {
             //skView.showsFPS = true
             //skView.showsNodeCount = true
             
-            let scene = MatchingGameScene(size: view.bounds.size)
-            scene.scaleMode = .ResizeFill
+            let matchingGameScene = MatchingGameScene(size: view.bounds.size)
+            matchingGameScene.scaleMode = .ResizeFill
             
-            skView.presentScene(scene)
+            switch gameType {
+            case .Classic:
+                matchingGameScene.settings.gameMode = .ColorMatch
+                matchingGameScene.settings.minNumberOfTargets = 4
+                matchingGameScene.settings.maxNumberOfTargets = 4
+                matchingGameScene.settings.newTargetAfterTurn = 0
+                matchingGameScene.settings.newTargetIncrement = 0
+            case .Pro:
+                matchingGameScene.settings.gameMode = .ShapeMatch
+                matchingGameScene.settings.minNumberOfTargets = 2
+                matchingGameScene.settings.maxNumberOfTargets = 8
+                matchingGameScene.settings.newTargetAfterTurn = 5
+                matchingGameScene.settings.newTargetIncrement = 2
+            }
+            
+            skView.presentScene(matchingGameScene)
         }
     }
     
