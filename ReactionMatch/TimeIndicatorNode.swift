@@ -13,23 +13,25 @@ class TimeIndicatorNode: SKSpriteNode {
     var indicatorStrokeColor = SKColor.grayColor()
     var indicatorStrokeWidth: CGFloat = 4
     
-    var percentFull: Double = 0 {
+    var percent: Double = 0 {
         didSet {
-            if percentFull <= 0 {
-                texture = nil
-            } else {
-                texture = getTimeIndicatorTextureOfSize(CGFloat(percentFull))
+            if oldValue != percent {
+                if percent <= 0 {
+                    texture = nil
+                } else {
+                    texture = getTimeIndicatorTextureOfSize()
+                }
             }
         }
     }
     
-    private func getTimeIndicatorTextureOfSize(percentFull: CGFloat) -> SKTexture {
+    private func getTimeIndicatorTextureOfSize() -> SKTexture {
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         let context = UIGraphicsGetCurrentContext()
         
         CGContextSetStrokeColorWithColor(context, indicatorStrokeColor.CGColor)
         CGContextSetLineWidth(context, indicatorStrokeWidth)
-        CGContextAddPath(context, getTimeIndicatorPath(percentFull))
+        CGContextAddPath(context, getTimeIndicatorPath(CGFloat(percent)))
         CGContextStrokePath(context)
         
         let spriteImage = UIGraphicsGetImageFromCurrentImageContext()
@@ -38,16 +40,16 @@ class TimeIndicatorNode: SKSpriteNode {
         return SKTexture(image: spriteImage)
     }
     
-    private func getTimeIndicatorPath(percentFull: CGFloat) -> CGPath {
-        let startAngle: CGFloat = -90
-        let endAngle: CGFloat = startAngle - (360/100 * percentFull)
+    private func getTimeIndicatorPath(strokeArcPercent: CGFloat) -> CGPath {
+        let startAngle: CGFloat = 270
+        let endAngle: CGFloat = startAngle + (360/100 * strokeArcPercent)
         
         let indicatorPath = UIBezierPath(
             arcCenter: CGPoint(x: size.width/2, y: size.height/2),
             radius: (size.width * 0.9) / 2,
             startAngle: startAngle * CGFloat(M_PI) / 180,
             endAngle: endAngle * CGFloat(M_PI) / 180,
-            clockwise: false)
+            clockwise: true)
         
         return indicatorPath.CGPath
     }

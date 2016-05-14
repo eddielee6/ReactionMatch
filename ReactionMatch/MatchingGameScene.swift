@@ -244,7 +244,7 @@ class MatchingGameScene: SKScene {
         timeForCurrentLevel = getTimeForLevel(level)
         timeRemainingForCurrentLevel = timeForCurrentLevel
         
-        timeIndicator.percentFull = 100
+        timeIndicator.percent = 0
         timeIndicator.runAction(SKAction.fadeInWithDuration(setupNewGameAnimationDuration))
         
         runAction(SKAction.sequence([
@@ -467,7 +467,7 @@ class MatchingGameScene: SKScene {
     private func updateLevelWithDeltaTime(deltaTime: NSTimeInterval) {
         timeRemainingForCurrentLevel -= deltaTime
         
-        timeIndicator.percentFull = (timeRemainingForCurrentLevel / timeForCurrentLevel) * 100
+        timeIndicator.percent = ((timeForCurrentLevel - timeRemainingForCurrentLevel) / timeForCurrentLevel) * 100
         
         if timeRemainingForCurrentLevel <= 0 {
             if timeRemainingForCurrentLevel <= 0 {
@@ -475,6 +475,7 @@ class MatchingGameScene: SKScene {
                 if collisionState == .CorrectTarget {
                     player(playerNode!, didSelectCorrectTarget: correctTarget!, withIncorrectTargets: incorrectTargets)
                 } else {
+                    timeIndicator.percent = 100
                     gameOver("Times Up")
                 }
             }
@@ -665,11 +666,7 @@ extension MatchingGameScene {
 // MARK: Handle input
 extension MatchingGameScene {
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        // Start initial game after initial touch
-        if !hasStartedFirstLevel {
-            hasStartedFirstLevel = true
-            startLevel()
-        } else if isGameOver {
+        if isGameOver {
             restartGame()
         }
     }
@@ -682,11 +679,15 @@ extension MatchingGameScene {
         let touchLocation = touch.locationInNode(self)
         let previousLocation = touch.previousLocationInNode(self)
         
-        guard isPlayingLevel else {
-            return
+        // Start initial game after initial move
+        if !hasStartedFirstLevel {
+            hasStartedFirstLevel = true
+            startLevel()
         }
         
-        movePlayerNode(playerNode!, withVector: touchLocation - previousLocation)
+        if isPlayingLevel {
+            movePlayerNode(playerNode!, withVector: touchLocation - previousLocation)
+        }
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
