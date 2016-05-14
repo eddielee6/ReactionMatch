@@ -60,25 +60,51 @@ class MatchingGameScene: SKScene {
     var hasStartedPlaying: Bool = false
     
     var levelsPlayed: Int = 0
+    
     var score: Int64 = 0 {
         didSet {
+            // Fade in on first score
             if score > 0 && oldValue <= 0 {
-                let fadeInAction = SKAction.fadeInWithDuration(0.25)
-                fadeInAction.timingMode = .EaseIn
-                scoreLabel.runAction(fadeInAction)
-            } else if score <= 0 && oldValue > 0 {
-                let fadeOutAction = SKAction.fadeOutWithDuration(0.25)
-                fadeOutAction.timingMode = .EaseIn
-                scoreLabel.runAction(fadeOutAction)
+                if let fadeInAction = scoreLabel.userData?.objectForKey("fadeInAction") as? SKAction {
+                    scoreLabel.runAction(fadeInAction)
+                } else {
+                    let fadeInAction = SKAction.fadeInWithDuration(0.25)
+                    fadeInAction.timingMode = .EaseIn
+                    scoreLabel.runAction(fadeInAction)
+                    
+                    scoreLabel.userData?.setObject(fadeInAction, forKey: "fadeInAction")
+                }
             }
             
-            let growAction = SKAction.scaleBy(1.25, duration: 0.15)
-            let pulseAction = SKAction.sequence([
-                growAction,
-                growAction.reversedAction()
-            ])
-            pulseAction.timingMode = .EaseInEaseOut
-            scoreLabel.runAction(pulseAction)
+            // Fade out when set to 0
+            if score <= 0 && oldValue > 0 {
+                if let fadeOutAction = scoreLabel.userData?.objectForKey("fadeOutAction") as? SKAction {
+                    scoreLabel.runAction(fadeOutAction)
+                } else {
+                    let fadeOutAction = SKAction.fadeOutWithDuration(0.25)
+                    fadeOutAction.timingMode = .EaseIn
+                    scoreLabel.runAction(fadeOutAction)
+                    
+                    scoreLabel.userData?.setObject(fadeOutAction, forKey: "fadeOutAction")
+                }
+            }
+            
+            // Pulse when score increases
+            if score > oldValue {
+                if let pulseAction = scoreLabel.userData?.objectForKey("pulseAction") as? SKAction {
+                    scoreLabel.runAction(pulseAction)
+                } else {
+                    let growAction = SKAction.scaleBy(1.25, duration: 0.15)
+                    let pulseAction = SKAction.sequence([
+                        growAction,
+                        growAction.reversedAction()
+                    ])
+                    pulseAction.timingMode = .EaseInEaseOut
+                    scoreLabel.runAction(pulseAction)
+                    
+                    scoreLabel.userData?.setObject(pulseAction, forKey: "pulseAction")
+                }
+            }
             
             scoreLabel.text = "Score \(score)"
         }
@@ -247,7 +273,7 @@ class MatchingGameScene: SKScene {
         setTimer(timeForLevel)
         
         runAction(SKAction.sequence([
-            SKAction.waitForDuration(setupNewGameAnimationDuration),
+            SKAction.waitForDuration(setupNewGameAnimationDuration * 1.5),
             SKAction.runBlock({
                 if self.hasStartedPlaying {
                     self.isPlayingLevel = true
