@@ -72,11 +72,13 @@ class MatchingGameScene: SKScene {
                 scoreLabel.runAction(fadeOutAction)
             }
             
-            let growAction = SKAction.scaleBy(1.25, duration: 0.25)
-            scoreLabel.runAction(SKAction.sequence([
+            let growAction = SKAction.scaleBy(1.25, duration: 0.15)
+            let pulseAction = SKAction.sequence([
                 growAction,
                 growAction.reversedAction()
-            ]))
+            ])
+            pulseAction.timingMode = .EaseInEaseOut
+            scoreLabel.runAction(pulseAction)
             
             scoreLabel.text = "Score \(score)"
         }
