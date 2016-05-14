@@ -528,9 +528,7 @@ extension MatchingGameScene {
         let currentHighScore = scoreManager.getHighScore()
         scoreManager.recordNewScore(score)
         
-        if score > currentHighScore {
-            // New High Score
-        }
+        showHighScoreLabel(score, isHighScore: score > currentHighScore)
         blurScene()
         showNewGameButton()
     }
@@ -539,12 +537,38 @@ extension MatchingGameScene {
         let blurNode = SKEffectNode()
         blurNode.filter = CIFilter(name: "CIGaussianBlur", withInputParameters: ["inputRadius": 10.0])!
         blurNode.shouldRasterize = true
-        blurNode.runAction(SKAction.fadeAlphaTo(0.55, duration: 0.5))
+        blurNode.runAction(SKAction.fadeAlphaTo(0.45, duration: 0.5))
         
         addChild(blurNode)
         
         gameAreaNode.removeFromParent()
         blurNode.addChild(gameAreaNode)
+    }
+    
+    private func showHighScoreLabel(score: Int64, isHighScore: Bool) {
+        let scoreLabel = SKLabelNode()
+        scoreLabel.text = isHighScore ? "New High Score" : "Score \(score)"
+        scoreLabel.alpha = 0
+        scoreLabel.horizontalAlignmentMode = .Center
+        scoreLabel.fontSize = 45
+        scoreLabel.fontColor = SKColor.blackColor()
+        scoreLabel.position = centerPoint + CGPoint(x: 0, y: 175)
+        scoreLabel.zPosition = NodeStackingOrder.Interface.rawValue
+        
+        scoreLabel.runAction(SKAction.fadeInWithDuration(0.5))
+        addChild(scoreLabel)
+        
+        let highScoreLabel = SKLabelNode()
+        highScoreLabel.text = "High Score \(scoreManager.getHighScore())"
+        highScoreLabel.alpha = 0
+        highScoreLabel.horizontalAlignmentMode = .Center
+        highScoreLabel.fontSize = 30
+        highScoreLabel.fontColor = SKColor.blackColor()
+        highScoreLabel.position = centerPoint + CGPoint(x: 0, y: 135)
+        highScoreLabel.zPosition = NodeStackingOrder.Interface.rawValue
+        
+        highScoreLabel.runAction(SKAction.fadeInWithDuration(0.5))
+        addChild(highScoreLabel)
     }
     
     private func showNewGameButton() {
