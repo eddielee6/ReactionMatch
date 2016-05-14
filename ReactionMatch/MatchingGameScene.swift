@@ -244,6 +244,9 @@ class MatchingGameScene: SKScene {
         timeForCurrentLevel = getTimeForLevel(level)
         timeRemainingForCurrentLevel = timeForCurrentLevel
         
+        timeIndicator.percentFull = 100
+        timeIndicator.runAction(SKAction.fadeInWithDuration(setupNewGameAnimationDuration))
+        
         runAction(SKAction.sequence([
             SKAction.waitForDuration(setupNewGameAnimationDuration * 1.5),
             SKAction.runBlock({
@@ -258,8 +261,6 @@ class MatchingGameScene: SKScene {
     
     private func startLevel() {
         isPlayingLevel = true
-        timeIndicator.percentFull = 100
-        
     }
     
     private func getNumberOfTargetsForLevelsPlayed(levelsPlayed: Int) -> Int {
@@ -414,6 +415,9 @@ class MatchingGameScene: SKScene {
                 SKAction.removeFromParent()
             ]))
         })
+        
+        // Fade out timer
+        timeIndicator.runAction(SKAction.fadeOutWithDuration(successAnimationDuration))
         
         // Animate removal of current player node
         playerNode.runAction(SKAction.sequence([
@@ -632,7 +636,7 @@ extension MatchingGameScene {
     
     private func showGuidanceLabel() {
         var guidanceLabelPosition: CGPoint {
-            let distanceFromGameArea: CGFloat = 50
+            let distanceFromGameArea: CGFloat = 60
             return centerPoint + CGPointMake(0, maxPlayerDistanceFromCenterPoint + distanceFromGameArea)
         }
         
