@@ -8,6 +8,7 @@
 
 import SpriteKit
 import GameKit
+import CoreImage
 
 class MatchingGameScene: SKScene {
     
@@ -118,15 +119,17 @@ class MatchingGameScene: SKScene {
     
     
     // MARK: Game Nodes
+    private let gameAreaNode = SKNode()
+    
     private let playerNodeName: String = "player"
     private var playerNode: TargetShapeNode? {
-        return childNodeWithName(playerNodeName) as? TargetShapeNode
+        return gameAreaNode.childNodeWithName(playerNodeName) as? TargetShapeNode
     }
     
     private let incorrectTargetNodeName: String = "target-incorrect"
     private var incorrectTargets: [TargetShapeNode] {
         var incorrectTargetNodes = [TargetShapeNode]()
-        enumerateChildNodesWithName(incorrectTargetNodeName) { node, _ in
+        gameAreaNode.enumerateChildNodesWithName(incorrectTargetNodeName) { node, _ in
             incorrectTargetNodes.append(node as! TargetShapeNode)
         }
         return incorrectTargetNodes
@@ -134,7 +137,7 @@ class MatchingGameScene: SKScene {
 
     private let correctTargetNodeName: String = "target-correct"
     private var correctTarget: TargetShapeNode? {
-        return childNodeWithName(correctTargetNodeName) as? TargetShapeNode
+        return gameAreaNode.childNodeWithName(correctTargetNodeName) as? TargetShapeNode
     }
     
     
@@ -146,6 +149,8 @@ class MatchingGameScene: SKScene {
     
     // MARK: Interface Setup
     override func didMoveToView(view: SKView) {
+        addChild(gameAreaNode)
+        
         setupBackground()
         setupScoreLabel()
         setupTimeIndicator()
@@ -154,10 +159,11 @@ class MatchingGameScene: SKScene {
     }
     
     private func setupBackground() {
+        backgroundColor = SKColor.whiteColor()
         let backgroundNode = SKSpriteNode(texture: Textures.getWhiteToGreyTextureOfSize(size))
         backgroundNode.anchorPoint = CGPoint.zero
         backgroundNode.zPosition = NodeStackingOrder.BackgroundImage.rawValue
-        addChild(backgroundNode)
+        gameAreaNode.addChild(backgroundNode)
     }
     
     private func setupTimeIndicator() {
@@ -166,7 +172,7 @@ class MatchingGameScene: SKScene {
         timeIndicator.size = CGSizeMake(size.width, size.width)
         timeIndicator.position = centerPoint
         timeIndicator.zPosition = NodeStackingOrder.TimerIndicator.rawValue
-        addChild(timeIndicator)
+        gameAreaNode.addChild(timeIndicator)
     }
     
     private func setupScoreLabel() {
@@ -183,7 +189,7 @@ class MatchingGameScene: SKScene {
         scoreLabel.position = scoreLabelPosition
         scoreLabel.zPosition = NodeStackingOrder.Interface.rawValue
         
-        addChild(scoreLabel)
+        gameAreaNode.addChild(scoreLabel)
     }
     
     
@@ -228,7 +234,7 @@ class MatchingGameScene: SKScene {
     private func drawPuzzleForLevel(level: Int) {
         // Create Player
         let newPlayer = getNewPlayerNode()
-        addChild(newPlayer)
+        gameAreaNode.addChild(newPlayer)
         
         // Create Targets
         let numberOfTargets = getNumberOfTargetsForLevelsPlayed(levelsPlayed)
@@ -298,7 +304,7 @@ class MatchingGameScene: SKScene {
         
         // Add targets to screen
         for newTarget in newTargets {
-            addChild(newTarget)
+            gameAreaNode.addChild(newTarget)
         }
     }
     
@@ -525,30 +531,39 @@ extension MatchingGameScene {
         if score > currentHighScore {
             // New High Score
         }
-        
+        blurScene()
         showNewGameButton()
     }
     
-    private func showNewGameButton() {
-        let growAndShrink = SKAction.sequence([
-            SKAction.scaleBy(1.2, duration: 0.4),
-            SKAction.scaleBy(0.8333, duration: 0.4)
-        ])
+    private func blurScene() {
+        let blurNode = SKEffectNode()
+        blurNode.filter = CIFilter(name: "CIGaussianBlur", withInputParameters: ["inputRadius": 10.0])!
+        blurNode.shouldRasterize = true
+        blurNode.runAction(SKAction.fadeAlphaTo(0.55, duration: 0.5))
         
-        runAction(SKAction.sequence([
-            SKAction.waitForDuration(NSTimeInterval(0.3)),
-            SKAction.runBlock({
-                let playAgainLabel = SKLabelNode()
-                playAgainLabel.text = "Tap to Play Again"
-                playAgainLabel.fontSize = 35
-                playAgainLabel.fontColor = SKColor.blackColor()
-                playAgainLabel.verticalAlignmentMode = .Center
-                playAgainLabel.position = self.centerPoint
-                playAgainLabel.zPosition = NodeStackingOrder.GameOverInterface.rawValue
-                self.addChild(playAgainLabel)
-                
-                playAgainLabel.runAction(SKAction.repeatActionForever(growAndShrink))
-            })
+        addChild(blurNode)
+        
+        gameAreaNode.removeFromParent()
+        blurNode.addChild(gameAreaNode)
+    }
+    
+    private func showNewGameButton() {
+        let playAgainLabel = SKLabelNode()
+        playAgainLabel.text = "Tap to Play Again"
+        playAgainLabel.fontSize = 35
+        playAgainLabel.fontColor = SKColor.blackColor()
+        playAgainLabel.verticalAlignmentMode = .Center
+        playAgainLabel.alpha = 0
+        playAgainLabel.position = centerPoint
+        playAgainLabel.zPosition = NodeStackingOrder.GameOverInterface.rawValue
+        addChild(playAgainLabel)
+        
+        playAgainLabel.runAction(SKAction.group([
+            SKAction.fadeInWithDuration(0.5),
+            SKAction.repeatActionForever(SKAction.sequence([
+                SKAction.scaleBy(1.2, duration: 0.4),
+                SKAction.scaleBy(0.8333, duration: 0.4)
+            ]))
         ]))
     }
     
@@ -569,7 +584,7 @@ extension MatchingGameScene {
     
     private func removeGameGuidance() {
         playerNode?.removeActionForKey("Hint")
-        if let guidanceLabel = childNodeWithName("guidance-label") {
+        if let guidanceLabel = gameAreaNode.childNodeWithName("guidance-label") {
             guidanceLabel.removeFromParent()
         }
     }
@@ -613,7 +628,7 @@ extension MatchingGameScene {
             SKAction.fadeAlphaTo(1, duration: 0.5)
         ])))
         
-        addChild(guidanceLabel)
+        gameAreaNode.addChild(guidanceLabel)
     }
 }
 
