@@ -27,9 +27,9 @@ class TimeIndicatorNode: SKSpriteNode {
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         let context = UIGraphicsGetCurrentContext()
         
-        CGContextAddPath(context, getTimeIndicatorPath(percentFull))
         CGContextSetStrokeColorWithColor(context, indicatorStrokeColor.CGColor)
         CGContextSetLineWidth(context, indicatorStrokeWidth)
+        CGContextAddPath(context, getTimeIndicatorPath(percentFull))
         CGContextStrokePath(context)
         
         let spriteImage = UIGraphicsGetImageFromCurrentImageContext()

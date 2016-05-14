@@ -10,7 +10,7 @@ import SpriteKit
 import GameKit
 
 enum TargetColor: Int {
-    case Red, Yellow, Purple, Green, Orange, Cyan, Blue, Pink
+    case Red, Maroon, Purple, Green, Orange, Cyan, Blue, Pink
 }
 
 extension TargetColor {
@@ -19,8 +19,8 @@ extension TargetColor {
             switch self {
             case .Red:
                 return "red"
-            case .Yellow:
-                return "yellow"
+            case .Maroon:
+                return "maroon"
             case .Purple:
                 return "purple"
             case .Green:
@@ -43,21 +43,21 @@ extension TargetColor {
         get {
             switch self {
             case .Red:
-                return SKColor(red: 234/255, green: 72/255, blue: 89/255, alpha: 1)
-            case .Yellow:
-                return SKColor(red: 240/255, green: 221/255, blue: 41/255, alpha: 1)
+                return SKColor(red: 255/255, green: 81/255, blue: 50/255, alpha: 1)
+            case .Maroon:
+                return SKColor(red: 157/255, green: 17/255, blue: 0/255, alpha: 1)
             case .Purple:
-                return SKColor(red: 148/255, green: 20/255, blue: 141/255, alpha: 1)
+                return SKColor(red: 94/255, green: 49/255, blue: 147/255, alpha: 1)
             case .Green:
-                return SKColor(red: 88/255, green: 222/255, blue: 99/255, alpha: 1)
+                return SKColor(red: 0/255, green: 144/255, blue: 81/255, alpha: 1)
             case .Orange:
-                return SKColor(red: 235/255, green: 94/255, blue: 0/255, alpha: 1)
+                return SKColor(red: 255/255, green: 158/255, blue: 24/255, alpha: 1)
             case .Cyan:
-                return SKColor(red: 67/255, green: 213/255, blue: 222/255, alpha: 1)
+                return SKColor(red: 0/255, green: 145/255, blue: 246/255, alpha: 1)
             case .Blue:
-                return SKColor(red: 29/255, green: 45/255, blue: 222/255, alpha: 1)
+                return SKColor(red: 6/255, green: 86/255, blue: 147/255, alpha: 1)
             case .Pink:
-                return SKColor(red: 234/255, green: 85/255, blue: 202/255, alpha: 1)
+                return SKColor(red: 255/255, green: 47/255, blue: 146/255, alpha: 1)
             }
         }
     }

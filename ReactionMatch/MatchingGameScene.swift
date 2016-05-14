@@ -167,7 +167,7 @@ class MatchingGameScene: SKScene {
     }
     
     private func setupTimeIndicator() {
-        timeIndicator.indicatorStrokeColor = SKColor.grayColor()
+        timeIndicator.indicatorStrokeColor = SKColor(red: 192/255, green: 192/255, blue: 192/255, alpha: 1)
         timeIndicator.indicatorStrokeWidth = 4
         timeIndicator.size = CGSizeMake(size.width, size.width)
         timeIndicator.position = centerPoint
