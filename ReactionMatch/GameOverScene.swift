@@ -32,7 +32,7 @@ class GameOverScene: SKScene {
     
     func setGameOverState() {
         // Set background
-        let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
+        let backgroundNode = SKSpriteNode(texture: Textures.getWhiteToGreyTextureOfSize(size))
         backgroundNode.anchorPoint = CGPoint.zero
         backgroundNode.zPosition = StackingOrder.BackgroundImage.rawValue
         addChild(backgroundNode)
@@ -71,23 +71,7 @@ class GameOverScene: SKScene {
         }
     }
     
-    func getBackgroundTexture() -> SKTexture {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = frame
-        gradientLayer.colors = [
-            SKColor(red: 247/255, green: 247/255, blue: 247/255, alpha: 1),
-            SKColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1)
-            ].map { $0.CGColor }
-        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
-        gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
-        
-        UIGraphicsBeginImageContext(frame.size)
-        gradientLayer.renderInContext(UIGraphicsGetCurrentContext()!)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return SKTexture(CGImage: image.CGImage!)
-    }
+    
     
     func showNewGameButton() {
         runAction(SKAction.sequence([

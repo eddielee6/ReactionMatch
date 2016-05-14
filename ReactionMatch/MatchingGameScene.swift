@@ -143,63 +143,36 @@ class MatchingGameScene: SKScene {
     
     
     override func didMoveToView(view: SKView) {
-        setBackground()
-        setHud()
-        drawNewPuzzle()
-    }
-    
-    var lastUpdateTime: NSTimeInterval = 0
-    override func update(currentTime: NSTimeInterval) {
-        let deltaTime = lastUpdateTime > 0 ? currentTime - lastUpdateTime : 0
-        lastUpdateTime = currentTime
+        setupBackground()
+        setupScoreLabel()
+        setupGuidanceLabel()
         
-        if isPlayingLevel {
-            updateLevelWithDeltaTime(deltaTime)
-        }
-    }
-    
-    func setTimer(timeForLevel: NSTimeInterval) {
-        timeRemainingForLevel = timeForLevel
-    }
-    
-    func getPointsForTime(timeRemaining: Double) -> Int {
-        return Int(ceil((timeRemaining / timeForLevel) * 10))
-    }
-    
-    func playSound(soundAction: SKAction) {
-        if soundsEnabled {
-            runAction(soundAction)
-        }
+        drawNewPuzzle()
     }
     
     
     
     // MARK: Interface Setup
     
-    func setBackground() {
-        let backgroundNode = SKSpriteNode(texture: getBackgroundTexture())
+    func setupBackground() {
+        let backgroundNode = SKSpriteNode(texture: Textures.getWhiteToGreyTextureOfSize(size))
         backgroundNode.anchorPoint = CGPoint.zero
         backgroundNode.zPosition = NodeStackingOrder.BackgroundImage.rawValue
         addChild(backgroundNode)
     }
     
-    func setHud() {
-        scoreLabel.text = "Score \(score)"
-        scoreLabel.alpha = 0
-        scoreLabel.horizontalAlignmentMode = .Center
-        scoreLabel.fontSize = 45
-        scoreLabel.fontColor = SKColor.blackColor()
-        scoreLabel.position = CGPoint(x: size.width/2, y: size.height - 85)
-        scoreLabel.zPosition = NodeStackingOrder.Interface.rawValue
-        addChild(scoreLabel)
+    func setupGuidanceLabel() {
+        var guidanceLabelPosition: CGPoint {
+            let distanceFromGameArea: CGFloat = 55
+            return centerPoint + CGPointMake(0, maxPlayerDistanceFromCenterPoint + distanceFromGameArea)
+        }
         
         stateLabel.text = "Swipe to Play"
         stateLabel.horizontalAlignmentMode = .Center
         stateLabel.fontSize = 30
         stateLabel.fontColor = SKColor.blackColor()
-        stateLabel.position = CGPoint(x: size.width/2, y: scoreLabel.position.y - 60)
+        stateLabel.position = guidanceLabelPosition
         stateLabel.zPosition = NodeStackingOrder.Interface.rawValue
-        addChild(stateLabel)
         
         let blinkAction = SKAction.sequence([
             SKAction.fadeAlphaTo(0.4, duration: 0.4),
@@ -207,25 +180,25 @@ class MatchingGameScene: SKScene {
         ])
         blinkAction.timingMode = .EaseInEaseOut
         stateLabel.runAction(SKAction.repeatActionForever(blinkAction))
+        
+        addChild(stateLabel)
     }
     
-    func getBackgroundTexture() -> SKTexture {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = frame
-        gradientLayer.colors = [
-            SKColor(red: 247/255, green: 247/255, blue: 247/255, alpha: 1),
-            SKColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1)
-        ].map { $0.CGColor }
-        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
-        gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
+    func setupScoreLabel() {
+        var scoreLabelPosition: CGPoint {
+            let distanceFromGameArea: CGFloat = 110
+            return centerPoint + CGPointMake(0, maxPlayerDistanceFromCenterPoint + distanceFromGameArea)
+        }
         
-        // render the gradient to a UIImage
-        UIGraphicsBeginImageContext(frame.size)
-        gradientLayer.renderInContext(UIGraphicsGetCurrentContext()!)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        scoreLabel.text = "Score \(score)"
+        scoreLabel.alpha = 0
+        scoreLabel.horizontalAlignmentMode = .Center
+        scoreLabel.fontSize = 45
+        scoreLabel.fontColor = SKColor.blackColor()
+        scoreLabel.position = scoreLabelPosition
+        scoreLabel.zPosition = NodeStackingOrder.Interface.rawValue
         
-        return SKTexture(CGImage: image.CGImage!)
+        addChild(scoreLabel)
     }
     
     
@@ -401,6 +374,30 @@ class MatchingGameScene: SKScene {
     
     
     // MARK: Gameplay
+    
+    var lastUpdateTime: NSTimeInterval = 0
+    override func update(currentTime: NSTimeInterval) {
+        let deltaTime = lastUpdateTime > 0 ? currentTime - lastUpdateTime : 0
+        lastUpdateTime = currentTime
+        
+        if isPlayingLevel {
+            updateLevelWithDeltaTime(deltaTime)
+        }
+    }
+    
+    func setTimer(timeForLevel: NSTimeInterval) {
+        timeRemainingForLevel = timeForLevel
+    }
+    
+    func getPointsForTime(timeRemaining: Double) -> Int {
+        return Int(ceil((timeRemaining / timeForLevel) * 10))
+    }
+    
+    func playSound(soundAction: SKAction) {
+        if soundsEnabled {
+            runAction(soundAction)
+        }
+    }
     
     func playHintAnimationForPlayer(playerNode: TargetShapeNode, toNode targetNode: TargetShapeNode) {
         let hintPoint = (centerPoint + targetNode.position) / 2
