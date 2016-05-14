@@ -17,6 +17,7 @@ class MatchingGameScene: SKScene {
         case PlayerTarget
         case TimerIndicator
         case Interface
+        case GameOverInterface
     }
     
     
@@ -32,6 +33,8 @@ class MatchingGameScene: SKScene {
     
     
     // MARK: Constants
+    private let scoreManager = ScoreManager.sharedInstance
+    
     private let successAnimationDuration: Double = 0.25 // Time taken to animate to new levels
     private let setupNewGameAnimationDuration: Double = 0.25 // Time taken to animate to game start
     private let minNumberOfTargets: Int = 2 // Starting number of targets on screen
@@ -53,12 +56,13 @@ class MatchingGameScene: SKScene {
     
     // MARK: Game State
     private var hasStartedFirstLevel: Bool = false
-    private var levelsPlayed: Int = 0
-    
     private var isPlayingLevel: Bool = false
+    private var isGameOver: Bool = false
+    
+    // MARK: Score
+    private var levelsPlayed: Int = 0
     private var timeForCurrentLevel: NSTimeInterval = 0
     private var timeRemainingForCurrentLevel: NSTimeInterval = 0
-    
     private var pointsRemainingForCurrentLevel: Int {
         return Int(ceil((timeRemainingForCurrentLevel / timeForCurrentLevel) * 10))
     }
@@ -368,15 +372,12 @@ class MatchingGameScene: SKScene {
             updateLevelWithDeltaTime(deltaTime)
         }
     }
-
     
     private func playSound(soundAction: SKAction) {
         if soundsEnabled {
             runAction(soundAction)
         }
     }
-    
-    
     
     private func player(playerNode: TargetShapeNode, didSelectCorrectTarget correctTarget: TargetShapeNode, withIncorrectTargets incorrectTargets: [TargetShapeNode]) {
         isPlayingLevel = false
@@ -431,19 +432,6 @@ class MatchingGameScene: SKScene {
         let returnAction = SKAction.moveTo(centerPoint, duration: NSTimeInterval(0.15))
         returnAction.timingMode = .EaseInEaseOut
         playerNode.runAction(returnAction, withKey: "Return")
-    }
-    
-    private func gameOver(reason: String) {
-        isPlayingLevel = false
-        
-        print("Game Over: \(reason)")
-        
-        playSound(failSoundAction)
-        
-        let transition = SKTransition.doorsCloseVerticalWithDuration(NSTimeInterval(0.5))
-        let gameOverScene = GameOverScene(size: self.size)
-        gameOverScene.newScore = score
-        self.view?.presentScene(gameOverScene, transition: transition)
     }
     
     private func movePlayerNode(playerNode: TargetShapeNode, withVector vector: CGPoint) {
@@ -523,7 +511,56 @@ class MatchingGameScene: SKScene {
 
 
 
-// Mark: Game Guidance
+// MARK: Game Over
+extension MatchingGameScene {
+    private func gameOver(reason: String) {
+        isPlayingLevel = false
+        isGameOver = true
+        
+        playSound(failSoundAction)
+        
+        let currentHighScore = scoreManager.getHighScore()
+        scoreManager.recordNewScore(score)
+        
+        if score > currentHighScore {
+            // New High Score
+        }
+        
+        showNewGameButton()
+    }
+    
+    private func showNewGameButton() {
+        let growAndShrink = SKAction.sequence([
+            SKAction.scaleBy(1.2, duration: 0.4),
+            SKAction.scaleBy(0.8333, duration: 0.4)
+        ])
+        
+        runAction(SKAction.sequence([
+            SKAction.waitForDuration(NSTimeInterval(0.3)),
+            SKAction.runBlock({
+                let playAgainLabel = SKLabelNode()
+                playAgainLabel.text = "Tap to Play Again"
+                playAgainLabel.fontSize = 35
+                playAgainLabel.fontColor = SKColor.blackColor()
+                playAgainLabel.verticalAlignmentMode = .Center
+                playAgainLabel.position = self.centerPoint
+                playAgainLabel.zPosition = NodeStackingOrder.GameOverInterface.rawValue
+                self.addChild(playAgainLabel)
+                
+                playAgainLabel.runAction(SKAction.repeatActionForever(growAndShrink))
+            })
+        ]))
+    }
+    
+    private func restartGame() {
+        let newGameScene = MatchingGameScene(size: self.size)
+        self.view?.presentScene(newGameScene)
+    }
+}
+
+
+
+// MARK: Game Guidance
 extension MatchingGameScene {
     private func showGameGuidance() {
         showGuidanceLabel()
@@ -589,6 +626,8 @@ extension MatchingGameScene {
         if !hasStartedFirstLevel {
             hasStartedFirstLevel = true
             startLevel()
+        } else if isGameOver {
+            restartGame()
         }
     }
     

@@ -17,7 +17,6 @@
 		2C401ADC1C6D135100932BC6 /* fail.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C401ADB1C6D135100932BC6 /* fail.wav */; };
 		2C4811DF1C53F458007BD90B /* success.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C4811DD1C53F458007BD90B /* success.wav */; };
 		2C60A5411CB5A86800AE40B4 /* TargetColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C60A5401CB5A86800AE40B4 /* TargetColor.swift */; };
-		2C677D1B1C4EC57C00E519C9 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */; };
 		2C7806D51CE731440072F8A8 /* Textures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7806D41CE731440072F8A8 /* Textures.swift */; };
 		2C7806D71CE73C060072F8A8 /* CGSizeExtentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7806D61CE73C060072F8A8 /* CGSizeExtentions.swift */; };
 		2C7806D91CE75A390072F8A8 /* TimeIndicatorNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7806D81CE75A390072F8A8 /* TimeIndicatorNode.swift */; };
@@ -43,7 +42,6 @@
 		2C401ADB1C6D135100932BC6 /* fail.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = fail.wav; path = Resources/Sounds/fail.wav; sourceTree = "<group>"; };
 		2C4811DD1C53F458007BD90B /* success.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = success.wav; path = Resources/Sounds/success.wav; sourceTree = "<group>"; };
 		2C60A5401CB5A86800AE40B4 /* TargetColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetColor.swift; sourceTree = "<group>"; };
-		2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
 		2C7806D41CE731440072F8A8 /* Textures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Textures.swift; sourceTree = "<group>"; };
 		2C7806D61CE73C060072F8A8 /* CGSizeExtentions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGSizeExtentions.swift; sourceTree = "<group>"; };
 		2C7806D81CE75A390072F8A8 /* TimeIndicatorNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeIndicatorNode.swift; sourceTree = "<group>"; };
@@ -108,7 +106,6 @@
 			children = (
 				2C27EDCB1CE672DD00C12B5F /* MenuScene.swift */,
 				2C104D281C4D6BA10097E0AD /* MatchingGameScene.swift */,
-				2C677D1A1C4EC57C00E519C9 /* GameOverScene.swift */,
 			);
 			name = GameScenes;
 			sourceTree = "<group>";
@@ -237,7 +234,6 @@
 				2C60A5411CB5A86800AE40B4 /* TargetColor.swift in Sources */,
 				2C7806D51CE731440072F8A8 /* Textures.swift in Sources */,
 				2C27EDCC1CE672DD00C12B5F /* MenuScene.swift in Sources */,
-				2C677D1B1C4EC57C00E519C9 /* GameOverScene.swift in Sources */,
 				2C104D251C4D6BA10097E0AD /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
