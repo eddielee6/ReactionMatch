@@ -9,8 +9,9 @@
 import UIKit
 import SpriteKit
 import AVFoundation
+import GameKit
 
-class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate {
+class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate, GKGameCenterControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,5 +59,18 @@ class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate {
     
     override func prefersStatusBarHidden() -> Bool {
         return true
+    }
+    
+    func gameCenterViewControllerDidFinish(gcViewController: GKGameCenterViewController) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    func showLeaderboard() {
+        let gcViewController: GKGameCenterViewController = GKGameCenterViewController()
+        gcViewController.gameCenterDelegate = self
+        gcViewController.viewState = GKGameCenterViewControllerState.Leaderboards
+        gcViewController.leaderboardIdentifier = GameType.V2.leaderboardIdentifier
+        self.showViewController(gcViewController, sender: self)
+        self.presentViewController(gcViewController, animated: true, completion: nil)
     }
 }

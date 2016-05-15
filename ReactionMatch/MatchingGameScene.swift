@@ -404,7 +404,7 @@ class MatchingGameScene: SKScene {
         correctTarget.setPointsGained(pointsGained)
         
         // Grow winning target
-        let growAction = SKAction.scaleBy(2, duration: successAnimationDuration)
+        let growAction = SKAction.scaleTo(2, duration: successAnimationDuration)
         growAction.timingMode = .EaseIn
         correctTarget.runAction(SKAction.sequence([
             growAction,
@@ -412,7 +412,7 @@ class MatchingGameScene: SKScene {
         ]))
         
         // Fade out incorrect targets
-        let shrinkAction = SKAction.scaleBy(0, duration: successAnimationDuration)
+        let shrinkAction = SKAction.scaleTo(1, duration: successAnimationDuration)
         shrinkAction.timingMode = .EaseIn
         incorrectTargets.forEach({
             $0.runAction(SKAction.sequence([

@@ -11,7 +11,8 @@ import SpriteKit
 class MenuScene: SKScene {
     let menuOptions = [
         (title: "Play Now", action: startGameV2),
-        (title: "Classic Mode", action: startClassicGame)
+        (title: "Classic Mode", action: startClassicGame),
+        (title: "Leaderboard", action: showGameCenterLeaderboards)
     ]
     
     override func didMoveToView(view: SKView) {
@@ -20,8 +21,8 @@ class MenuScene: SKScene {
     
     private func addMenuButtons() {
         let pulseAction = SKAction.repeatActionForever(SKAction.sequence([
-            SKAction.scaleBy(1.1, duration: 0.35),
-            SKAction.scaleBy(0.9, duration: 0.35)
+            SKAction.scaleTo(1.1, duration: 0.35),
+            SKAction.scaleTo(0.9, duration: 0.35)
         ]))
         
         
@@ -51,7 +52,9 @@ class MenuScene: SKScene {
     }
     
     private func showGameCenterLeaderboards() {
-        
+        if let matchingGameViewController = self.view?.window?.rootViewController as? MatchingGameViewController {
+            matchingGameViewController.showLeaderboard()
+        }
     }
     
     private func startGameWithType(gameType: GameType) {
