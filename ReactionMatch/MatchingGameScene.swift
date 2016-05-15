@@ -64,59 +64,59 @@ class MatchingGameScene: SKScene {
     
     // MARK: Score
     private var levelsPlayed: Int = 0
-    private var timeForCurrentLevel: NSTimeInterval = 0
-    private var timeRemainingForCurrentLevel: NSTimeInterval = 0
+    private var timeForCurrentLevel: NSTimeInterval = 0 { didSet { updateTimeIndicator() } }
+    private var timeRemainingForCurrentLevel: NSTimeInterval = 0 { didSet { updateTimeIndicator() } }
     private var pointsRemainingForCurrentLevel: Int {
         return Int(ceil((timeRemainingForCurrentLevel / timeForCurrentLevel) * 10))
     }
     
-    private var score: Int64 = 0 {
-        didSet {
-            // Fade in on first score
-            if score > 0 && oldValue <= 0 {
-                if let fadeInAction = scoreLabel.userData?.objectForKey("fadeInAction") as? SKAction {
-                    scoreLabel.runAction(fadeInAction)
-                } else {
-                    let fadeInAction = SKAction.fadeInWithDuration(0.25)
-                    fadeInAction.timingMode = .EaseIn
-                    scoreLabel.runAction(fadeInAction)
-                    
-                    scoreLabel.userData?.setObject(fadeInAction, forKey: "fadeInAction")
-                }
+    private var score: Int64 = 0 { didSet { updateScoreLabel(score, oldScore: oldValue) } }
+    
+    private func updateScoreLabel(score: Int64, oldScore: Int64) {
+        // Fade in on first score
+        if score > 0 && oldScore <= 0 {
+            if let fadeInAction = scoreLabel.userData?.objectForKey("fadeInAction") as? SKAction {
+                scoreLabel.runAction(fadeInAction)
+            } else {
+                let fadeInAction = SKAction.fadeInWithDuration(0.25)
+                fadeInAction.timingMode = .EaseIn
+                scoreLabel.runAction(fadeInAction)
+                
+                scoreLabel.userData?.setObject(fadeInAction, forKey: "fadeInAction")
             }
-            
-            // Fade out when set to 0
-            if score <= 0 && oldValue > 0 {
-                if let fadeOutAction = scoreLabel.userData?.objectForKey("fadeOutAction") as? SKAction {
-                    scoreLabel.runAction(fadeOutAction)
-                } else {
-                    let fadeOutAction = SKAction.fadeOutWithDuration(0.25)
-                    fadeOutAction.timingMode = .EaseIn
-                    scoreLabel.runAction(fadeOutAction)
-                    
-                    scoreLabel.userData?.setObject(fadeOutAction, forKey: "fadeOutAction")
-                }
-            }
-            
-            // Pulse when score increases
-            if score > oldValue {
-                if let pulseAction = scoreLabel.userData?.objectForKey("pulseAction") as? SKAction {
-                    scoreLabel.runAction(pulseAction)
-                } else {
-                    let growAction = SKAction.scaleBy(1.25, duration: 0.15)
-                    let pulseAction = SKAction.sequence([
-                        growAction,
-                        growAction.reversedAction()
-                    ])
-                    pulseAction.timingMode = .EaseInEaseOut
-                    scoreLabel.runAction(pulseAction)
-                    
-                    scoreLabel.userData?.setObject(pulseAction, forKey: "pulseAction")
-                }
-            }
-            
-            scoreLabel.text = "Score \(score)"
         }
+        
+        // Fade out when set to 0
+        if score <= 0 && oldScore > 0 {
+            if let fadeOutAction = scoreLabel.userData?.objectForKey("fadeOutAction") as? SKAction {
+                scoreLabel.runAction(fadeOutAction)
+            } else {
+                let fadeOutAction = SKAction.fadeOutWithDuration(0.25)
+                fadeOutAction.timingMode = .EaseIn
+                scoreLabel.runAction(fadeOutAction)
+                
+                scoreLabel.userData?.setObject(fadeOutAction, forKey: "fadeOutAction")
+            }
+        }
+        
+        // Pulse when score increases
+        if score > oldScore {
+            if let pulseAction = scoreLabel.userData?.objectForKey("pulseAction") as? SKAction {
+                scoreLabel.runAction(pulseAction)
+            } else {
+                let growAction = SKAction.scaleBy(1.25, duration: 0.15)
+                let pulseAction = SKAction.sequence([
+                    growAction,
+                    growAction.reversedAction()
+                ])
+                pulseAction.timingMode = .EaseInEaseOut
+                scoreLabel.runAction(pulseAction)
+                
+                scoreLabel.userData?.setObject(pulseAction, forKey: "pulseAction")
+            }
+        }
+        
+        scoreLabel.text = "Score \(score)"
     }
     
     
@@ -385,6 +385,24 @@ class MatchingGameScene: SKScene {
         }
     }
     
+    private func updateLevelWithDeltaTime(deltaTime: NSTimeInterval) {
+        timeRemainingForCurrentLevel -= deltaTime
+        
+        if timeRemainingForCurrentLevel <= 0 {
+            let collisionState = getCollisionStateForPlayer(playerNode!, withCorrectTarget: correctTarget!, andIncorrectTargets: incorrectTargets)
+            if collisionState == .CorrectTarget {
+                player(playerNode!, didSelectCorrectTarget: correctTarget!, withIncorrectTargets: incorrectTargets)
+            } else {
+                timeIndicator.percent = 100
+                gameOver("Times Up")
+            }
+        }
+    }
+    
+    private func updateTimeIndicator() {
+        timeIndicator.percent = ((timeForCurrentLevel - timeRemainingForCurrentLevel) / timeForCurrentLevel) * 100
+    }
+    
     private func playSound(soundAction: SKAction) {
         if settings.soundsEnabled {
             runAction(soundAction)
@@ -469,24 +487,6 @@ class MatchingGameScene: SKScene {
         playerNode.position = newPlayerNodePosition
     }
     
-    private func updateLevelWithDeltaTime(deltaTime: NSTimeInterval) {
-        timeRemainingForCurrentLevel -= deltaTime
-        
-        timeIndicator.percent = ((timeForCurrentLevel - timeRemainingForCurrentLevel) / timeForCurrentLevel) * 100
-        
-        if timeRemainingForCurrentLevel <= 0 {
-            if timeRemainingForCurrentLevel <= 0 {
-                let collisionState = getCollisionStateForPlayer(playerNode!, withCorrectTarget: correctTarget!, andIncorrectTargets: incorrectTargets)
-                if collisionState == .CorrectTarget {
-                    player(playerNode!, didSelectCorrectTarget: correctTarget!, withIncorrectTargets: incorrectTargets)
-                } else {
-                    timeIndicator.percent = 100
-                    gameOver("Times Up")
-                }
-            }
-        }
-    }
-    
     private enum PlayerCollisionState {
         case CorrectTarget
         case IncorrectTarget
@@ -533,14 +533,24 @@ extension MatchingGameScene {
         isPlayingLevel = false
         isGameOver = true
         
+        print("Game Over: \(reason)")
+        
         playSound(failSoundAction)
         
         let currentHighScore = scoreManager.getHighScoreForGameType(settings.gameType)
         scoreManager.recordNewScore(score, forGameType: settings.gameType)
         
-        showHighScoreLabel(score, isHighScore: score > currentHighScore)
-        blurScene()
-        showNewGameButton()
+        runAction(SKAction.sequence([
+            SKAction.waitForDuration(0.1),
+            SKAction.runBlock({
+                self.blurScene()
+            }),
+            SKAction.waitForDuration(0.25),
+            SKAction.runBlock({
+                self.showHighScoreLabel(self.score, isHighScore: self.score > currentHighScore)
+                self.showNewGameButton()
+            })
+        ]))
     }
     
     private func blurScene() {
