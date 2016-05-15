@@ -25,8 +25,7 @@ public class ScoreManager {
     
     
     // MARK: Authentication
-    
-    public func authenticateLocalPlayer(viewController: UIViewController) {
+    func authenticateLocalPlayer(viewController: UIViewController) {
         print("authenticateLocalPlayer")
         
         localPlayer = GKLocalPlayer.localPlayer()
