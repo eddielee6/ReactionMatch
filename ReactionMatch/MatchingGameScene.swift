@@ -53,8 +53,8 @@ class MatchingGameScene: SKScene {
     
     
     // MARK: Actions
-    private let successSoundAction = SKAction.playSoundFileNamed("success.wav", waitForCompletion: false)
-    private let failSoundAction = SKAction.playSoundFileNamed("fail.wav", waitForCompletion: false)
+    private let successSoundAction = SKAction.playSoundFileNamed("success.mp3", waitForCompletion: false)
+    private let failSoundAction = SKAction.playSoundFileNamed("fail.mp3", waitForCompletion: false)
     
     
     // MARK: Game State
