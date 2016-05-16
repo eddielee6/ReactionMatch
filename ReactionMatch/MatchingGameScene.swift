@@ -541,13 +541,14 @@ extension MatchingGameScene {
         
         runAction(SKAction.sequence([
             SKAction.waitForDuration(0.1),
-            SKAction.runBlock({
-                self.blurScene()
+            SKAction.runBlock({ [ unowned scope = self ] in
+                scope.blurScene()
             }),
             SKAction.waitForDuration(0.25),
-            SKAction.runBlock({
-                self.showHighScoreLabel(self.score, isHighScore: self.score > currentHighScore)
-                self.showNewGameButton()
+            SKAction.runBlock({ [ unowned scope = self ] in
+                scope.showHighScoreLabel(scope.score, isHighScore: scope.score > currentHighScore)
+                scope.showNewGameButton()
+                scope.showReturnToMenuButton()
             })
         ]))
     }
