@@ -94,7 +94,7 @@ extension MenuScene {
                         } else {
                             labelNode.runAction(SKAction.sequence([
                                 SKAction.group([
-                                    SKAction.scaleTo(0, duration: 0.15),
+                                    SKAction.scaleTo(0.2, duration: 0.15),
                                     SKAction.fadeOutWithDuration(0.15)
                                 ]),
                                 SKAction.runBlock({
