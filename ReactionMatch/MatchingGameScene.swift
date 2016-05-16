@@ -169,9 +169,11 @@ class MatchingGameScene: SKScene {
     }
     
     private func setupTimeIndicator() {
+        let timeIndicatorDiamiter: CGFloat = 375.0
+        
         timeIndicator.indicatorStrokeColor = SKColor(red: 49/255, green: 71/255, blue: 215/255, alpha: 0.75)
         timeIndicator.indicatorStrokeWidth = 4
-        timeIndicator.size = CGSizeMake(size.width, size.width)
+        timeIndicator.size = CGSizeMake(timeIndicatorDiamiter, timeIndicatorDiamiter)
         timeIndicator.position = centerPoint
         timeIndicator.zPosition = NodeStackingOrder.TimerIndicator.rawValue
         gameAreaNode.addChild(timeIndicator)
