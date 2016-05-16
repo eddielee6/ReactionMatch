@@ -9,14 +9,29 @@
 import SpriteKit
 
 class MenuScene: SKScene {
-    let menuOptions = [
+    
+    private enum NodeStackingOrder: CGFloat {
+        case BackgroundImage
+        case Interface
+    }
+    
+    private let menuOptions = [
         (title: "Play Now", action: startGameV2),
         (title: "Classic Mode", action: startClassicGame),
         (title: "Leaderboard", action: showGameCenterLeaderboards)
     ]
     
     override func didMoveToView(view: SKView) {
+        setupBackground()
         addMenuButtons()
+    }
+    
+    private func setupBackground() {
+        backgroundColor = SKColor.whiteColor()
+        let backgroundNode = SKSpriteNode(texture: Textures.getMenuScreenTexture(size))
+        backgroundNode.anchorPoint = CGPoint.zero
+        backgroundNode.zPosition = NodeStackingOrder.BackgroundImage.rawValue
+        addChild(backgroundNode)
     }
     
     private func addMenuButtons() {
@@ -25,11 +40,12 @@ class MenuScene: SKScene {
             SKAction.scaleTo(0.9, duration: 0.35)
         ]))
         
-        
         for (i, menuOption) in menuOptions.enumerate() {
             let menuOptionLabel = SKLabelNode()
+            menuOptionLabel.fontColor = SKColor.blackColor()
             menuOptionLabel.name = "menu-option"
             menuOptionLabel.text = menuOption.title
+            menuOptionLabel.zPosition = NodeStackingOrder.Interface.rawValue
             
             menuOptionLabel.position = CGPoint(
                 x: size.width/2,
