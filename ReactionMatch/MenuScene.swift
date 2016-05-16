@@ -16,9 +16,9 @@ class MenuScene: SKScene {
     }
     
     private let menuOptions = [
-        (title: "Play Now", action: startGameV2),
-        (title: "Classic Mode", action: startClassicGame),
-        (title: "Leaderboard", action: showGameCenterLeaderboards)
+        (title: "Play Now", action: startGameV2, instant: false),
+        (title: "Classic Mode", action: startClassicGame, instant: false),
+        (title: "Leaderboard", action: showGameCenterLeaderboards, instant: true)
     ]
     
     override func didMoveToView(view: SKView) {
@@ -88,13 +88,20 @@ extension MenuScene {
             if node.containsPoint(touchLocation) {
                 if let labelNode = node as? SKLabelNode {
                     if let selectedMenuOption = self.menuOptions.filter({$0.title == labelNode.text}).first {
-                        labelNode.runAction(SKAction.sequence([
-                            SKAction.scaleTo(0, duration: 0.25),
-                            SKAction.runBlock({
-                                let action = selectedMenuOption.action
-                                action(self)()
-                            })
-                        ]))
+                        let action = selectedMenuOption.action
+                        if selectedMenuOption.instant {
+                            action(self)()
+                        } else {
+                            labelNode.runAction(SKAction.sequence([
+                                SKAction.group([
+                                    SKAction.scaleTo(0, duration: 0.15),
+                                    SKAction.fadeOutWithDuration(0.15)
+                                ]),
+                                SKAction.runBlock({
+                                    action(self)()
+                                })
+                            ]))
+                        }
                     }
                 }
             }

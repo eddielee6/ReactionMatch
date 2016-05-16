@@ -594,6 +594,7 @@ extension MatchingGameScene {
     private func showNewGameButton() {
         let playAgainLabel = SKLabelNode()
         playAgainLabel.text = "Tap to Play Again"
+        playAgainLabel.name = "play-again"
         playAgainLabel.fontSize = 35
         playAgainLabel.fontColor = SKColor.blackColor()
         playAgainLabel.verticalAlignmentMode = .Center
@@ -611,10 +612,33 @@ extension MatchingGameScene {
         ]))
     }
     
+    private func showReturnToMenuButton() {
+        let returnToMenuLabel = SKLabelNode()
+        returnToMenuLabel.text = "Return to Menu"
+        returnToMenuLabel.name = "back-to-menu"
+        returnToMenuLabel.fontSize = 35
+        returnToMenuLabel.fontColor = SKColor.blackColor()
+        returnToMenuLabel.verticalAlignmentMode = .Center
+        returnToMenuLabel.alpha = 0
+        returnToMenuLabel.position = CGPoint(x: centerPoint.x, y: 100)
+        returnToMenuLabel.zPosition = NodeStackingOrder.GameOverInterface.rawValue
+        addChild(returnToMenuLabel)
+        
+        returnToMenuLabel.runAction(SKAction.fadeInWithDuration(0.65))
+    }
+    
     private func restartGame() {
         let newGameScene = MatchingGameScene(size: self.size)
+        newGameScene.scaleMode = scaleMode
         newGameScene.settings = settings
         self.view?.presentScene(newGameScene)
+    }
+    
+    private func returnToMenu() {
+        let menuScene = MenuScene(size: self.size)
+        menuScene.scaleMode = scaleMode
+        let transition = SKTransition.doorsCloseHorizontalWithDuration(0.25)
+        self.view?.presentScene(menuScene, transition: transition)
     }
 }
 
@@ -681,12 +705,6 @@ extension MatchingGameScene {
 
 // MARK: Handle input
 extension MatchingGameScene {
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if isGameOver {
-            restartGame()
-        }
-    }
-    
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         guard let touch = touches.first else {
             return
@@ -707,10 +725,21 @@ extension MatchingGameScene {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        guard isPlayingLevel else {
+        guard let touch = touches.first else {
             return
         }
         
-        player(playerNode!, didEndMoveWithCorrectTarget: correctTarget!, andIncorrectTargets: incorrectTargets)
+        let touchLocation = touch.locationInNode(self)
+        
+        if isPlayingLevel {
+            player(playerNode!, didEndMoveWithCorrectTarget: correctTarget!, andIncorrectTargets: incorrectTargets)
+        } else if isGameOver {
+            let touchedNodes = nodesAtPoint(touchLocation)
+            if touchedNodes.contains({$0.name == "play-again" }) {
+                restartGame()
+            } else if touchedNodes.contains({$0.name == "back-to-menu" }) {
+                returnToMenu()
+            }
+        }
     }
 }
