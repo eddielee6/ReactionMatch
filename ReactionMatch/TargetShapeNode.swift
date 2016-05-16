@@ -38,7 +38,8 @@ class TargetShapeNode: SKShapeNode {
         
         self.path = self.targetShape.getShapeNode(targetSize).path
         self.fillColor = self.targetColor.value
-        self.strokeColor = self.targetColor.value
+        self.strokeColor = SKColor.whiteColor()
+        self.lineWidth = 2
     }
     
     convenience init (targetShape: TargetShape) {
@@ -46,7 +47,7 @@ class TargetShapeNode: SKShapeNode {
     }
     
     func setPointsGained(points: Int) {
-        pointsGainedLabel.fontColor = targetColor.value.inverted
+        pointsGainedLabel.fontColor = SKColor.whiteColor() // targetColor.value.inverted
         pointsGainedLabel.text = String(points)
     }
     

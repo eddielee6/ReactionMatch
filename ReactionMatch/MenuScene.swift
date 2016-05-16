@@ -35,11 +35,6 @@ class MenuScene: SKScene {
     }
     
     private func addMenuButtons() {
-        let pulseAction = SKAction.repeatActionForever(SKAction.sequence([
-            SKAction.scaleTo(1.1, duration: 0.35),
-            SKAction.scaleTo(0.9, duration: 0.35)
-        ]))
-        
         for (i, menuOption) in menuOptions.enumerate() {
             let menuOptionLabel = SKLabelNode()
             menuOptionLabel.fontColor = SKColor.blackColor()
@@ -52,8 +47,6 @@ class MenuScene: SKScene {
                 y: size.height - (size.height * CGFloat(i+1)) / (CGFloat(menuOptions.count) + 1))
             menuOptionLabel.fontSize = 45
             menuOptionLabel.verticalAlignmentMode = .Center
-            
-            menuOptionLabel.runAction(pulseAction)
             
             addChild(menuOptionLabel)
         }
@@ -78,8 +71,7 @@ class MenuScene: SKScene {
         matchingGameScene.scaleMode = scaleMode
         matchingGameScene.settings = gameType.matchingGameSettings
         
-        let transition = SKTransition.doorsOpenVerticalWithDuration(0.5)
-        view?.presentScene(matchingGameScene, transition: transition)
+        view?.presentScene(matchingGameScene)
     }
 }
 
@@ -96,8 +88,13 @@ extension MenuScene {
             if node.containsPoint(touchLocation) {
                 if let labelNode = node as? SKLabelNode {
                     if let selectedMenuOption = self.menuOptions.filter({$0.title == labelNode.text}).first {
-                        let action = selectedMenuOption.action
-                        action(self)()
+                        labelNode.runAction(SKAction.sequence([
+                            SKAction.scaleTo(0, duration: 0.25),
+                            SKAction.runBlock({
+                                let action = selectedMenuOption.action
+                                action(self)()
+                            })
+                        ]))
                     }
                 }
             }

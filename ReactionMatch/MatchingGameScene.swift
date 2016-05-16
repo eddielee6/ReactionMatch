@@ -162,14 +162,14 @@ class MatchingGameScene: SKScene {
     
     private func setupBackground() {
         backgroundColor = SKColor.whiteColor()
-        let backgroundNode = SKSpriteNode(texture: Textures.getWhiteToGreyTextureOfSize(size))
+        let backgroundNode = SKSpriteNode(texture: Textures.getMenuScreenTexture(size))
         backgroundNode.anchorPoint = CGPoint.zero
         backgroundNode.zPosition = NodeStackingOrder.BackgroundImage.rawValue
         gameAreaNode.addChild(backgroundNode)
     }
     
     private func setupTimeIndicator() {
-        timeIndicator.indicatorStrokeColor = SKColor(red: 192/255, green: 192/255, blue: 192/255, alpha: 1)
+        timeIndicator.indicatorStrokeColor = SKColor(red: 49/255, green: 71/255, blue: 215/255, alpha: 0.75)
         timeIndicator.indicatorStrokeWidth = 4
         timeIndicator.size = CGSizeMake(size.width, size.width)
         timeIndicator.position = centerPoint
@@ -216,7 +216,6 @@ class MatchingGameScene: SKScene {
     private func getNewPlayerNode() -> TargetShapeNode {
         let newPlayer = settings.gameMode == .ColorMatch ? TargetShapeNode(targetShape: TargetShape.Square) : TargetShapeNode.randomShapeNode()
         newPlayer.name = playerNodeName
-        newPlayer.strokeColor = SKColor.whiteColor()
         newPlayer.position = centerPoint
         newPlayer.alpha = 0
         newPlayer.setScale(0)
@@ -660,7 +659,7 @@ extension MatchingGameScene {
         let guidanceLabel = SKLabelNode()
         guidanceLabel.text = settings.gameMode == .ColorMatch ? "Match the Colour" : "Match the Shape"
         guidanceLabel.horizontalAlignmentMode = .Center
-        guidanceLabel.fontSize = 30
+        guidanceLabel.fontSize = 35
         guidanceLabel.fontColor = SKColor.blackColor()
         guidanceLabel.position = guidanceLabelPosition
         guidanceLabel.zPosition = NodeStackingOrder.Interface.rawValue
@@ -669,7 +668,7 @@ extension MatchingGameScene {
         // Blink label
         guidanceLabel.runAction(SKAction.repeatActionForever(SKAction.sequence([
             SKAction.waitForDuration(0.25),
-            SKAction.fadeAlphaTo(0.5, duration: 0.5),
+            SKAction.fadeAlphaTo(0.75, duration: 0.5),
             SKAction.fadeAlphaTo(1, duration: 0.5)
         ])))
         

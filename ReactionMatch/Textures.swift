@@ -13,7 +13,7 @@ class Textures {
         return getTextureOfSize(size, withColors: [
             SKColor(red: 85/255, green: 190/255, blue: 239/255, alpha: 1),
             SKColor(red: 91/255, green: 112/255, blue: 255/255, alpha: 1)
-        ], andStartPoint: CGPoint(x: 0.0, y: 0.0), andStopPoint: CGPoint(x: 0.0, y: 1.0))
+        ], andStartPoint: CGPoint(x: 0.0, y: 0.2), andStopPoint: CGPoint(x: 0.0, y: 0.8))
     }
     
     static func getWhiteToGreyTextureOfSize(size: CGSize) -> SKTexture {
