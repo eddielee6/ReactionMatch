@@ -66,11 +66,15 @@ class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate, G
     }
     
     func showLeaderboard() {
-        let gcViewController: GKGameCenterViewController = GKGameCenterViewController()
-        gcViewController.gameCenterDelegate = self
-        gcViewController.viewState = GKGameCenterViewControllerState.Leaderboards
-        gcViewController.leaderboardIdentifier = GameType.V2.leaderboardIdentifier
-        self.showViewController(gcViewController, sender: self)
-        self.presentViewController(gcViewController, animated: true, completion: nil)
+        if ScoreManager.sharedInstance.isAuthenticated {
+            let gcViewController: GKGameCenterViewController = GKGameCenterViewController()
+            gcViewController.gameCenterDelegate = self
+            gcViewController.viewState = GKGameCenterViewControllerState.Leaderboards
+            gcViewController.leaderboardIdentifier = GameType.V2.leaderboardIdentifier
+            self.showViewController(gcViewController, sender: self)
+            self.presentViewController(gcViewController, animated: true, completion: nil)
+        } else {
+            ScoreManager.sharedInstance.authenticateLocalPlayer(self)
+        }
     }
 }

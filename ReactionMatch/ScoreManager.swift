@@ -23,6 +23,10 @@ public class ScoreManager {
     private var gameCentreEnabled: Bool = false
     private var localPlayer: GKLocalPlayer!
     
+    var isAuthenticated: Bool {
+        return localPlayer.authenticated
+    }
+    
     
     // MARK: Authentication
     func authenticateLocalPlayer(viewController: UIViewController) {
