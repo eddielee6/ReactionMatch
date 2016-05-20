@@ -189,7 +189,7 @@ class MatchingGameScene: SKScene {
         scoreLabel.alpha = 0
         scoreLabel.horizontalAlignmentMode = .Center
         scoreLabel.fontSize = 45
-        scoreLabel.fontColor = SKColor.blackColor()
+        scoreLabel.fontColor = SKColor.whiteColor()
         scoreLabel.position = scoreLabelPosition
         scoreLabel.zPosition = NodeStackingOrder.Interface.rawValue
         
@@ -687,7 +687,7 @@ extension MatchingGameScene {
         guidanceLabel.text = settings.gameMode == .ColorMatch ? "Match the Colour" : "Match the Shape"
         guidanceLabel.horizontalAlignmentMode = .Center
         guidanceLabel.fontSize = 35
-        guidanceLabel.fontColor = SKColor.blackColor()
+        guidanceLabel.fontColor = SKColor.whiteColor()
         guidanceLabel.position = guidanceLabelPosition
         guidanceLabel.zPosition = NodeStackingOrder.Interface.rawValue
         guidanceLabel.name = "guidance-label"
