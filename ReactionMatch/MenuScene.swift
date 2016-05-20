@@ -37,7 +37,7 @@ class MenuScene: SKScene {
     private func addMenuButtons() {
         for (i, menuOption) in menuOptions.enumerate() {
             let menuOptionLabel = SKLabelNode()
-            menuOptionLabel.fontColor = SKColor.blackColor()
+            menuOptionLabel.fontColor = SKColor.whiteColor()
             menuOptionLabel.name = "menu-option"
             menuOptionLabel.text = menuOption.title
             menuOptionLabel.zPosition = NodeStackingOrder.Interface.rawValue
