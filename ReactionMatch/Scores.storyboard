@@ -19,7 +19,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="yTn-4Q-biI">
-                                <rect key="frame" x="20" y="64" width="560" height="191"/>
+                                <rect key="frame" x="20" y="74" width="560" height="191"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="😭" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="z9n-Rk-i34">
                                         <rect key="frame" x="248" y="0.0" width="65" height="78"/>
@@ -52,7 +52,7 @@
                         <constraints>
                             <constraint firstAttribute="trailingMargin" secondItem="yTn-4Q-biI" secondAttribute="trailing" id="Cqn-Te-v6v"/>
                             <constraint firstAttribute="leadingMargin" secondItem="yTn-4Q-biI" secondAttribute="leading" id="FbL-XC-94L"/>
-                            <constraint firstItem="yTn-4Q-biI" firstAttribute="top" secondItem="p43-Mp-Vw3" secondAttribute="bottom" id="avP-Qh-Gdp"/>
+                            <constraint firstItem="yTn-4Q-biI" firstAttribute="top" secondItem="p43-Mp-Vw3" secondAttribute="bottom" constant="10" id="avP-Qh-Gdp"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Game Center" id="xU6-HZ-6QN">
