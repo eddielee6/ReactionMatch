@@ -43,7 +43,6 @@ class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate, G
     
     
     // MARK: ScoreManagerFocusDelegate
-    
     func scoreManagerWillTakeFocus() {
         if let skView = self.view as? SKView {
             skView.paused = true
@@ -71,10 +70,11 @@ class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate, G
             gcViewController.gameCenterDelegate = self
             gcViewController.viewState = GKGameCenterViewControllerState.Leaderboards
             gcViewController.leaderboardIdentifier = GameType.V2.leaderboardIdentifier
-            self.showViewController(gcViewController, sender: self)
             self.presentViewController(gcViewController, animated: true, completion: nil)
         } else {
-            ScoreManager.sharedInstance.authenticateLocalPlayer(self)
+            let storyboard = UIStoryboard(name: "Scores", bundle: nil)
+            let scoresViewController = storyboard.instantiateInitialViewController()!
+            self.presentViewController(scoresViewController, animated: true, completion: nil)
         }
     }
 }

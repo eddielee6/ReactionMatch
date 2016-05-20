@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C0AD1041CEF2A5300B53096 /* ScoresViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C0AD1031CEF2A5300B53096 /* ScoresViewController.swift */; };
+		2C0AD1061CEF2C6200B53096 /* Scores.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C0AD1051CEF2C6200B53096 /* Scores.storyboard */; };
 		2C104D251C4D6BA10097E0AD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C104D241C4D6BA10097E0AD /* AppDelegate.swift */; };
 		2C104D291C4D6BA10097E0AD /* MatchingGameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C104D281C4D6BA10097E0AD /* MatchingGameScene.swift */; };
 		2C104D2B1C4D6BA10097E0AD /* MatchingGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C104D2A1C4D6BA10097E0AD /* MatchingGameViewController.swift */; };
@@ -31,6 +33,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2C0AD1031CEF2A5300B53096 /* ScoresViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScoresViewController.swift; sourceTree = "<group>"; };
+		2C0AD1051CEF2C6200B53096 /* Scores.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Scores.storyboard; sourceTree = "<group>"; };
 		2C104D211C4D6BA00097E0AD /* Reactions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reactions.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C104D241C4D6BA10097E0AD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2C104D281C4D6BA10097E0AD /* MatchingGameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchingGameScene.swift; sourceTree = "<group>"; };
@@ -89,6 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				2C104D2A1C4D6BA10097E0AD /* MatchingGameViewController.swift */,
+				2C0AD1031CEF2A5300B53096 /* ScoresViewController.swift */,
 				2C27EDCD1CE6731000C12B5F /* GameScenes */,
 				2C9B9F211CBC281E0015DDE4 /* Extentions */,
 				2C4811DA1C53F3E4007BD90B /* Resources */,
@@ -118,6 +123,7 @@
 			children = (
 				2C4811DB1C53F43E007BD90B /* Sounds */,
 				2C104D311C4D6BA10097E0AD /* LaunchScreen.storyboard */,
+				2C0AD1051CEF2C6200B53096 /* Scores.storyboard */,
 				2C104D2C1C4D6BA10097E0AD /* Main.storyboard */,
 				2C104D2F1C4D6BA10097E0AD /* Assets.xcassets */,
 				2C104D341C4D6BA10097E0AD /* Info.plist */,
@@ -210,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2C104D331C4D6BA10097E0AD /* LaunchScreen.storyboard in Resources */,
+				2C0AD1061CEF2C6200B53096 /* Scores.storyboard in Resources */,
 				2C104D301C4D6BA10097E0AD /* Assets.xcassets in Resources */,
 				2C6EDA481CEA461600EC74EA /* success.mp3 in Resources */,
 				2C6EDA471CEA461600EC74EA /* fail.mp3 in Resources */,
@@ -227,6 +234,7 @@
 				2CA8E6251C5176200001F2DA /* ScoreManager.swift in Sources */,
 				2C9B9F201CBC27EF0015DDE4 /* CGPointExtentions.swift in Sources */,
 				2C104D291C4D6BA10097E0AD /* MatchingGameScene.swift in Sources */,
+				2C0AD1041CEF2A5300B53096 /* ScoresViewController.swift in Sources */,
 				2CD8EDBE1CB7A4F6005B6492 /* TargetShape.swift in Sources */,
 				2CC6D5F81CBD1AD900857F85 /* TargetShapeNode.swift in Sources */,
 				2C7806D71CE73C060072F8A8 /* CGSizeExtentions.swift in Sources */,
