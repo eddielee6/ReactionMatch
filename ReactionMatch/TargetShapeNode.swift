@@ -13,8 +13,6 @@ class TargetShapeNode: SKShapeNode {
     let targetColor: TargetColor
     let targetShape: TargetShape
     
-    private let pointsGainedLabel: SKLabelNode
-    
     private let targetSize = CGSize(width: 40, height: 40)
     
     var shapeName: String {
@@ -26,15 +24,9 @@ class TargetShapeNode: SKShapeNode {
     init (targetColor: TargetColor, targetShape: TargetShape) {
         self.targetColor = targetColor
         self.targetShape = targetShape
-        
-        self.pointsGainedLabel = SKLabelNode(fontNamed: "SanFrancisco")
-        
         super.init()
         
-        pointsGainedLabel.verticalAlignmentMode = .Center
-        pointsGainedLabel.horizontalAlignmentMode = .Center
-        pointsGainedLabel.fontSize = 20
-        self.addChild(pointsGainedLabel)
+        setupPointsGainedLabel()
         
         self.path = self.targetShape.getShapeNode(targetSize).path
         self.fillColor = self.targetColor.value
@@ -46,9 +38,28 @@ class TargetShapeNode: SKShapeNode {
         self.init(targetColor: TargetColor.random(), targetShape: TargetShape.Square)
     }
     
+    private func setupPointsGainedLabel() {
+        let pointsGainedLabel = SKLabelNode()
+        pointsGainedLabel.verticalAlignmentMode = .Center
+        pointsGainedLabel.horizontalAlignmentMode = .Center
+        pointsGainedLabel.fontSize = 140
+        pointsGainedLabel.setScale(0.1)
+        pointsGainedLabel.fontColor = SKColor.whiteColor()
+        pointsGainedLabel.name = "points-gained-label"
+        addChild(pointsGainedLabel)
+    }
+    
     func setPointsGained(points: Int) {
-        pointsGainedLabel.fontColor = SKColor.whiteColor() // targetColor.value.inverted
+        let pointsGainedLabel = childNodeWithName("points-gained-label") as! SKLabelNode
         pointsGainedLabel.text = String(points)
+        
+        let action = SKAction.group([
+            SKAction.scaleTo(10, duration: 0.5),
+            SKAction.fadeOutWithDuration(0.4)
+        ])
+        action.timingMode = .EaseIn
+        
+        pointsGainedLabel.runAction(action)
     }
     
     required init?(coder aDecoder: NSCoder) {
