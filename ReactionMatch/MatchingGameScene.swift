@@ -541,18 +541,26 @@ extension MatchingGameScene {
         let currentHighScore = scoreManager.getHighScoreForGameType(settings.gameType)
         scoreManager.recordNewScore(score, forGameType: settings.gameType)
         
-        runAction(SKAction.sequence([
-            SKAction.waitForDuration(0.1),
-            SKAction.runBlock({ [ unowned scope = self ] in
-                scope.blurScene()
-            }),
+        var gameOverSequence = [SKAction]()
+        #if !((arch(i386) || arch(x86_64)) && os(iOS))
+            gameOverSequence.appendContentsOf([
+                SKAction.waitForDuration(0.1),
+                SKAction.runBlock({ [ unowned scope = self ] in
+                    scope.blurScene()
+                })
+            ])
+        #endif
+        
+        gameOverSequence.appendContentsOf([
             SKAction.waitForDuration(0.25),
             SKAction.runBlock({ [ unowned scope = self ] in
                 scope.showHighScoreLabel(scope.score, isHighScore: scope.score > currentHighScore)
                 scope.showNewGameButton()
                 scope.showReturnToMenuButton()
             })
-        ]))
+        ])
+        
+        runAction(SKAction.sequence(gameOverSequence))
     }
     
     private func blurScene() {
