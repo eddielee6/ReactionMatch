@@ -12,6 +12,7 @@ class MenuScene: SKScene {
     
     private enum NodeStackingOrder: CGFloat {
         case BackgroundImage
+        case Effects
         case Interface
     }
     
@@ -23,6 +24,7 @@ class MenuScene: SKScene {
     
     override func didMoveToView(view: SKView) {
         setupBackground()
+        setupEffects()
         addMenuButtons()
     }
     
@@ -32,6 +34,14 @@ class MenuScene: SKScene {
         backgroundNode.anchorPoint = CGPoint.zero
         backgroundNode.zPosition = NodeStackingOrder.BackgroundImage.rawValue
         addChild(backgroundNode)
+    }
+    
+    private func setupEffects() {
+        let blobEmiter = SKEmitterNode(fileNamed: "Blobs.sks")!
+        blobEmiter.particlePositionRange = CGVector(dx: size.width, dy: size.height)
+        blobEmiter.zPosition = NodeStackingOrder.Effects.rawValue
+        blobEmiter.position = CGPoint(x: size.width/2, y: size.height/2)
+        self.addChild(blobEmiter)
     }
     
     private func addMenuButtons() {
