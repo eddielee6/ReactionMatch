@@ -30,9 +30,9 @@ class MatchingGameScene: SKScene {
     
     private enum NodeStackingOrder: CGFloat {
         case BackgroundImage
+        case TimerIndicator
         case Target
         case PlayerTarget
-        case TimerIndicator
         case Interface
         case GameOverInterface
     }
@@ -50,6 +50,23 @@ class MatchingGameScene: SKScene {
     }
     private let targetDistanceFromCenterPoint: CGFloat = 110 // Distance away from center targets are placed
     private let maxPlayerDistanceFromCenterPoint: CGFloat = 130 // Max distance away from center player can move
+    private var targetSize: CGSize {
+        let targetSizeCap: CGFloat = 40
+        let desiredDimention = size.width/9.37
+        let dimention = desiredDimention < targetSizeCap ? desiredDimention : targetSizeCap
+        return CGSize(width: dimention, height: dimention)
+    }
+    private var timeIndicatorDiamiter: CGFloat {
+        let desiredTimeIndicatorDiamiter: CGFloat = 375.0
+        let timeIndicatorDiamiterCap: CGFloat = size.width * 0.975
+        
+        return desiredTimeIndicatorDiamiter < timeIndicatorDiamiterCap ? desiredTimeIndicatorDiamiter : timeIndicatorDiamiterCap
+    }
+    private var topLabelPosition: CGPoint {
+        let timeIndicatorRadius = timeIndicatorDiamiter / 2
+        let freeSpace = size.height/2 - timeIndicatorRadius
+        return centerPoint + CGPointMake(0, timeIndicatorRadius + (freeSpace/2))
+    }
     
     
     // MARK: Actions
@@ -169,8 +186,6 @@ class MatchingGameScene: SKScene {
     }
     
     private func setupTimeIndicator() {
-        let timeIndicatorDiamiter: CGFloat = 375.0
-        
         timeIndicator.indicatorStrokeColor = SKColor(red: 49/255, green: 71/255, blue: 215/255, alpha: 0.75)
         timeIndicator.indicatorStrokeWidth = 4
         timeIndicator.size = CGSizeMake(timeIndicatorDiamiter, timeIndicatorDiamiter)
@@ -180,17 +195,13 @@ class MatchingGameScene: SKScene {
     }
     
     private func setupScoreLabel() {
-        var scoreLabelPosition: CGPoint {
-            let distanceFromGameArea: CGFloat = 100
-            return centerPoint + CGPointMake(0, maxPlayerDistanceFromCenterPoint + distanceFromGameArea)
-        }
-        
         scoreLabel.text = "Score \(score)"
         scoreLabel.alpha = 0
+        scoreLabel.verticalAlignmentMode = .Center
         scoreLabel.horizontalAlignmentMode = .Center
         scoreLabel.fontSize = 45
         scoreLabel.fontColor = SKColor.whiteColor()
-        scoreLabel.position = scoreLabelPosition
+        scoreLabel.position = topLabelPosition
         scoreLabel.zPosition = NodeStackingOrder.Interface.rawValue
         
         gameAreaNode.addChild(scoreLabel)
@@ -219,6 +230,7 @@ class MatchingGameScene: SKScene {
         let newPlayer = settings.gameMode == .ColorMatch ? TargetShapeNode(targetShape: TargetShape.Square) : TargetShapeNode.randomShapeNode()
         newPlayer.name = playerNodeName
         newPlayer.position = centerPoint
+        newPlayer.targetSize = targetSize
         newPlayer.alpha = 0
         newPlayer.setScale(0)
         newPlayer.zPosition = NodeStackingOrder.PlayerTarget.rawValue
@@ -346,6 +358,7 @@ class MatchingGameScene: SKScene {
         }
         
         let targetNode = TargetShapeNode(targetColor: targetColor, targetShape: targetShape)
+        targetNode.targetSize = targetSize
         
         if isWinning {
             targetNode.name = correctTargetNodeName
@@ -686,17 +699,13 @@ extension MatchingGameScene {
     }
     
     private func showGuidanceLabel() {
-        var guidanceLabelPosition: CGPoint {
-            let distanceFromGameArea: CGFloat = 60
-            return centerPoint + CGPointMake(0, maxPlayerDistanceFromCenterPoint + distanceFromGameArea)
-        }
-        
         let guidanceLabel = SKLabelNode()
         guidanceLabel.text = settings.gameMode == .ColorMatch ? "Match the Colour" : "Match the Shape"
+        guidanceLabel.verticalAlignmentMode = .Center
         guidanceLabel.horizontalAlignmentMode = .Center
         guidanceLabel.fontSize = 35
         guidanceLabel.fontColor = SKColor.whiteColor()
-        guidanceLabel.position = guidanceLabelPosition
+        guidanceLabel.position = topLabelPosition
         guidanceLabel.zPosition = NodeStackingOrder.Interface.rawValue
         guidanceLabel.name = "guidance-label"
         
