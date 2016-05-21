@@ -33,6 +33,7 @@ class MatchingGameScene: SKScene {
         case TimerIndicator
         case Target
         case PlayerTarget
+        case Effects
         case Interface
         case GameOverInterface
     }
@@ -41,6 +42,10 @@ class MatchingGameScene: SKScene {
     
     // MARK: Constants
     private let scoreManager = ScoreManager.sharedInstance
+    
+    private var currentHighScore: Int64 {
+        return scoreManager.getHighScoreForGameType(settings.gameType)
+    }
     
     private let successAnimationDuration: Double = 0.25 // Time taken to animate to new levels
     private let setupNewGameAnimationDuration: Double = 0.25 // Time taken to animate to game start
@@ -87,7 +92,33 @@ class MatchingGameScene: SKScene {
         return Int(ceil((timeRemainingForCurrentLevel / timeForCurrentLevel) * 10))
     }
     
-    private var score: Int64 = 0 { didSet { updateScoreLabel(score, oldScore: oldValue) } }
+    private var hasCelebratedHighScore: Bool = false
+    
+    private var score: Int64 = 0 {
+        didSet {
+            updateScoreLabel(score, oldScore: oldValue)
+            checkForNewHighScore(score)
+        }
+    }
+    
+    private func checkForNewHighScore(score: Int64) {
+        guard currentHighScore > 0 || !hasCelebratedHighScore else {
+            return
+        }
+        
+        if score > currentHighScore {
+            celebrateHighScore()
+        }
+    }
+    
+    private func celebrateHighScore() {
+        let blobEmiter = SKEmitterNode(fileNamed: "Confetti.sks")!
+        let labelWidth = scoreLabel.calculateAccumulatedFrame().width
+        blobEmiter.particlePositionRange = CGVector(dx: labelWidth, dy: 0)
+        blobEmiter.position = scoreLabel.position
+        blobEmiter.zPosition = NodeStackingOrder.Effects.rawValue
+        self.addChild(blobEmiter)
+    }
     
     private func updateScoreLabel(score: Int64, oldScore: Int64) {
         // Fade in on first score

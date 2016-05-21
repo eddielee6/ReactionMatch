@@ -31,6 +31,8 @@
 		2CC6D5F81CBD1AD900857F85 /* TargetShapeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC6D5F71CBD1AD900857F85 /* TargetShapeNode.swift */; };
 		2CC6D5FA1CBD24FB00857F85 /* SKShapeNodeExtentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC6D5F91CBD24FB00857F85 /* SKShapeNodeExtentions.swift */; };
 		2CD8EDBE1CB7A4F6005B6492 /* TargetShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD8EDBD1CB7A4F6005B6492 /* TargetShape.swift */; };
+		2CEFA7181CF0972300F5F968 /* Confetti.sks in Resources */ = {isa = PBXBuildFile; fileRef = 2CEFA7161CF0972300F5F968 /* Confetti.sks */; };
+		2CEFA71B1CF099B800F5F968 /* confetti.png in Resources */ = {isa = PBXBuildFile; fileRef = 2CEFA71A1CF099B800F5F968 /* confetti.png */; };
 		2CF9F5141C503596004B01E5 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CF9F5131C503596004B01E5 /* GameKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +63,8 @@
 		2CC6D5F71CBD1AD900857F85 /* TargetShapeNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetShapeNode.swift; sourceTree = "<group>"; };
 		2CC6D5F91CBD24FB00857F85 /* SKShapeNodeExtentions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKShapeNodeExtentions.swift; sourceTree = "<group>"; };
 		2CD8EDBD1CB7A4F6005B6492 /* TargetShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetShape.swift; sourceTree = "<group>"; };
+		2CEFA7161CF0972300F5F968 /* Confetti.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Confetti.sks; sourceTree = "<group>"; };
+		2CEFA71A1CF099B800F5F968 /* confetti.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = confetti.png; sourceTree = "<group>"; };
 		2CF9F5131C503596004B01E5 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -132,7 +136,9 @@
 				2C104D2F1C4D6BA10097E0AD /* Assets.xcassets */,
 				2C104D341C4D6BA10097E0AD /* Info.plist */,
 				2C89AF0C1CF051070073FA58 /* Blobs.sks */,
+				2CEFA71A1CF099B800F5F968 /* confetti.png */,
 				2C89AF0D1CF051070073FA58 /* blob.png */,
+				2CEFA7161CF0972300F5F968 /* Confetti.sks */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -224,9 +230,11 @@
 				2C104D331C4D6BA10097E0AD /* LaunchScreen.storyboard in Resources */,
 				2C0AD1061CEF2C6200B53096 /* Scores.storyboard in Resources */,
 				2C104D301C4D6BA10097E0AD /* Assets.xcassets in Resources */,
+				2CEFA71B1CF099B800F5F968 /* confetti.png in Resources */,
 				2C6EDA481CEA461600EC74EA /* success.mp3 in Resources */,
 				2C89AF0E1CF051070073FA58 /* Blobs.sks in Resources */,
 				2C89AF0F1CF051070073FA58 /* blob.png in Resources */,
+				2CEFA7181CF0972300F5F968 /* Confetti.sks in Resources */,
 				2C6EDA471CEA461600EC74EA /* fail.mp3 in Resources */,
 				2C104D2E1C4D6BA10097E0AD /* Main.storyboard in Resources */,
 			);
