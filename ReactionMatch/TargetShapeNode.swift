@@ -39,11 +39,12 @@ class TargetShapeNode: SKShapeNode {
     }
     
     private func setupPointsGainedLabel() {
-        let pointsGainedLabel = SKLabelNode()
+        let pointsGainedLabel = SKLabelNode(fontNamed: "SanFranciscoDisplay-Bold")
         pointsGainedLabel.verticalAlignmentMode = .Center
         pointsGainedLabel.horizontalAlignmentMode = .Center
         pointsGainedLabel.fontSize = 550
         pointsGainedLabel.setScale(0.1)
+        pointsGainedLabel.alpha = 0.75
         pointsGainedLabel.fontColor = SKColor.whiteColor()
         pointsGainedLabel.name = "points-gained-label"
         addChild(pointsGainedLabel)
@@ -55,7 +56,10 @@ class TargetShapeNode: SKShapeNode {
         
         let action = SKAction.group([
             SKAction.scaleTo(1, duration: 0.5),
-            SKAction.fadeOutWithDuration(0.5)
+            SKAction.sequence([
+                SKAction.waitForDuration(0.2),
+                SKAction.fadeOutWithDuration(0.3)
+            ])
         ])
         action.timingMode = .EaseIn
         
