@@ -102,7 +102,7 @@ class MatchingGameScene: SKScene {
     }
     
     private func checkForNewHighScore(score: Int64) {
-        guard currentHighScore > 0 || !hasCelebratedHighScore else {
+        guard currentHighScore > 0 && !hasCelebratedHighScore else {
             return
         }
         
@@ -112,12 +112,13 @@ class MatchingGameScene: SKScene {
     }
     
     private func celebrateHighScore() {
+        hasCelebratedHighScore = true
         let blobEmiter = SKEmitterNode(fileNamed: "Confetti.sks")!
         let labelWidth = scoreLabel.calculateAccumulatedFrame().width
         blobEmiter.particlePositionRange = CGVector(dx: labelWidth, dy: 0)
         blobEmiter.position = scoreLabel.position
         blobEmiter.zPosition = NodeStackingOrder.Effects.rawValue
-        self.addChild(blobEmiter)
+        addChild(blobEmiter)
     }
     
     private func updateScoreLabel(score: Int64, oldScore: Int64) {
@@ -682,17 +683,17 @@ extension MatchingGameScene {
     }
     
     private func restartGame() {
-        let newGameScene = MatchingGameScene(size: self.size)
+        let newGameScene = MatchingGameScene(size: size)
         newGameScene.scaleMode = scaleMode
         newGameScene.settings = settings
-        self.view?.presentScene(newGameScene)
+        view?.presentScene(newGameScene)
     }
     
     private func returnToMenu() {
-        let menuScene = MenuScene(size: self.size)
+        let menuScene = MenuScene(size: size)
         menuScene.scaleMode = scaleMode
         let transition = SKTransition.doorsCloseHorizontalWithDuration(0.25)
-        self.view?.presentScene(menuScene, transition: transition)
+        view?.presentScene(menuScene, transition: transition)
     }
 }
 

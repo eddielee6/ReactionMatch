@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C089E0F1CF0CF9600356C42 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C089E0E1CF0CF9600356C42 /* GameKit.framework */; };
 		2C0AD1041CEF2A5300B53096 /* ScoresViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C0AD1031CEF2A5300B53096 /* ScoresViewController.swift */; };
 		2C0AD1061CEF2C6200B53096 /* Scores.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C0AD1051CEF2C6200B53096 /* Scores.storyboard */; };
 		2C104D251C4D6BA10097E0AD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C104D241C4D6BA10097E0AD /* AppDelegate.swift */; };
@@ -33,10 +34,10 @@
 		2CD8EDBE1CB7A4F6005B6492 /* TargetShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD8EDBD1CB7A4F6005B6492 /* TargetShape.swift */; };
 		2CEFA7181CF0972300F5F968 /* Confetti.sks in Resources */ = {isa = PBXBuildFile; fileRef = 2CEFA7161CF0972300F5F968 /* Confetti.sks */; };
 		2CEFA71B1CF099B800F5F968 /* confetti.png in Resources */ = {isa = PBXBuildFile; fileRef = 2CEFA71A1CF099B800F5F968 /* confetti.png */; };
-		2CF9F5141C503596004B01E5 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CF9F5131C503596004B01E5 /* GameKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2C089E0E1CF0CF9600356C42 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2C0AD1031CEF2A5300B53096 /* ScoresViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScoresViewController.swift; sourceTree = "<group>"; };
 		2C0AD1051CEF2C6200B53096 /* Scores.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Scores.storyboard; sourceTree = "<group>"; };
 		2C104D211C4D6BA00097E0AD /* Reactions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reactions.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -65,7 +66,6 @@
 		2CD8EDBD1CB7A4F6005B6492 /* TargetShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetShape.swift; sourceTree = "<group>"; };
 		2CEFA7161CF0972300F5F968 /* Confetti.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Confetti.sks; sourceTree = "<group>"; };
 		2CEFA71A1CF099B800F5F968 /* confetti.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = confetti.png; sourceTree = "<group>"; };
-		2CF9F5131C503596004B01E5 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,7 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CF9F5141C503596004B01E5 /* GameKit.framework in Frameworks */,
+				2C089E0F1CF0CF9600356C42 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +83,7 @@
 		2C104D181C4D6BA00097E0AD = {
 			isa = PBXGroup;
 			children = (
-				2CF9F5131C503596004B01E5 /* GameKit.framework */,
+				2C089E0E1CF0CF9600356C42 /* GameKit.framework */,
 				2C104D231C4D6BA10097E0AD /* ReactionMatch */,
 				2C104D221C4D6BA00097E0AD /* Products */,
 			);
@@ -381,7 +381,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.eddielee.ReactionMatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "c46e78dc-80fe-4c8d-8e32-bd9e3a0c9a3a";
 			};
 			name = Debug;
 		};
@@ -395,7 +395,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.eddielee.ReactionMatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "c46e78dc-80fe-4c8d-8e32-bd9e3a0c9a3a";
 			};
 			name = Release;
 		};
