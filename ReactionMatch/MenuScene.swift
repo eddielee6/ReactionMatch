@@ -58,6 +58,12 @@ class MenuScene: SKScene {
             menuOptionLabel.fontSize = 45
             menuOptionLabel.verticalAlignmentMode = .Center
             
+            menuOptionLabel.runAction(SKAction.repeatActionForever(SKAction.sequence([
+                SKAction.waitForDuration(0.25),
+                SKAction.fadeAlphaTo(0.75, duration: 0.5),
+                SKAction.fadeAlphaTo(1, duration: 0.5)
+            ])))
+            
             addChild(menuOptionLabel)
         }
     }
