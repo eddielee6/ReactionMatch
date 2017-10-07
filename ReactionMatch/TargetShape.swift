@@ -10,23 +10,23 @@ import SpriteKit
 import GameKit
 
 enum TargetShape: Int {
-    case Square
-    case Circle
-    case Triangle
-    case Star
+    case square
+    case circle
+    case triangle
+    case star
 }
 
 extension TargetShape {
     var name: String {
         get {
             switch self {
-            case .Square:
+            case .square:
                 return "square"
-            case .Circle:
+            case .circle:
                 return "circle"
-            case .Triangle:
+            case .triangle:
                 return "triangle"
-            case .Star:
+            case .star:
                 return "star"
             }
         }
@@ -34,15 +34,15 @@ extension TargetShape {
 }
 
 extension TargetShape {
-    func getShapeNode(shapeSize: CGSize) -> SKShapeNode {
+    func getShapeNode(_ shapeSize: CGSize) -> SKShapeNode {
         switch self {
-        case .Square:
-            return SKShapeNode(rectOfSize: shapeSize, cornerRadius: 5.0)
-        case .Circle:
-            return SKShapeNode(ellipseOfSize: shapeSize)
-        case .Triangle:
+        case .square:
+            return SKShapeNode(rectOf: shapeSize, cornerRadius: 5.0)
+        case .circle:
+            return SKShapeNode(ellipseOf: shapeSize)
+        case .triangle:
             return SKShapeNode(triangleOfSize: shapeSize)
-        case .Star:
+        case .star:
             let visualOffset:CGFloat = 1.2 // Stars within standard rect are too small - boost them a bit
             let starShapeSize = CGSize(width: shapeSize.width * visualOffset , height: shapeSize.height * visualOffset)
             return SKShapeNode(fivePointStarOfSize: starShapeSize)
@@ -51,9 +51,9 @@ extension TargetShape {
 }
 
 extension TargetShape {
-    private static let randomSource = GKRandomDistribution(lowestValue: 0, highestValue: count - 1)
+    fileprivate static let randomSource = GKRandomDistribution(lowestValue: 0, highestValue: count - 1)
     
-    private static let count: Int = {
+    fileprivate static let count: Int = {
         var max: Int = 0
         while let _ = TargetShape(rawValue: max) { max += 1 }
         return max

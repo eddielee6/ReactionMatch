@@ -13,11 +13,11 @@ extension SKShapeNode {
     convenience init(triangleOfSize size: CGSize) {
         self.init()
         
-        let trianglePath = CGPathCreateMutable()
-        CGPathMoveToPoint(trianglePath, nil, -size.width/2, -size.height/2)
-        CGPathAddLineToPoint(trianglePath, nil, size.width/2, -size.height/2)
-        CGPathAddLineToPoint(trianglePath, nil, 0, size.height/2)
-        CGPathAddLineToPoint(trianglePath, nil, -size.width/2, -size.height/2)
+        let trianglePath = CGMutablePath()
+        trianglePath.move(to: CGPoint(x: -size.width/2, y: -size.height/2))
+        trianglePath.addLine(to: CGPoint(x: size.width/2, y: -size.height/2))
+        trianglePath.addLine(to: CGPoint(x: 0, y: size.height/2))
+        trianglePath.addLine(to: CGPoint(x: -size.width/2, y: -size.height/2))
         
         path = trianglePath
     }
@@ -42,9 +42,9 @@ extension SKShapeNode {
         let starPathPointsGridSize:CGFloat = 10.0
         let gridSizeOffset = starPathPointsGridSize / 2.0
         
-        let starPath = CGPathCreateMutable()
+        let starPath = CGMutablePath()
         
-        for (i, starPathPoint) in starPathPoints.enumerate() {
+        for (i, starPathPoint) in starPathPoints.enumerated() {
             let xNormalised = (starPathPoint.x - gridSizeOffset) / starPathPointsGridSize
             let yNormalised = (starPathPoint.y - gridSizeOffset) / starPathPointsGridSize
             
@@ -52,12 +52,12 @@ extension SKShapeNode {
             let yScaled = yNormalised * size.height
             
             if i == 0 {
-                CGPathMoveToPoint(starPath, nil, xScaled, yScaled)
+                starPath.move(to: CGPoint(x: xScaled, y: yScaled))
             } else {
-                CGPathAddLineToPoint(starPath, nil, xScaled, yScaled)
+                starPath.addLine(to: CGPoint(x: xScaled, y: yScaled))
             }
         }
-        CGPathCloseSubpath(starPath)
+        starPath.closeSubpath()
         
         path = starPath
     }

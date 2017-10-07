@@ -10,79 +10,79 @@ import SpriteKit
 
 class MenuScene: SKScene {
     
-    private enum NodeStackingOrder: CGFloat {
-        case BackgroundImage
-        case Effects
-        case Interface
+    fileprivate enum NodeStackingOrder: CGFloat {
+        case backgroundImage
+        case effects
+        case interface
     }
     
-    private let menuOptions = [
+    fileprivate let menuOptions = [
         (title: "Play Now", action: startGameV2, instant: false),
         (title: "Classic Mode", action: startClassicGame, instant: false),
         (title: "Leaderboard", action: showGameCenterLeaderboards, instant: true)
     ]
     
-    override func didMoveToView(view: SKView) {
+    override func didMove(to view: SKView) {
         setupBackground()
         setupEffects()
         addMenuButtons()
     }
     
-    private func setupBackground() {
-        backgroundColor = SKColor.whiteColor()
+    fileprivate func setupBackground() {
+        backgroundColor = SKColor.white
         let backgroundNode = SKSpriteNode(texture: Textures.getMenuScreenTexture(size))
         backgroundNode.anchorPoint = CGPoint.zero
-        backgroundNode.zPosition = NodeStackingOrder.BackgroundImage.rawValue
+        backgroundNode.zPosition = NodeStackingOrder.backgroundImage.rawValue
         addChild(backgroundNode)
     }
     
-    private func setupEffects() {
+    fileprivate func setupEffects() {
         let blobEmiter = SKEmitterNode(fileNamed: "Blobs.sks")!
         blobEmiter.particlePositionRange = CGVector(dx: size.width, dy: size.height)
-        blobEmiter.zPosition = NodeStackingOrder.Effects.rawValue
+        blobEmiter.zPosition = NodeStackingOrder.effects.rawValue
         blobEmiter.position = CGPoint(x: size.width/2, y: size.height/2)
         self.addChild(blobEmiter)
     }
     
-    private func addMenuButtons() {
-        for (i, menuOption) in menuOptions.enumerate() {
+    fileprivate func addMenuButtons() {
+        for (i, menuOption) in menuOptions.enumerated() {
             let menuOptionLabel = SKLabelNode()
-            menuOptionLabel.fontColor = SKColor.whiteColor()
+            menuOptionLabel.fontColor = SKColor.white
             menuOptionLabel.name = "menu-option"
             menuOptionLabel.text = menuOption.title
-            menuOptionLabel.zPosition = NodeStackingOrder.Interface.rawValue
+            menuOptionLabel.zPosition = NodeStackingOrder.interface.rawValue
             
             menuOptionLabel.position = CGPoint(
                 x: size.width/2,
                 y: size.height - (size.height * CGFloat(i+1)) / (CGFloat(menuOptions.count) + 1))
             menuOptionLabel.fontSize = 45
-            menuOptionLabel.verticalAlignmentMode = .Center
+            menuOptionLabel.verticalAlignmentMode = .center
             
-            menuOptionLabel.runAction(SKAction.repeatActionForever(SKAction.sequence([
-                SKAction.waitForDuration(0.25),
-                SKAction.fadeAlphaTo(0.75, duration: 0.5),
-                SKAction.fadeAlphaTo(1, duration: 0.5)
+            menuOptionLabel.run(SKAction.repeatForever(SKAction.sequence([
+                SKAction.wait(forDuration: 0.25),
+                SKAction.fadeAlpha(to: 0.75, duration: 0.5),
+                SKAction.fadeAlpha(to: 1, duration: 0.5)
             ])))
             
             addChild(menuOptionLabel)
         }
     }
     
-    private func startGameV2() {
-        startGameWithType(.V2)
+    fileprivate func startGameV2() {
+        startGameWithType(.v2)
     }
     
-    private func startClassicGame() {
-        startGameWithType(.Classic)
+    fileprivate func startClassicGame() {
+        startGameWithType(.classic)
     }
     
-    private func showGameCenterLeaderboards() {
+    fileprivate func showGameCenterLeaderboards() {
         if let matchingGameViewController = self.view?.window?.rootViewController as? MatchingGameViewController {
             matchingGameViewController.showLeaderboard()
         }
     }
     
-    private func startGameWithType(gameType: GameType) {
+    fileprivate func startGameWithType(_ gameType: GameType) {
         let matchingGameScene = MatchingGameScene(size: size)
         matchingGameScene.scaleMode = scaleMode
         matchingGameScene.settings = gameType.matchingGameSettings
@@ -93,27 +93,27 @@ class MenuScene: SKScene {
 
 // MARK: Input
 extension MenuScene {
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {
             return
         }
         
-        let touchLocation = touch.locationInNode(self)
+        let touchLocation = touch.location(in: self)
         
-        enumerateChildNodesWithName("menu-option") { node, _ in
-            if node.containsPoint(touchLocation) {
+        enumerateChildNodes(withName: "menu-option") { node, _ in
+            if node.contains(touchLocation) {
                 if let labelNode = node as? SKLabelNode {
                     if let selectedMenuOption = self.menuOptions.filter({$0.title == labelNode.text}).first {
                         let action = selectedMenuOption.action
                         if selectedMenuOption.instant {
                             action(self)()
                         } else {
-                            labelNode.runAction(SKAction.sequence([
+                            labelNode.run(SKAction.sequence([
                                 SKAction.group([
-                                    SKAction.scaleTo(0.2, duration: 0.15),
-                                    SKAction.fadeOutWithDuration(0.15)
+                                    SKAction.scale(to: 0.2, duration: 0.15),
+                                    SKAction.fadeOut(withDuration: 0.15)
                                 ]),
-                                SKAction.runBlock({
+                                SKAction.run({
                                     action(self)()
                                 })
                             ]))

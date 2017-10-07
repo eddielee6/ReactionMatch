@@ -9,16 +9,16 @@
 import Foundation
 
 enum GameType {
-    case Classic, V2
+    case classic, v2
 }
 
 extension GameType {
     var name: String {
         get {
             switch self {
-            case .Classic:
+            case .classic:
                 return "classic"
-            case .V2:
+            case .v2:
                 return "v2"
             }
         }
@@ -29,9 +29,9 @@ extension GameType {
     var leaderboardIdentifier: String {
         get {
             switch self {
-            case .Classic:
+            case .classic:
                 return "me.eddielee.ReactionMatch.TopScore"
-            case .V2:
+            case .v2:
                 return "me.eddielee.ReactionMatch.TopScoreV2"
             }
         }
@@ -45,14 +45,14 @@ extension GameType {
             matchingGameSettings.gameType = self
             
             switch self {
-            case .Classic:
-                matchingGameSettings.gameMode = .ColorMatch
+            case .classic:
+                matchingGameSettings.gameMode = .colorMatch
                 matchingGameSettings.minNumberOfTargets = 4
                 matchingGameSettings.maxNumberOfTargets = 4
                 matchingGameSettings.newTargetAfterTurn = 0
                 matchingGameSettings.newTargetIncrement = 0
-            case .V2:
-                matchingGameSettings.gameMode = .ShapeMatch
+            case .v2:
+                matchingGameSettings.gameMode = .shapeMatch
                 matchingGameSettings.minNumberOfTargets = 2
                 matchingGameSettings.maxNumberOfTargets = 8
                 matchingGameSettings.newTargetAfterTurn = 5
