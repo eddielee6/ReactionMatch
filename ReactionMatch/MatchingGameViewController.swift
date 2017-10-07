@@ -12,7 +12,6 @@ import AVFoundation
 import GameKit
 
 class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate, GKGameCenterControllerDelegate {
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -21,37 +20,30 @@ class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate, G
         ScoreManager.sharedInstance.focusDelegate = self
         ScoreManager.sharedInstance.authenticateLocalPlayer(self)
 
-        if let skView = self.view as? SKView {
-            skView.ignoresSiblingOrder = true
-            //skView.showsFPS = true
-            //skView.showsNodeCount = true
+        let skView = self.view as! SKView
+        skView.ignoresSiblingOrder = true
+        //skView.showsFPS = true
+        //skView.showsNodeCount = true
 
-            let menuScene = MenuScene(size: view.bounds.size)
-            menuScene.scaleMode = .resizeFill
+        let menuScene = MenuScene(size: view.bounds.size)
+        menuScene.scaleMode = .resizeFill
 
-            skView.presentScene(menuScene)
-        }
+        skView.presentScene(menuScene)
     }
 
-    func setAudioSessionCategory(_ audioSessionCategory: String) {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(audioSessionCategory)
-        } catch {
-            print(error)
-        }
+    fileprivate func setAudioSessionCategory(_ audioSessionCategory: String) {
+        try? AVAudioSession.sharedInstance().setCategory(audioSessionCategory)
     }
 
     // MARK: ScoreManagerFocusDelegate
     func scoreManagerWillTakeFocus() {
-        if let skView = self.view as? SKView {
-            skView.isPaused = true
-        }
+        let skView = self.view as! SKView
+        skView.isPaused = true
     }
 
     func scoreManagerDidResignFocus() {
-        if let skView = self.view as? SKView {
-            skView.isPaused = false
-        }
+        let skView = self.view as! SKView
+        skView.isPaused = false
     }
 
     override var prefersStatusBarHidden: Bool {
