@@ -34,6 +34,7 @@
 		2CD8EDBE1CB7A4F6005B6492 /* TargetShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD8EDBD1CB7A4F6005B6492 /* TargetShape.swift */; };
 		2CEFA7181CF0972300F5F968 /* Confetti.sks in Resources */ = {isa = PBXBuildFile; fileRef = 2CEFA7161CF0972300F5F968 /* Confetti.sks */; };
 		2CEFA71B1CF099B800F5F968 /* confetti.png in Resources */ = {isa = PBXBuildFile; fileRef = 2CEFA71A1CF099B800F5F968 /* confetti.png */; };
+		CE3DE9C52808421C1A60D65B /* Pods_Reactions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D212A37CDB8939EBD0CA737 /* Pods_Reactions.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 		2C104D321C4D6BA10097E0AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2C104D341C4D6BA10097E0AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2C27EDCB1CE672DD00C12B5F /* MenuScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
+		2C5B5CF61F8927B300AA0B96 /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = SOURCE_ROOT; };
 		2C60A5401CB5A86800AE40B4 /* TargetColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetColor.swift; sourceTree = "<group>"; };
 		2C6EDA451CEA461600EC74EA /* fail.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = fail.mp3; path = Resources/Sounds/fail.mp3; sourceTree = "<group>"; };
 		2C6EDA461CEA461600EC74EA /* success.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = success.mp3; path = Resources/Sounds/success.mp3; sourceTree = "<group>"; };
@@ -66,6 +68,9 @@
 		2CD8EDBD1CB7A4F6005B6492 /* TargetShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetShape.swift; sourceTree = "<group>"; };
 		2CEFA7161CF0972300F5F968 /* Confetti.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Confetti.sks; sourceTree = "<group>"; };
 		2CEFA71A1CF099B800F5F968 /* confetti.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = confetti.png; sourceTree = "<group>"; };
+		33935C68083076BBA16BFCBF /* Pods-Reactions.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Reactions.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Reactions/Pods-Reactions.debug.xcconfig"; sourceTree = "<group>"; };
+		7D212A37CDB8939EBD0CA737 /* Pods_Reactions.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Reactions.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBE6EA00B150DD201E57EB2F /* Pods-Reactions.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Reactions.release.xcconfig"; path = "Pods/Target Support Files/Pods-Reactions/Pods-Reactions.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +79,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2C089E0F1CF0CF9600356C42 /* GameKit.framework in Frameworks */,
+				CE3DE9C52808421C1A60D65B /* Pods_Reactions.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +92,8 @@
 				2C089E0E1CF0CF9600356C42 /* GameKit.framework */,
 				2C104D231C4D6BA10097E0AD /* ReactionMatch */,
 				2C104D221C4D6BA00097E0AD /* Products */,
+				B68D5117A849F85AD418031D /* Pods */,
+				82BF13DD17F73A5DE87DCE66 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -113,6 +121,7 @@
 				2CD8EDBD1CB7A4F6005B6492 /* TargetShape.swift */,
 				2C7806D41CE731440072F8A8 /* Textures.swift */,
 				2C8C82901CE7C58E004D9630 /* GameType.swift */,
+				2C5B5CF61F8927B300AA0B96 /* Podfile */,
 			);
 			path = ReactionMatch;
 			sourceTree = "<group>";
@@ -163,6 +172,23 @@
 			name = Extentions;
 			sourceTree = "<group>";
 		};
+		82BF13DD17F73A5DE87DCE66 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7D212A37CDB8939EBD0CA737 /* Pods_Reactions.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B68D5117A849F85AD418031D /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				33935C68083076BBA16BFCBF /* Pods-Reactions.debug.xcconfig */,
+				BBE6EA00B150DD201E57EB2F /* Pods-Reactions.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -170,9 +196,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2C104D371C4D6BA10097E0AD /* Build configuration list for PBXNativeTarget "Reactions" */;
 			buildPhases = (
+				BD0BBEC872073236FB6D66E9 /* [CP] Check Pods Manifest.lock */,
 				2C104D1D1C4D6BA00097E0AD /* Sources */,
 				2C104D1E1C4D6BA00097E0AD /* Frameworks */,
 				2C104D1F1C4D6BA00097E0AD /* Resources */,
+				BB04AF222B3A78DC68764B1E /* [CP] Embed Pods Frameworks */,
+				3D429E440AE3F4807165E767 /* [CP] Copy Pods Resources */,
+				2C45B5E21F89283B007C4CFE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -197,6 +227,7 @@
 						CreatedOnToolsVersion = 7.2;
 						DevelopmentTeam = AKQ68EUQCY;
 						LastSwiftMigration = 0900;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.GameCenter = {
 								enabled = 1;
@@ -242,6 +273,70 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2C45B5E21F89283B007C4CFE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/SwiftLint/swiftlint\"";
+		};
+		3D429E440AE3F4807165E767 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Reactions/Pods-Reactions-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BB04AF222B3A78DC68764B1E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Reactions/Pods-Reactions-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BD0BBEC872073236FB6D66E9 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Reactions-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2C104D1D1C4D6BA00097E0AD /* Sources */ = {
@@ -391,30 +486,38 @@
 		};
 		2C104D381C4D6BA10097E0AD /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33935C68083076BBA16BFCBF /* Pods-Reactions.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ReactionMatch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.eddielee.ReactionMatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "c46e78dc-80fe-4c8d-8e32-bd9e3a0c9a3a";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
 		2C104D391C4D6BA10097E0AD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBE6EA00B150DD201E57EB2F /* Pods-Reactions.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ReactionMatch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.eddielee.ReactionMatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "c46e78dc-80fe-4c8d-8e32-bd9e3a0c9a3a";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;

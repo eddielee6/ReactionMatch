@@ -12,27 +12,27 @@ import AVFoundation
 import GameKit
 
 class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate, GKGameCenterControllerDelegate {
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         setAudioSessionCategory(AVAudioSessionCategoryAmbient)
-        
+
         ScoreManager.sharedInstance.focusDelegate = self
         ScoreManager.sharedInstance.authenticateLocalPlayer(self)
-        
+
         if let skView = self.view as? SKView {
             skView.ignoresSiblingOrder = true
             //skView.showsFPS = true
             //skView.showsNodeCount = true
-            
+
             let menuScene = MenuScene(size: view.bounds.size)
             menuScene.scaleMode = .resizeFill
-            
+
             skView.presentScene(menuScene)
         }
     }
-    
+
     func setAudioSessionCategory(_ audioSessionCategory: String) {
         do {
             try AVAudioSession.sharedInstance().setCategory(audioSessionCategory)
@@ -40,36 +40,34 @@ class MatchingGameViewController: UIViewController, ScoreManagerFocusDelegate, G
             print(error)
         }
     }
-    
-    
+
     // MARK: ScoreManagerFocusDelegate
     func scoreManagerWillTakeFocus() {
         if let skView = self.view as? SKView {
             skView.isPaused = true
         }
     }
-    
+
     func scoreManagerDidResignFocus() {
         if let skView = self.view as? SKView {
             skView.isPaused = false
         }
     }
-    
-    
-    override var prefersStatusBarHidden : Bool {
+
+    override var prefersStatusBarHidden: Bool {
         return true
     }
-    
+
     func gameCenterViewControllerDidFinish(_ gcViewController: GKGameCenterViewController) {
         self.dismiss(animated: true, completion: nil)
     }
-    
+
     func showLeaderboard() {
         if ScoreManager.sharedInstance.isAuthenticated {
             let gcViewController: GKGameCenterViewController = GKGameCenterViewController()
             gcViewController.gameCenterDelegate = self
             gcViewController.viewState = GKGameCenterViewControllerState.leaderboards
-            gcViewController.leaderboardIdentifier = GameType.v2.leaderboardIdentifier
+            gcViewController.leaderboardIdentifier = GameType.v2Mode.leaderboardIdentifier
             self.present(gcViewController, animated: true, completion: nil)
         } else {
             let storyboard = UIStoryboard(name: "Scores", bundle: nil)
