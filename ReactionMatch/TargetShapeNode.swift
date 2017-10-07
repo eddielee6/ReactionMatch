@@ -12,36 +12,34 @@ import SpriteKit
 class TargetShapeNode: SKShapeNode {
     let targetColor: TargetColor
     let targetShape: TargetShape
-    
-    var targetSize:CGSize = CGSize(width: 40, height: 40) {
+
+    var targetSize: CGSize = CGSize(width: 40, height: 40) {
         didSet {
             path = targetShape.getShapeNode(targetSize).path
         }
     }
-    
+
     var shapeName: String {
-        get {
-            return "\(targetColor.name) \(targetShape.name)"
-        }
+        return "\(targetColor.name) \(targetShape.name)"
     }
-    
+
     init (targetColor: TargetColor, targetShape: TargetShape) {
         self.targetColor = targetColor
         self.targetShape = targetShape
         super.init()
-        
+
         setupPointsGainedLabel()
-        
+
         self.path = self.targetShape.getShapeNode(targetSize).path
         self.fillColor = self.targetColor.value
         self.strokeColor = SKColor.white
         self.lineWidth = 2
     }
-    
+
     convenience init (targetShape: TargetShape) {
         self.init(targetColor: TargetColor.random(), targetShape: TargetShape.square)
     }
-    
+
     fileprivate func setupPointsGainedLabel() {
         let pointsGainedLabel = SKLabelNode(fontNamed: "SanFranciscoDisplay-Bold")
         pointsGainedLabel.verticalAlignmentMode = .center
@@ -53,11 +51,12 @@ class TargetShapeNode: SKShapeNode {
         pointsGainedLabel.name = "points-gained-label"
         addChild(pointsGainedLabel)
     }
-    
+
     func setPointsGained(_ points: Int64) {
+        // swiftlint:disable:next force_cast
         let pointsGainedLabel = childNode(withName: "points-gained-label") as! SKLabelNode
         pointsGainedLabel.text = String(points)
-        
+
         let action = SKAction.group([
             SKAction.scale(to: 1, duration: 0.5),
             SKAction.sequence([
@@ -66,10 +65,10 @@ class TargetShapeNode: SKShapeNode {
             ])
         ])
         action.timingMode = .easeIn
-        
+
         pointsGainedLabel.run(action)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -79,7 +78,7 @@ extension TargetShapeNode {
     class func randomShapeNode() -> TargetShapeNode {
         let targetColor = TargetColor.random()
         let targetShape = TargetShape.random()
-        
+
         return TargetShapeNode(targetColor: targetColor, targetShape: targetShape)
     }
 }

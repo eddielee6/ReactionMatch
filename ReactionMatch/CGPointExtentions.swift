@@ -15,7 +15,7 @@ func + (left: CGPoint, right: CGPoint) -> CGPoint {
 }
 
 func += (left: inout CGPoint, right: CGPoint) {
-    left = left + right
+    left += right
 }
 
 // MARK: CGPoint Subtraction
@@ -24,7 +24,7 @@ func - (left: CGPoint, right: CGPoint) -> CGPoint {
 }
 
 func -= (left: inout CGPoint, right: CGPoint) {
-    left = left - right
+    left -= right
 }
 
 // MARK: CGPoint Multiplication
@@ -33,7 +33,7 @@ func * (left: CGPoint, right: CGPoint) -> CGPoint {
 }
 
 func *= (left: inout CGPoint, right: CGPoint) {
-    left = left * right
+    left *= right
 }
 
 // MARK: CGPoint Scalar Multiplication
@@ -42,7 +42,7 @@ func * (point: CGPoint, scalar: CGFloat) -> CGPoint {
 }
 
 func *= (point: inout CGPoint, scalar: CGFloat) {
-    point = point * scalar
+    point *= scalar
 }
 
 // MARK: CGPoint Division
@@ -51,7 +51,7 @@ func / (left: CGPoint, right: CGPoint) -> CGPoint {
 }
 
 func /= (left: inout CGPoint, right: CGPoint) {
-    left = left / right
+    left /= right
 }
 
 // MARK: CGPoint Scalar Division
@@ -60,19 +60,18 @@ func / (point: CGPoint, scalar: CGFloat) -> CGPoint {
 }
 
 func /= (point: inout CGPoint, scalar: CGFloat) {
-    point = point / scalar
+    point /= scalar
 }
-
 
 // MARK: CGPoint Extentions
 
 #if !(arch(x86_64) || arch(arm64))
-    func atan2(y: CGFloat, x: CGFloat) -> CGFloat {
-        return CGFloat(atan2f(Float(y), Float(x)))
+    func atan2(yPos: CGFloat, xPos: CGFloat) -> CGFloat {
+        return CGFloat(atan2f(Float(yPos), Float(xPos)))
     }
-    
-    func sqrt(a: CGFloat) -> CGFloat {
-        return CGFloat(sqrtf(Float(a)))
+
+    func sqrt(of value: CGFloat) -> CGFloat {
+        return CGFloat(sqrtf(Float(value)))
     }
 #endif
 
@@ -80,11 +79,11 @@ extension CGPoint {
     func length() -> CGFloat {
         return sqrt((x * x) + (y * y))
     }
-    
+
     func normalized() -> CGPoint {
         return self / length()
     }
-    
+
     var angle: CGFloat {
         return atan2(y, x)
     }
