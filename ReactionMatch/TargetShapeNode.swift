@@ -34,40 +34,40 @@ class TargetShapeNode: SKShapeNode {
         
         self.path = self.targetShape.getShapeNode(targetSize).path
         self.fillColor = self.targetColor.value
-        self.strokeColor = SKColor.whiteColor()
+        self.strokeColor = SKColor.white
         self.lineWidth = 2
     }
     
     convenience init (targetShape: TargetShape) {
-        self.init(targetColor: TargetColor.random(), targetShape: TargetShape.Square)
+        self.init(targetColor: TargetColor.random(), targetShape: TargetShape.square)
     }
     
-    private func setupPointsGainedLabel() {
+    fileprivate func setupPointsGainedLabel() {
         let pointsGainedLabel = SKLabelNode(fontNamed: "SanFranciscoDisplay-Bold")
-        pointsGainedLabel.verticalAlignmentMode = .Center
-        pointsGainedLabel.horizontalAlignmentMode = .Center
+        pointsGainedLabel.verticalAlignmentMode = .center
+        pointsGainedLabel.horizontalAlignmentMode = .center
         pointsGainedLabel.fontSize = 550
         pointsGainedLabel.setScale(0.1)
         pointsGainedLabel.alpha = 0.75
-        pointsGainedLabel.fontColor = SKColor.whiteColor()
+        pointsGainedLabel.fontColor = SKColor.white
         pointsGainedLabel.name = "points-gained-label"
         addChild(pointsGainedLabel)
     }
     
-    func setPointsGained(points: Int) {
-        let pointsGainedLabel = childNodeWithName("points-gained-label") as! SKLabelNode
+    func setPointsGained(_ points: Int64) {
+        let pointsGainedLabel = childNode(withName: "points-gained-label") as! SKLabelNode
         pointsGainedLabel.text = String(points)
         
         let action = SKAction.group([
-            SKAction.scaleTo(1, duration: 0.5),
+            SKAction.scale(to: 1, duration: 0.5),
             SKAction.sequence([
-                SKAction.waitForDuration(0.2),
-                SKAction.fadeOutWithDuration(0.3)
+                SKAction.wait(forDuration: 0.2),
+                SKAction.fadeOut(withDuration: 0.3)
             ])
         ])
-        action.timingMode = .EaseIn
+        action.timingMode = .easeIn
         
-        pointsGainedLabel.runAction(action)
+        pointsGainedLabel.run(action)
     }
     
     required init?(coder aDecoder: NSCoder) {

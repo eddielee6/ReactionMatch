@@ -17,17 +17,17 @@ class ScoresViewController: UIViewController {
     
     func addBackgroundBlur() {
         if !UIAccessibilityIsReduceTransparencyEnabled() {
-            view.backgroundColor = UIColor.clearColor()
+            view.backgroundColor = UIColor.clear
             
-            let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .ExtraLight))
+            let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
             blurEffectView.frame = self.view.bounds
-            blurEffectView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             
-            view.insertSubview(blurEffectView, atIndex: 0)
+            view.insertSubview(blurEffectView, at: 0)
         }
     }
     
-    @IBAction func didTouchDone(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func didTouchDone(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
 }

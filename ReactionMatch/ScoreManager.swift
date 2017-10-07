@@ -14,7 +14,7 @@ public protocol ScoreManagerFocusDelegate {
     func scoreManagerDidResignFocus()
 }
 
-public class ScoreManager {
+open class ScoreManager {
     
     struct FriendsScore {
         var highscore: Int64
@@ -25,15 +25,15 @@ public class ScoreManager {
     
     var focusDelegate: ScoreManagerFocusDelegate?
     
-    private var gameCentreEnabled: Bool = false
+    fileprivate var gameCentreEnabled: Bool = false
     
     var isAuthenticated: Bool {
-        return GKLocalPlayer.localPlayer().authenticated
+        return GKLocalPlayer.localPlayer().isAuthenticated
     }
     
     
     // MARK: Authentication
-    func authenticateLocalPlayer(viewController: UIViewController) {
+    func authenticateLocalPlayer(_ viewController: UIViewController) {
         print("authenticateLocalPlayer")
         
         var scoreManagerDidTakeFocus: Bool = false
@@ -48,7 +48,7 @@ public class ScoreManager {
                 
                 print("will present gameCentreLoginViewController")
                 
-                viewController.presentViewController(gameCentreLoginViewController, animated: true, completion: nil)
+                viewController.present(gameCentreLoginViewController, animated: true, completion: nil)
                 
             } else {
                 if scoreManagerDidTakeFocus {
@@ -58,7 +58,7 @@ public class ScoreManager {
                 }
                 
                 guard error == nil else {
-                    print(error)
+                    print(error!)
                     return
                 }
                 
@@ -74,20 +74,20 @@ public class ScoreManager {
         }
     }
     
-    private func updateLocalHighScores() {
-        for gameType in [GameType.Classic, GameType.V2] {
+    fileprivate func updateLocalHighScores() {
+        for gameType in [GameType.classic, GameType.v2] {
             updateLocalHighScoreForGameType(gameType)
         }
     }
     
-    private func updateLocalHighScoreForGameType(gameType: GameType) {
+    fileprivate func updateLocalHighScoreForGameType(_ gameType: GameType) {
         print("will updateLocalHighScoreForGameType: \(gameType.name)")
         
         let leaderboardRequest = GKLeaderboard(players: [GKLocalPlayer.localPlayer()])
         leaderboardRequest.identifier = gameType.leaderboardIdentifier
-        leaderboardRequest.loadScoresWithCompletionHandler { (scores, error) in
+        leaderboardRequest.loadScores { (scores, error) in
             guard error == nil else {
-                print(error)
+                print(error!)
                 return
             }
             
@@ -95,7 +95,7 @@ public class ScoreManager {
             let localHighScore = self.getLocalHighScoreForGameType(gameType)
             
             print("updating high score for game type \(gameType.name)")
-            print("gameCentreHighScore: \(gameCentreHighScore)")
+            print("gameCentreHighScore: \(gameCentreHighScore ?? 0)")
             print("localHighScore: \(localHighScore)")
             
             if gameCentreHighScore != localHighScore {
@@ -105,7 +105,7 @@ public class ScoreManager {
     }
     
     // MARK: Leaderboards
-    func getFriendsHighScoresForGameType(gameType: GameType, withCompletionHandler completionHandler: ([FriendsScore]) -> ()) {
+    func getFriendsHighScoresForGameType(_ gameType: GameType, withCompletionHandler completionHandler: @escaping ([FriendsScore]) -> ()) {
         guard isAuthenticated else {
             print("localPlayer.authenticated: \(self.isAuthenticated)")
             return
@@ -113,17 +113,17 @@ public class ScoreManager {
         
         let leaderboardRequest = GKLeaderboard()
         leaderboardRequest.identifier = gameType.leaderboardIdentifier
-        leaderboardRequest.playerScope = .FriendsOnly
-        leaderboardRequest.timeScope = .AllTime
-        leaderboardRequest.loadScoresWithCompletionHandler({ (scores, error) in
+        leaderboardRequest.playerScope = .friendsOnly
+        leaderboardRequest.timeScope = .allTime
+        leaderboardRequest.loadScores(completionHandler: { (scores, error) in
             guard error == nil else {
-                print(error)
+                print(error!)
                 return
             }
             
             let scores: [FriendsScore]? = scores!.map({ score in
                 let highScore: Int64 = score.value
-                let name: String = score.player.displayName ?? score.player.alias ?? "Unknown"
+                let name: String = score.player!.displayName ?? score.player!.alias ?? "Unknown"
                 return FriendsScore(highscore: highScore, name: name)
             })
             
@@ -133,7 +133,7 @@ public class ScoreManager {
     
     
     // MARK: Score Recording
-    func recordNewScore(newScore: Int64, forGameType gameType: GameType) {
+    func recordNewScore(_ newScore: Int64, forGameType gameType: GameType) {
         updateLocalHighScore(newScore, forGameType: gameType)
         
         if gameCentreEnabled {
@@ -141,17 +141,17 @@ public class ScoreManager {
         }
     }
     
-    private func updateLocalHighScore(newScore: Int64, forGameType gameType: GameType) {
+    fileprivate func updateLocalHighScore(_ newScore: Int64, forGameType gameType: GameType) {
         if newScore > getLocalHighScoreForGameType(gameType) {
             setLocalHighScore(newScore, forGameType: gameType)
         }
     }
     
-    private func submitScoreToGameCentre(score: Int64, forGameType gameType: GameType) {
+    fileprivate func submitScoreToGameCentre(_ score: Int64, forGameType gameType: GameType) {
         let scoreToSubmit = GKScore(leaderboardIdentifier: gameType.leaderboardIdentifier)
         scoreToSubmit.value = Int64(score)
         
-        GKScore.reportScores([scoreToSubmit], withCompletionHandler: { error in
+        GKScore.report([scoreToSubmit], withCompletionHandler: { error in
             if let error = error {
                 print(error.localizedDescription)
             }
@@ -160,24 +160,24 @@ public class ScoreManager {
     
     
     // MARK: Get High Score
-    func getHighScoreForGameType(gameType: GameType) -> Int64 {
+    func getHighScoreForGameType(_ gameType: GameType) -> Int64 {
         return getLocalHighScoreForGameType(gameType)
     }
     
     
     // MARK: Local Cache
-    private func setLocalHighScore(score: Int64, forGameType gameType: GameType) {
-        let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
+    fileprivate func setLocalHighScore(_ score: Int64, forGameType gameType: GameType) {
+        let defaults: UserDefaults = UserDefaults.standard
         
-        defaults.setObject(NSNumber(longLong: score), forKey: "highScore-\(gameType.name)")
+        defaults.set(NSNumber(value: score as Int64), forKey: "highScore-\(gameType.name)")
         defaults.synchronize()
     }
     
-    private func getLocalHighScoreForGameType(gameType: GameType) -> Int64 {
-        let defaults: NSUserDefaults = NSUserDefaults.standardUserDefaults()
+    fileprivate func getLocalHighScoreForGameType(_ gameType: GameType) -> Int64 {
+        let defaults: UserDefaults = UserDefaults.standard
         
-        if let highScore = defaults.objectForKey("highScore-\(gameType.name)") as? NSNumber {
-            return highScore.longLongValue
+        if let highScore = defaults.object(forKey: "highScore-\(gameType.name)") as? NSNumber {
+            return highScore.int64Value
         }
         
         return 0

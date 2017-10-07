@@ -10,7 +10,7 @@ import SpriteKit
 
 class TimeIndicatorNode: SKSpriteNode {
     
-    var indicatorStrokeColor = SKColor.grayColor()
+    var indicatorStrokeColor = SKColor.gray
     var indicatorStrokeWidth: CGFloat = 4
     
     var percent: Double = 0 {
@@ -25,32 +25,32 @@ class TimeIndicatorNode: SKSpriteNode {
         }
     }
     
-    private func getTimeIndicatorTextureOfSize() -> SKTexture {
+    fileprivate func getTimeIndicatorTextureOfSize() -> SKTexture {
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         let context = UIGraphicsGetCurrentContext()
         
-        CGContextSetStrokeColorWithColor(context, indicatorStrokeColor.CGColor)
-        CGContextSetLineWidth(context, indicatorStrokeWidth)
-        CGContextAddPath(context, getTimeIndicatorPath(CGFloat(percent)))
-        CGContextStrokePath(context)
+        context?.setStrokeColor(indicatorStrokeColor.cgColor)
+        context?.setLineWidth(indicatorStrokeWidth)
+        context?.addPath(getTimeIndicatorPath(CGFloat(percent)))
+        context?.strokePath()
         
         let spriteImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        return SKTexture(image: spriteImage)
+        return SKTexture(image: spriteImage!)
     }
     
-    private func getTimeIndicatorPath(strokeArcPercent: CGFloat) -> CGPath {
+    fileprivate func getTimeIndicatorPath(_ strokeArcPercent: CGFloat) -> CGPath {
         let startAngle: CGFloat = 270
         let endAngle: CGFloat = startAngle + (360/100 * strokeArcPercent)
         
         let indicatorPath = UIBezierPath(
             arcCenter: CGPoint(x: size.width/2, y: size.height/2),
             radius: (size.width * 0.9) / 2,
-            startAngle: startAngle * CGFloat(M_PI) / 180,
-            endAngle: endAngle * CGFloat(M_PI) / 180,
+            startAngle: startAngle * CGFloat(Double.pi) / 180,
+            endAngle: endAngle * CGFloat(Double.pi) / 180,
             clockwise: true)
         
-        return indicatorPath.CGPath
+        return indicatorPath.cgPath
     }
 }
