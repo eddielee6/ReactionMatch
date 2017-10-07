@@ -179,7 +179,6 @@ class MatchingGameScene: SKScene {
     fileprivate var incorrectTargets: [TargetShapeNode] {
         var incorrectTargetNodes = [TargetShapeNode]()
         gameAreaNode.enumerateChildNodes(withName: incorrectTargetNodeName) { node, _ in
-            // swiftlint:disable:next force_cast
             incorrectTargetNodes.append(node as! TargetShapeNode)
         }
         return incorrectTargetNodes

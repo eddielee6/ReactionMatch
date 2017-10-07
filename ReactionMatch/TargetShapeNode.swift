@@ -53,7 +53,6 @@ class TargetShapeNode: SKShapeNode {
     }
 
     func setPointsGained(_ points: Int64) {
-        // swiftlint:disable:next force_cast
         let pointsGainedLabel = childNode(withName: "points-gained-label") as! SKLabelNode
         pointsGainedLabel.text = String(points)
 
